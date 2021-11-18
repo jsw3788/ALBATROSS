@@ -1,4 +1,5 @@
 from django.http.response import JsonResponse
+from requests.api import get
 from rest_framework.decorators import api_view, authentication_classes
 from rest_framework import status
 from rest_framework.response import Response
@@ -6,7 +7,7 @@ import requests
 from django.shortcuts import get_list_or_404, get_object_or_404
 from decouple import config
 from .serializers import CommentSerializer, MovieListSerializer, ReviewSerializer
-from .models import Genre, Movie, Actor, Director, Recommend, Review, Comment
+from .models import Genre, Movie, Actor, Director, Recommend, Review, Comment, Record
 from django.contrib.auth import get_user_model
 from django.db.models import Max, F
 from datetime import datetime
@@ -205,6 +206,113 @@ def get_credits(request):
 
 
 
+
+# 영화의 평점을 매기면 scroe를 작성하고, wanted를 false로 뒤집기
+@api_view(['POST', 'PUT', 'DELETE'])
+def update_score(request, movie_pk):
+    # 평점을 매기면, 사용자의 Recommend 테이블과 Record 테이블을 갱신해야함
+    # POST 요청은 사용자가 평점을 매긴적이 없는 경우
+    # PUT 요청은 사용자가 매긴 평점을 수정할 경우
+    # DELETE 요청은 사용자가 평점을 0으로 바꿀 경우
+
+    # 선택한 영화
+    movie = get_object_or_404(Movie, pk=movie_pk)
+    after_score = request.data.get('score')
+    if request.method == "PUT":
+        my_movie = Record.objects.get(user=request.user.pk, movie=movie.pk)
+        before_score = my_movie.score
+        my_movie.score = after_score
+        my_movie.save()
+        # 이거는 내가 담아놓은 모든 장르 가져오는 필터
+        my_recommends = Recommend.objects.filter(user=request.user.pk).values('genre')
+        movie_genres = movie.genres.all()
+        for movie_genre in movie_genres:
+            for recommend in my_recommends:
+                if movie_genre.pk == recommend.genre: # 이거 값들은 나중에 찍어보면서 확인
+                    recommend.score += (after_score - before_score)
+                    recommend.save()
+
+    elif request.mehtod == "POST":
+        # 보고싶어요가 체크되어 있는 상태라면
+        if Record.objects.filter(user=request.user.pk, movie=movie_pk).exists():
+            my_movie = Record.objects.get(user=request.user.pk, movie=movie.pk)
+            my_movie.wanted = False
+            my_movie.score = after_score
+            my_movie.save()
+            my_recommends = Recommend.objects.filter(user=request.user.pk).values('genre')
+            movie_genres = movie.genres.all()
+            for movie_genre in movie_genres:
+                for recommend in my_recommends:
+                    if movie_genre.pk == recommend.genre: 
+                        recommend.score += after_score
+                        recommend.count += 1
+                        recommend.save()
+        else: # 보고싶어요 체크 안된 상태라면
+            my_movie = Record.objects.create(
+                title=movie.title,
+                poster_path=movie.poster_path,
+                score=after_score,
+                wanted=False,
+            )
+            """
+            아래가 맞는 표현인지 Vue 후에 확인 필요
+            """
+            my_movie.user.add(request.user)
+            my_movie.movie.add(movie)
+            my_recommends = Recommend.objects.filter(user=request.user.pk).values('genre')
+            movie_genres = movie.genres.all()
+            for movie_genre in movie_genres:
+                for recommend in my_recommends:
+                    if movie_genre.pk == recommend.genre: 
+                        recommend.score += after_score
+                        recommend.count += 1
+                        recommend.save()
+
+    elif request.mehtod == "DELETE":  # 0점을 줬어! 삭제할거야!
+        my_movie = Record.objects.get(user=request.user.pk, movie=movie.pk)
+        before_score = my_movie.score
+        my_recommends = Recommend.objects.filter(user=request.user.pk).values('genre')
+        movie_genres = movie.genres.all()
+        for movie_genre in movie_genres:
+            for recommend in my_recommends:
+                if movie_genre.pk == recommend.genre: 
+                    recommend.score -= before_score
+                    recommend.count -= 1
+                    recommend.save()
+        my_movie.delete()
+
+
+
+# 영화를 보고싶어하면 wanted를 true로 Record에 넣기
+@api_view(['POST'])
+def update_wanted(request, movie_pk):
+    # 선택한 영화
+    movie = Movie.objects.get(pk=movie_pk)
+    # 그 영화가 Record에 이미 담겨있을까? 그럴수도 있고~ 아닐수도 있고
+    if not Record.objects.filter(user=request.user.pk, movie=movie_pk).exists():
+        my_movie = Record.objects.create(
+            title=movie.title,
+            poster_path=movie.poster_path,
+            wanted=True,
+        )
+        """
+        아래가 맞는 표현인지 Vue 후에 확인 필요
+        """
+        my_movie.user.add(request.user)
+        my_movie.movie.add(movie)
+        wanted = True
+    else:
+        my_movie = Record.objects.get(user=request.user.pk, movie=movie_pk)
+        if my_movie.wanted:  #보고싶어요를 취소하고있음
+            my_movie.delete()
+            wanted = False
+        else:
+            return Response({ 'error': '이미 본 영화입니다.' }, status=status.HTTP_400_BAD_REQUEST)
+    context = {
+        'wanted': wanted,
+    }
+    return JsonResponse(context)
+
 # 리뷰 전체 조회, 생성
 @api_view(['GET','POST'])
 def review_list(request, movie_pk):
@@ -324,3 +432,4 @@ def comment_detail(request, comment_pk):
             return Response({'delete': f'{comment_pk}번 댓글이 삭제되었습니다.'})
     
     return Response({'Unauthorized': '권한이 없습니다.'}, status=status.HTTP_403_FORBIDDEN)
+

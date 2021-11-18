@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Comment, Movie, Review
+from .models import Movie, Record, Comment, Movie, Review
 
 
 class MovieListSerializer(serializers.ModelSerializer):
@@ -38,6 +38,14 @@ class MovieSerializer(serializers.ModelSerializer):
             'backdrop_path',
         )
 
+
+class RecordSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Record
+        fields = ('id', 'user', 'movie', 'title', 'poster_path', 'score', 'wanted')
+
+
 class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -53,6 +61,7 @@ class ReviewSerializer(serializers.ModelSerializer):
             'updated_at',
         )
 
+        
 class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
