@@ -7,6 +7,7 @@ from imagekit.processors import ResizeToFill
 class User(AbstractUser):
     profile_image = ProcessedImageField(
         blank=True,
+        default='default.png',
         upload_to='profile_images/%Y/%m/%d/',
         processors=[ResizeToFill(200,200)],
         format='JPEG',
