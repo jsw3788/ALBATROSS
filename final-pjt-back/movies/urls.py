@@ -7,6 +7,9 @@ urlpatterns = [
     path('movies/release_date/', views.read_movies_by_release),
     path('movies/recommend/', views.read_movies_by_recommend),
 
+    path('movies/score/update/<int:movie_pk>/', views.update_score),
+    path('movies/wanted/update/<int:movie_pk>/', views.update_wanted),
+
     path('database/genres/', views.get_genre),
     path('database/movies/', views.get_movies),
     path('database/credits/', views.get_credits)
