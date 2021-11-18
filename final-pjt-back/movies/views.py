@@ -4,9 +4,34 @@ from rest_framework.response import Response
 import requests
 from django.shortcuts import get_list_or_404
 from decouple import config
+from .serializers import MovieListSerializer
 from .models import Genre, Movie, Actor, Director
+from datetime import datetime
 
 # Create your views here.
+# 인기순
+@api_view(['GET'])
+def read_movies_by_popularity(request):
+    movies = Movie.objects.order_by('-popularity')
+    return Response(MovieListSerializer(movies, many=True).data)
+
+# 평점순
+@api_view(['GET'])
+def read_movies_by_score(request):
+    # F객체?
+    pass
+
+# 개봉순
+@api_view(['GET'])
+def read_movies_by_release(request):
+    now = datetime.today().strftime("%Y-%m-%d")
+    # release_date 데이터의 정확성에 문제가 있음
+    # movies = Movie.objects.order_by('-release_date').filter(release_status="Released")
+    movies = Movie.objects.filter(release_date__lte=now).order_by('-release_date')
+    return Response(MovieListSerializer(movies, many=True).data)
+
+
+
 
 
 @api_view(['POST'])
@@ -36,9 +61,9 @@ def get_movies(request):
             if Movie.objects.filter(tmdb_id=tmdb_movie_id).exists():
                 movie = Movie.objects.get(tmdb_id=tmdb_movie_id)
                 movie.popularity = tmdb_data.get('popularity')
-                movie.tmdb_vote_sum = tmdb_data.get(
-                    'vote_average') * tmdb_data.get('vote_count')
+                movie.tmdb_vote_sum = tmdb_data.get('vote_average') * tmdb_data.get('vote_count')
                 movie.tmdb_vote_cnt = tmdb_data.get('vote_count')
+                movie.release_status = tmdb_data.get('release_status')
                 movie.save()
             else:
                 detail_URL = f'https://api.themoviedb.org/3/movie/{tmdb_movie_id}?api_key={API_KEY}&language=ko-KR'
