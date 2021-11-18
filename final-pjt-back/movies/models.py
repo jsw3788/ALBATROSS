@@ -60,14 +60,25 @@ class Actor(models.Model):
 # 리뷰
 class Review(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             on_delete=models.CASCADE, related_name="my_reviews")
+                             on_delete=models.CASCADE, related_name="reviews")
     movie = models.ForeignKey(
-        Movie, on_delete=models.CASCADE, related_name="movie_reviews")
+        Movie, on_delete=models.CASCADE, related_name="reviews")
     like_users = models.ManyToManyField(
         settings.AUTH_USER_MODEL, related_name='like_reviews')
     dislike_users = models.ManyToManyField(
         settings.AUTH_USER_MODEL, related_name='dislike_reviews')
     content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_spoiled = models.BooleanField(default=False)
+
+
+
+class Comment(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE, related_name="comments")
+    review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name="comments")
+    content = models.CharField(max_length=500)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_spoiled = models.BooleanField(default=False)
