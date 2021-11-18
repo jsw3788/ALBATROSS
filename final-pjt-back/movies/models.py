@@ -27,7 +27,6 @@ class Movie(models.Model):
     overview = models.TextField()
     poster_path = models.TextField()
     backdrop_path = models.TextField()
-    release_status = models.TextField()
 
     def __str__(self) -> str:
         return self.title
@@ -105,4 +104,5 @@ class Recommend(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='genre_recommend')
     genre = models.ForeignKey(
         Genre, on_delete=models.CASCADE, related_name='user_recommend')
-    score = models.FloatField()
+    score = models.FloatField(default=0)
+    count = models.IntegerField(default=0)
