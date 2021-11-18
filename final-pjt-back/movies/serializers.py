@@ -16,7 +16,6 @@ class MovieListSerializer(serializers.ModelSerializer):
             'updated_vote_sum',
             'updated_vote_cnt',
             'poster_path',
-            'release_status',
         )
 
 
@@ -37,5 +36,4 @@ class MovieSerializer(serializers.ModelSerializer):
             'overview',
             'poster_path',
             'backdrop_path',
-            'release_status',
         )
