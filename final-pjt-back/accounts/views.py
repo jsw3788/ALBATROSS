@@ -1,3 +1,5 @@
+from django.shortcuts import get_object_or_404
+from django.http.response import JsonResponse
 from rest_framework import serializers, status
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -30,14 +32,16 @@ def signup(request):
         user.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+
 @api_view(['GET', 'PUT', 'DELETE'])
 # @authentication_classes([JSONWebTokenAuthentication])
 @permission_classes([IsAuthenticated])
-def profile(request):
+def profile(request, username):
 
     # 회원 정보 조회
     def profile_detail():
-        serializer = UserProfileSerializer(request.data)
+        user=get_object_or_404(get_user_model(), username=username)
+        serializer = UserProfileSerializer(user)
         return Response(serializer.data)
 
     # 회원 정보 수정 (프로필 이미지)
@@ -63,3 +67,24 @@ def profile(request):
         return update_profile()
     elif request.method == 'DELETE':
         return delete_profile()
+
+
+@api_view(['POST'])
+def follow(request, username):
+    me = request.user
+    you = get_object_or_404(get_user_model(), username=username)
+
+    if me!=you:
+        if me.followings.filter(pk=you.pk).exists():
+            following = False
+            me.followings.remove(you)
+        else:
+            following = True
+            me.followings.add(you)
+
+    context = {
+        'following': following,
+        'followingCnt' : you.followings.count(),
+        'followerCnt' : you.followers.count()
+    }
+    return JsonResponse(context)
