@@ -1,13 +1,13 @@
 from django.http.response import JsonResponse
 from requests.api import get
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, authentication_classes
 from rest_framework import status
 from rest_framework.response import Response
 import requests
 from django.shortcuts import get_list_or_404, get_object_or_404
 from decouple import config
-from .serializers import MovieListSerializer
-from .models import Genre, Movie, Actor, Director, Recommend, Record
+from .serializers import CommentSerializer, MovieListSerializer, ReviewSerializer
+from .models import Genre, Movie, Actor, Director, Recommend, Review, Comment, Record
 from django.contrib.auth import get_user_model
 from django.db.models import Max, F
 from datetime import datetime
@@ -104,7 +104,7 @@ def read_movies_by_recommend(request):
     """
 
 
-
+# db 장르 데이터 불러오기
 @api_view(['POST'])
 def get_genre(request):
     API_KEY = config('API_KEY')
@@ -119,7 +119,7 @@ def get_genre(request):
         )
     return Response({'database': '성공'}, status=status.HTTP_201_CREATED)
 
-
+# db 영화 데이터 불러오기
 @api_view(['POST'])
 def get_movies(request):
     API_KEY = config('API_KEY')
@@ -160,7 +160,7 @@ def get_movies(request):
                     movie.genres.add(genre)
     return Response({'database': '성공'}, status=status.HTTP_201_CREATED)
 
-
+# db 영화인 데이터 불러오기
 @api_view(['POST'])
 def get_credits(request):
     API_KEY = config('API_KEY')
@@ -202,6 +202,7 @@ def get_credits(request):
             )
             new_director.movies.add(movie)
     return Response({'database': '성공!'}, status=status.HTTP_201_CREATED)
+
 
 
 
@@ -311,3 +312,124 @@ def update_wanted(request, movie_pk):
         'wanted': wanted,
     }
     return JsonResponse(context)
+
+# 리뷰 전체 조회, 생성
+@api_view(['GET','POST'])
+def review_list(request, movie_pk):
+    if request.method =='GET':
+        reviews = Review.objects.filter(movie__pk=movie_pk)
+        serializer = ReviewSerializer(reviews, many=True)
+        return Response(serializer.data)
+
+    elif request.method == 'POST':
+        movie = get_object_or_404(Movie, pk=movie_pk)
+        serializer = ReviewSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(user=request.user, movie=movie)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+# 리뷰 상세 조회, 삭제, 수정
+@api_view(['GET', 'PUT', 'DELETE'])
+def review_detail(request, review_pk):
+    review = get_object_or_404(Review, pk=review_pk)
+    if request.method == 'GET':
+        serializer = ReviewSerializer(review)
+        return Response(serializer.data)
+
+    elif request.user == review.user:
+        # 리뷰 수정
+        if request.method == 'PUT':
+            serializer = ReviewSerializer(review, data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response(serializer.data)
+
+        # 리뷰 제거
+        elif request.method == 'DELETE':
+            review.delete()
+            return Response({'delete': f'{review_pk}번 리뷰가 삭제되었습니다.'}, status=status.HTTP_204_NO_CONTENT)
+    
+    return Response({'Unauthorized': '권한이 없습니다.'}, status=status.HTTP_403_FORBIDDEN)
+
+
+
+# 리뷰 좋아요
+@api_view(['POST'])
+def likes(request, review_pk):
+    review = get_object_or_404(Review, pk=review_pk)
+    # 싫어요를 눌렀으면 좋아요를 누를 수 없음
+    if review.dislike_users.filter(pk=request.user.pk).exists():
+        return Response({'error': '이미 싫어요를 눌렀습니다.'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if review.like_users.filter(pk=request.user.pk).exists():
+        liked=False
+        review.like_users.remove(request.user)
+    else:
+        liked =True
+        review.like_users.add(request.user)
+    
+    context = {
+        'liked': liked,
+        'likeCnt' : review.like_users.count()
+    }
+    return JsonResponse(context)
+
+
+
+# 리뷰 싫어요
+@api_view(['POST'])
+def dislikes(request, review_pk):
+    review = get_object_or_404(Review, pk=review_pk)
+    # 좋아요를 눌렀으면 싫어요를 누를 수 없음
+    if review.dislike_users.filter(pk=request.user.pk).exists():
+        return Response({'error': '이미 좋아요를 눌렀습니다.'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if review.dislike_users.filter(pk=request.user.pk).exists():
+        disliked=False
+        review.dislike_users.remove(request.user)
+    else:
+        disliked =True
+        review.dislike_users.add(request.user)
+    
+    context = {
+        'disliked': disliked,
+        'dislikeCnt' : review.dislike_users.count()
+    }
+    return JsonResponse(context)
+
+
+# 전체 댓글 조회, 생성
+@api_view(['GET', 'POST'])
+def comment_list(request, review_pk):
+    review = get_object_or_404(Review, pk=review_pk)
+    if request.method =='GET':
+        comments = Comment.objects.filter(review__pk=review_pk)
+        serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data)
+    elif request.method == 'POST':
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(user=request.user, review=review)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+# 댓글 삭제, 수정
+@api_view(['PUT', 'DELETE'])
+def comment_detail(request, comment_pk):
+    comment = get_object_or_404(Comment, pk=comment_pk)
+    if request.user == comment.user:
+        
+        if request.method =='PUT':
+            serializer = CommentSerializer(comment, data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response(serializer.data)
+        
+        # 댓글 제거
+        elif request.method == 'DELETE':
+            comment.delete()
+            return Response({'delete': f'{comment_pk}번 댓글이 삭제되었습니다.'})
+    
+    return Response({'Unauthorized': '권한이 없습니다.'}, status=status.HTTP_403_FORBIDDEN)
+
