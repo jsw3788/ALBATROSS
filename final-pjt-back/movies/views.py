@@ -6,7 +6,7 @@ from rest_framework.response import Response
 import requests
 from django.shortcuts import get_list_or_404, get_object_or_404
 from decouple import config
-from .serializers import ActorListSerializer, CommentSerializer, DirectorListSerializer, MovieListSerializer, ReviewSerializer
+from .serializers import ActorListSerializer, ActorSerializer, CommentSerializer, DirectorListSerializer, DirectorSerializer, MovieListSerializer, ReviewSerializer
 from .models import Genre, Movie, Actor, Director, Recommend, Review, Comment, Record
 from django.contrib.auth import get_user_model
 from django.db.models import Max, F
@@ -60,21 +60,31 @@ def read_movies_by_recommend(request):
 
 # 영화인 데이터 조회
 
-# 감독
+# 인기순 상위 감독 리스트
 @api_view(['GET'])
-def read_directors_by_popularity(request):
+def director_list(request):
     directors = Director.objects.order_by('-popularity')[:20]
     return Response(DirectorListSerializer(directors, many=True).data)
 
 
-# 배우
+# 인기순 상위 배우 리스트
 @api_view(['GET'])
-def read_actors_by_popularity(request):
+def actor_list(request):
     actors = Actor.objects.order_by('-popularity')[:20]
     return Response(ActorListSerializer(actors, many=True).data)
 
+# 감독 상세
+@api_view(['GET'])
+def director_detail(request, director_pk):
+    director = get_object_or_404(Director,pk=director_pk)
+    return Response(DirectorSerializer(director).data)
 
 
+# 배우 상세
+@api_view(['GET'])
+def actor_detail(request, actor_pk):
+    actor = get_object_or_404(Director,pk=actor_pk)
+    return Response(ActorSerializer(actor).data)
 
 
 # 영화의 평점을 매기면 scroe를 작성하고, wanted를 false로 뒤집기
