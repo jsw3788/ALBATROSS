@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div @click="goToDirectorDetail">
     <li>
       <img :src="director.profile_path">
       {{ director.name }}
@@ -16,7 +16,9 @@ export default {
     director: Object,
   },
   methods: {
-
+    goToDirectorDetail: function () {
+      this.$router.push({ name: 'PeopleDirectorDetail' , params: { director_pk: this.director.id } })
+    }
   }
 }
 </script>
