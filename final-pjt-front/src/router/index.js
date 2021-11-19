@@ -5,6 +5,9 @@ import People from '@/views/People.vue'
 import Detail from '@/views/Detail.vue'
 import Profile from '@/views/Profile.vue'
 import Review from '@/views/Review.vue'
+import PeopleDirectorDetail from '@/components/PeopleDirectorDetail'
+import PeopleActorDetail from '@/components/PeopleActorDetail'
+
 
 Vue.use(VueRouter)
 
@@ -33,6 +36,16 @@ const routes = [
     path: '/review',
     name: 'Review',
     component: Review
+  },
+  {
+    path: '/people/director/:director_pk',
+    name: 'PeopleDirectorDetail',
+    component: PeopleDirectorDetail
+  },
+  {
+    path: '/people/actor/:actor_pk',
+    name: 'PeopleActorDetail',
+    component: PeopleActorDetail
   },
 ]
 
