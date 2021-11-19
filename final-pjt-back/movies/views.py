@@ -76,14 +76,14 @@ def actor_list(request):
 # 감독 상세
 @api_view(['GET'])
 def director_detail(request, director_pk):
-    director = get_object_or_404(Director,pk=director_pk)
+    director = get_object_or_404(Director,id=director_pk)
     return Response(DirectorSerializer(director).data)
 
 
 # 배우 상세
 @api_view(['GET'])
 def actor_detail(request, actor_pk):
-    actor = get_object_or_404(Director,pk=actor_pk)
+    actor = get_object_or_404(Actor,id=actor_pk)
     return Response(ActorSerializer(actor).data)
 
 
