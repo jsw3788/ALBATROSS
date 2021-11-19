@@ -55,20 +55,21 @@ export default new Vuex.Store({
       axios({
         method: 'get',
         url: 'http://127.0.0.1:8000/api/v1/people/directors/',
-      }).then(res =>{
-        commit('GET_DIRECTORLIST',res)
+      }).then(res => {
+        commit('GET_DIRECTORLIST', res)
 
-      }).catch(err => {console.log(err)})
-      
+      }).catch(err => { console.log(err) })
+
       // 배우 리스트 가져오기
       axios({
         method: 'get',
         url: 'http://127.0.0.1:8000/api/v1/people/actors/',
-      }).then(res =>{
-        commit('GET_ACTORLIST',res)
+      }).then(res => {
+        commit('GET_ACTORLIST', res)
 
-      }).catch(err => {console.log(err)})
+      }).catch(err => { console.log(err) })
+    },
   },
   modules: {
-  }
+  },
 })
