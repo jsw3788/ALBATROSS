@@ -28,11 +28,6 @@ const routes = [
     component: Detail
   },
   {
-    path: '/profile',
-    name: 'Profile',
-    component: Profile
-  },
-  {
     path: '/review',
     name: 'Review',
     component: Review
@@ -47,6 +42,12 @@ const routes = [
     name: 'PeopleActorDetail',
     component: PeopleActorDetail
   },
+  {
+    path: '/:username/profile/',
+    name: 'Profile',
+    component: Profile
+
+  }
 ]
 
 const router = new VueRouter({

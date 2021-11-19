@@ -41,8 +41,9 @@ export default {
         .then((res) => {
           console.log(res);
           localStorage.setItem("jwt", res.data.token);
-          // this.$emit("login");
+          this.$store.dispatch('setUsername', this.credentials.username);
           this.$router.go();
+          // console.log(this.credentials.username)
         })
         .catch((err) => {
           console.log(err);

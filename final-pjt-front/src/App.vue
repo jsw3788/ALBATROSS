@@ -11,11 +11,15 @@
       <b-button v-b-modal.login-modal>Login</b-button>
       <b-modal id="login-modal"><login-form></login-form></b-modal>
     </div>
+    <div>
+      <b-button @click="goToProfile">My profile</b-button>
+    </div>
     <router-view />
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import SignupForm from "@/components/SignupForm";
 import LoginForm from "@/components/LoginForm";
 
@@ -25,6 +29,17 @@ export default {
     SignupForm,
     LoginForm,
   },
+  methods: {
+    goToProfile: function () {
+      // console.log(this.username)
+      this.$router.push({ name: 'Profile' , params: { username: this.username } })
+    }
+  },
+  computed: {
+    ...mapState([
+      'username'
+    ])
+  }
 };
 </script>
 
