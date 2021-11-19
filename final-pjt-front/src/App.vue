@@ -4,9 +4,30 @@
       <router-link to="/home">Home</router-link> |
       <router-link to="/people">People</router-link>
     </div>
+    <div>
+      <!-- The modal -->
+      <b-button v-b-modal.signup-modal>Signup</b-button>
+      <b-modal id="signup-modal"><signup-form></signup-form></b-modal>
+      <b-button v-b-modal.login-modal>Login</b-button>
+      <b-modal id="login-modal"><login-form></login-form></b-modal>
+    </div>
     <router-view />
   </div>
 </template>
+
+<script>
+import SignupForm from "@/components/SignupForm";
+import LoginForm from "@/components/LoginForm";
+
+export default {
+  name: "App",
+  components: {
+    SignupForm,
+    LoginForm,
+  },
+};
+</script>
+
 
 <style>
 #app {
