@@ -12,6 +12,7 @@ export default new Vuex.Store({
     scoreMovies: null,
     actors: [],
     directors: [],
+    username: null,
   },
   mutations: {
     GET_POPULAR_MOVIE_LIST: function (state, popularMovieList) {
@@ -35,8 +36,14 @@ export default new Vuex.Store({
       state.directors = res.data
       // console.log(state.directors)
     },
+    SET_USERNAME: function(state, username) {
+      state.username = username
+    }
   },
   actions: {
+    setUsername: function ({ commit }, username) {
+      commit('SET_USERNAME', username)
+    },
     getPopularMovies: function ({ commit }, popularMovieList) {
       commit('GET_POPULAR_MOVIE_LIST', popularMovieList)
     },
