@@ -6,23 +6,34 @@ from rest_framework.response import Response
 import requests
 from django.shortcuts import get_list_or_404, get_object_or_404
 from decouple import config
-from .serializers import ActorListSerializer, ActorSerializer, CommentSerializer, DirectorListSerializer, DirectorSerializer, MovieListSerializer, ReviewSerializer
+from .serializers import ActorListSerializer, ActorSerializer, CommentSerializer, DirectorListSerializer, DirectorSerializer, MovieListSerializer, ReviewSerializer, MovieSerializer
 from .models import Genre, Movie, Actor, Director, Recommend, Review, Comment, Record
+from rest_framework.decorators import authentication_classes, permission_classes
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.contrib.auth import get_user_model
 from django.db.models import Max, F
 from datetime import datetime
 from random import choice
 
-# 영화리스트 데이터 조회
+# 영화 상세 조회
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def read_movie_detail(request, movie_pk):
+    movie = Movie.objects.get(pk=movie_pk)
+    return Response(MovieSerializer(movie).data)
 
+
+# 영화리스트 데이터 조회
 # 인기순
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def read_movies_by_popularity(request):
     movies = Movie.objects.order_by('-popularity')
     return Response(MovieListSerializer(movies, many=True).data)
 
 # 평점순
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def read_movies_by_score(request):
     # DB의 정보들을 바탕으로 F를 사용하여 DB 내에서 평균평점을 처리하여 annotate를 사용해 새로운 column을 추가한 후 정렬
     movies = Movie.objects.annotate(vote_average=(F('tmdb_vote_sum') + F('updated_vote_sum')) / (F('tmdb_vote_cnt') + F('updated_vote_cnt'))).order_by('-vote_average')
@@ -31,6 +42,7 @@ def read_movies_by_score(request):
 
 # 개봉순
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def read_movies_by_release(request):
     now = datetime.today().strftime("%Y-%m-%d")
     # release_date 데이터의 정확성에 문제가 있음
@@ -40,6 +52,7 @@ def read_movies_by_release(request):
 
 # 추천 알고리즘
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def read_movies_by_recommend(request):
     my_genre = Recommend.objects.filter(user__pk=request.user.pk)
     most_prefer_point = 0

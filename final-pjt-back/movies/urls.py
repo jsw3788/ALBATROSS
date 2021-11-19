@@ -22,5 +22,7 @@ urlpatterns = [
 
     path('database/genres/', views.get_genre),
     path('database/movies/', views.get_movies),
-    path('database/credits/', views.get_credits)
+    path('database/credits/', views.get_credits),
+
+    path('movies/detail/<int:movie_pk>/', views.read_movie_detail)
 ]

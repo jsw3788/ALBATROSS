@@ -23,7 +23,7 @@ const routes = [
     component: People
   },
   {
-    path: '/detail',
+    path: '/detail/:movie_id',
     name: 'Detail',
     component: Detail
   },
