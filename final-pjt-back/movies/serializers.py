@@ -81,7 +81,7 @@ class DirectorListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Director
         fields = (
-            'director_id',
+            'id',
             'name',
             'profile_path',
             'popularity'
@@ -92,7 +92,7 @@ class ActorListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Actor
         fields = (
-            'actor_id',
+            'id',
             'name',
             'profile_path',
             'popularity'
@@ -114,7 +114,7 @@ class DirectorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Director
         fields = (
-            'director_id',
+            'id',
             'movies',
             'name',
             'profile_path',
@@ -136,7 +136,7 @@ class ActorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Actor
         fields = (
-            'actor_id',
+            'id',
             'movies',
             'name',
             'profile_path',
