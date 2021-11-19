@@ -19,7 +19,8 @@
 </template>
 
 <script>
-import axios from "axios";
+// import axios from "axios";
+// import { mapActions } from "vuex";
 
 export default {
   name: "Login",
@@ -32,22 +33,27 @@ export default {
     };
   },
   methods: {
+    // ...mapActions(["login"]),
     login: function () {
-      axios({
-        method: "post",
-        url: `${process.env.VUE_APP_SERVER_URL}/api/v2/api-token-auth/`,
-        data: this.credentials,
-      })
-        .then((res) => {
-          console.log(res);
-          localStorage.setItem("jwt", res.data.token);
-          // this.$emit("login");
-          this.$router.go();
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      this.$store.dispatch("login", this.credentials);
+      // this.$router.go();
     },
+    // login: function () {
+    //   axios({
+    //     method: "post",
+    //     url: `${process.env.VUE_APP_SERVER_URL}/api/v2/api-token-auth/`,
+    //     data: this.credentials,
+    //   })
+    //     .then((res) => {
+    //       console.log(res);
+    //       localStorage.setItem("jwt", res.data.token);
+    //       // this.$emit("login");
+    //       this.$router.go();
+    //     })
+    //     .catch((err) => {
+    //       console.log(err);
+    //     });
+    // },
   },
 };
 </script>
