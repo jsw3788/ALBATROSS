@@ -12,8 +12,6 @@ class Genre(models.Model):
         return self.name
 
 # 영화
-
-
 class Movie(models.Model):
     genres = models.ManyToManyField(Genre, related_name='movies')
     tmdb_id = models.IntegerField()
@@ -72,7 +70,7 @@ class Review(models.Model):
     is_spoiled = models.BooleanField(default=False)
 
 
-
+# 댓글
 class Comment(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              on_delete=models.CASCADE, related_name="comments")

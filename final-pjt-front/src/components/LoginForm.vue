@@ -36,7 +36,6 @@ export default {
     // ...mapActions(["login"]),
     login: function () {
       this.$store.dispatch("login", this.credentials);
-      // this.$router.go();
     },
     // login: function () {
     //   axios({

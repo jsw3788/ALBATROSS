@@ -176,6 +176,7 @@ def update_score(request, movie_pk):
 
 
 
+
 # 영화를 보고싶어하면 wanted를 true로 Record에 넣기
 @api_view(['POST'])
 def update_wanted(request, movie_pk):
@@ -205,6 +206,49 @@ def update_wanted(request, movie_pk):
         'wanted': wanted,
     }
     return JsonResponse(context)
+
+
+# 유저의 최신순 리뷰
+@api_view(['GET'])
+def read_recent_reviews_by_user(request, username):
+    person=get_object_or_404(get_user_model(), username=username)
+    recent_reviews = person.reviews.order_by('-updated_at')[:3]
+    return Response(ReviewSerializer(recent_reviews, many=True).data)
+
+
+
+# 유저의 인기순 리뷰
+@api_view(['GET'])
+def read_popular_reviews_by_user(request, username):
+    person=get_object_or_404(get_user_model(), username=username)
+    reviews = []
+    my_reviews = person.reviews.all()
+    for review in my_reviews:
+        reviews.append(review.like_users.count(), review)
+    # 좋아요 순 정렬
+    popular_reviews = sorted(reviews)[:3]
+    return JsonResponse(popular_reviews, safe=False)
+
+
+
+# 유저의 최신 리뷰 영화
+@api_view(['GET'])
+def read_recent_movies_by_user(request, username):
+    person=get_object_or_404(get_user_model(), username=username)
+    recent_movies = []
+    for review in person.reviews.order_by('-updated_at')[:10]:
+        recent_movies.append(review.movie)
+    return Response(MovieListSerializer(recent_movies, many=True).data)
+    
+
+# 유저의 최고 리뷰 영화
+@api_view(['GET'])
+def read_favorite_movies_by_user(request, username):
+    person=get_object_or_404(get_user_model(), username=username)
+    favorite_movies = person.movies.order_by('-score')[:10]
+    return Response(MovieListSerializer(favorite_movies, many=True).data)
+
+
 
 # 리뷰 전체 조회, 생성
 @api_view(['GET','POST'])

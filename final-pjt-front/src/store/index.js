@@ -14,6 +14,7 @@ export default new Vuex.Store({
     actors: [],
     directors: [],
     jwtToken: localStorage.getItem("jwt")
+    username: null,
   },
   mutations: {
     SET_TOKEN: function (state, token) {
@@ -45,6 +46,9 @@ export default new Vuex.Store({
       state.directors = res.data
       // console.log(state.directors)
     },
+    SET_USERNAME: function(state, username) {
+      state.username = username
+    }
   },
   actions: {
     login: function ({ commit }, credentials) {
@@ -67,6 +71,9 @@ export default new Vuex.Store({
     },
     logout: function ({ commit }) {
       commit("EXP_TOKEN")
+    },
+    setUsername: function ({ commit }, username) {
+      commit('SET_USERNAME', username)
     },
     getPopularMovies: function ({ commit }, popularMovieList) {
       commit('GET_POPULAR_MOVIE_LIST', popularMovieList)

@@ -9,9 +9,9 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('username', 'password')
 
 
-class UserProfileSerializer(serializers.ModelSerializer):
+class UserProfileUpdateSerializer(serializers.ModelSerializer):
     profile_image = serializers.ImageField(use_url=True)
 
     class Meta:
         model = get_user_model()
-        fields = ('username', 'profile_image', )
+        fields = ('username', 'profile_image')
