@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
+import router from '../router'
 
 Vue.use(Vuex)
 
@@ -12,9 +13,18 @@ export default new Vuex.Store({
     scoreMovies: null,
     actors: [],
     directors: [],
+    jwtToken: localStorage.getItem("jwt")
     username: null,
   },
   mutations: {
+    SET_TOKEN: function (state, token) {
+      localStorage.setItem("jwt", token);
+      state.jwtToken = token
+    },
+    EXP_TOKEN: function (state) {
+      localStorage.removeItem("jwt")
+      state.jwtToken = null
+    },
     GET_POPULAR_MOVIE_LIST: function (state, popularMovieList) {
       state.popularMovies = popularMovieList
     },
@@ -41,6 +51,27 @@ export default new Vuex.Store({
     }
   },
   actions: {
+    login: function ({ commit }, credentials) {
+      console.log(credentials)
+      axios({
+        method: "post",
+        url: `${process.env.VUE_APP_SERVER_URL}/api/v2/api-token-auth/`,
+        data: credentials,
+      })
+        .then(res => {
+          commit("SET_TOKEN", res.data.token)
+          router.go()
+        })
+        .catch(err => {
+          console.log(err)
+          // swal("아이디와 비밀번호를 확인하쇼", {
+          //   dangerMode: true,
+          // })
+        })
+    },
+    logout: function ({ commit }) {
+      commit("EXP_TOKEN")
+    },
     setUsername: function ({ commit }, username) {
       commit('SET_USERNAME', username)
     },
@@ -76,6 +107,11 @@ export default new Vuex.Store({
 
       }).catch(err => { console.log(err) })
     },
+  },
+  getters: {
+    isLogin: function (state) {
+      return state.jwtToken ? true : false
+    }
   },
   modules: {
   },
