@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Genre, Movie, Record, Comment, Movie, Review
+from .models import Genre, Movie, Record, Comment, Movie, Review, Director, Actor
 
 
 class MovieListSerializer(serializers.ModelSerializer):
@@ -80,4 +80,72 @@ class CommentSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
             'is_spoiled'
+        )
+
+
+class DirectorListSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Director
+        fields = (
+            'id',
+            'name',
+            'profile_path',
+            'popularity'
+        )
+
+class ActorListSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Actor
+        fields = (
+            'id',
+            'name',
+            'profile_path',
+            'popularity'
+        )
+
+
+# nested serializer로 변경해야함 : movies
+class DirectorSerializer(serializers.ModelSerializer):
+    
+    class MovieSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = Movie
+            fields = (
+                'title',
+                'poster_path',
+            )
+
+    movies = MovieSerializer(many=True, read_only=True)
+    class Meta:
+        model = Director
+        fields = (
+            'id',
+            'movies',
+            'name',
+            'profile_path',
+            'popularity'
+        )
+
+class ActorSerializer(serializers.ModelSerializer):
+    
+    class MovieSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = Movie
+            fields = (
+                'title',
+                'poster_path',
+            )
+
+    movies = MovieSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Actor
+        fields = (
+            'id',
+            'movies',
+            'name',
+            'profile_path',
+            'popularity'
         )
