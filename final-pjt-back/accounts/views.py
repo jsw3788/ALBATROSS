@@ -1,15 +1,14 @@
 from django.shortcuts import get_object_or_404
 from django.http.response import JsonResponse
-from rest_framework import serializers, status
+from rest_framework import status
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
-from .serializers import UserSerializer, UserProfileSerializer
-
 from rest_framework.decorators import authentication_classes, permission_classes
-from rest_framework.permissions import IsAuthenticated, AllowAny
-# from rest_framework_jwt.authentication import JSONWebTokenAuthentication
+from .serializers import UserSerializer, UserProfileUpdateSerializer
+
+
 
 from django.contrib.auth import get_user_model
 
@@ -34,15 +33,34 @@ def signup(request):
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
-# @authentication_classes([JSONWebTokenAuthentication])
+@authentication_classes([JSONWebTokenAuthentication])
 @permission_classes([IsAuthenticated])
+# @permission_classes([AllowAny])
 def profile(request, username):
 
-    # 회원 정보 조회
+    # 회원 정보 조회 -> JsonResponse로 바꾸기
     def profile_detail():
-        user=get_object_or_404(get_user_model(), username=username)
-        serializer = UserProfileSerializer(user)
-        return Response(serializer.data)
+        person=get_object_or_404(get_user_model(), username=username)
+        user=request.user
+        
+        if person != user:
+            if user.followings.filter(pk=person.pk).exists():
+                following = True
+            else:
+                following = False
+        # 자기 자신은 팔로우 안함
+        else:
+            following = False
+        
+        context = {
+            'username' : username,
+            'profile_image': str(person.profile_image),
+            'following': following,
+            'movieCnt' : person.movies.count(),
+            'followingCnt': person.followings.count(),
+            'followerCnt': person.followers.count(),
+        }
+        return JsonResponse(context)
 
     # 회원 정보 수정 (프로필 이미지)
     def update_profile():
@@ -50,7 +68,7 @@ def profile(request, username):
         if request.user.username != request.data.get('username') and get_user_model().objects.filter(username=request.data.get('username')).exists():
             return Response({'error':'이미 존재하는 사용자 이름 입니다.'},status=status.HTTP_400_BAD_REQUEST)
         
-        serializer = UserProfileSerializer(request.user, data=request.data)
+        serializer = UserProfileUpdateSerializer(request.user, data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save(profile_image=profile_image)
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)

@@ -45,12 +45,22 @@ class MovieSerializer(serializers.ModelSerializer):
             'backdrop_path',
         )
 
-
-class RecordSerializer(serializers.ModelSerializer):
+# 일단 ReviewSerializer 하나만 사용해보자
+class ReviewListSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Record
-        fields = ('id', 'user', 'movie', 'title', 'poster_path', 'score', 'wanted')
+        model = Review
+        fields = (
+            'id',
+            'user',
+            'movie',
+            'like_users',
+            'dislike_users',
+            'content',
+            'is_spoiled',
+            'created_at',
+            'updated_at',
+        )
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -58,6 +68,7 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = (
+            'id',
             'user',
             'movie',
             'like_users',
@@ -74,6 +85,7 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = (
+            'id',
             'user',
             'review',
             'content',
