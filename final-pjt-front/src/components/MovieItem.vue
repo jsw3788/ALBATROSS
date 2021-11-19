@@ -1,6 +1,8 @@
 <template>
   <div class="border-solid">
-    <p>{{ movie.title }}</p>
+    <div @click="goDetailInfo">
+      <p>{{ movie.title }}</p>
+    </div>
   </div>
 </template>
 
@@ -9,6 +11,17 @@ export default {
   name: "MovieItem",
   props: {
     movie: Object,
+  },
+  methods: {
+    goDetailInfo: function () {
+      console.log(this.movie);
+      this.$router.push({
+        name: "Detail",
+        params: {
+          movie_id: this.movie.id,
+        },
+      });
+    },
   },
 };
 </script>

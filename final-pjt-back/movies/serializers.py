@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Movie, Record, Comment, Movie, Review
+from .models import Genre, Movie, Record, Comment, Movie, Review
 
 
 class MovieListSerializer(serializers.ModelSerializer):
@@ -7,6 +7,7 @@ class MovieListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie
         fields = (
+            'id',
             'tmdb_id',
             'title',
             'release_date',
@@ -20,10 +21,16 @@ class MovieListSerializer(serializers.ModelSerializer):
 
 
 class MovieSerializer(serializers.ModelSerializer):
+    class GenreSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = Genre
+            fields = ('id', 'name')
 
+    genres = GenreSerializer(many=True, read_only=True)
     class Meta:
         model = Movie
         fields = (
+            'id',
             'genres',
             'tmdb_id',
             'title',
