@@ -5,7 +5,6 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
-from rest_framework.decorators import authentication_classes, permission_classes
 from .serializers import UserSerializer, UserProfileUpdateSerializer
 
 
@@ -88,6 +87,8 @@ def profile(request, username):
 
 
 @api_view(['POST'])
+@authentication_classes([JSONWebTokenAuthentication])
+@permission_classes([IsAuthenticated])
 def follow(request, username):
     me = request.user
     you = get_object_or_404(get_user_model(), username=username)

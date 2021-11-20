@@ -75,6 +75,8 @@ def read_movies_by_recommend(request):
 
 # 인기순 상위 감독 리스트
 @api_view(['GET'])
+@permission_classes([AllowAny])
+@permission_classes([AllowAny])
 def director_list(request):
     directors = Director.objects.order_by('-popularity')[:20]
     return Response(DirectorListSerializer(directors, many=True).data)
@@ -82,12 +84,14 @@ def director_list(request):
 
 # 인기순 상위 배우 리스트
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def actor_list(request):
     actors = Actor.objects.order_by('-popularity')[:20]
     return Response(ActorListSerializer(actors, many=True).data)
 
 # 감독 상세
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def director_detail(request, director_pk):
     director = get_object_or_404(Director,id=director_pk)
     return Response(DirectorSerializer(director).data)
@@ -95,121 +99,135 @@ def director_detail(request, director_pk):
 
 # 배우 상세
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def actor_detail(request, actor_pk):
     actor = get_object_or_404(Actor,id=actor_pk)
     return Response(ActorSerializer(actor).data)
 
 
+
 # 영화의 평점을 매기면 scroe를 작성하고, wanted를 false로 뒤집기
 @api_view(['POST', 'PUT', 'DELETE'])
-def update_score(request, movie_pk):
+def read_update_score(request, movie_pk):
     # 평점을 매기면, 사용자의 Recommend 테이블과 Record 테이블을 갱신해야함
     # POST 요청은 사용자가 평점을 매긴적이 없는 경우
     # PUT 요청은 사용자가 매긴 평점을 수정할 경우
     # DELETE 요청은 사용자가 평점을 0으로 바꿀 경우
-
-    # 선택한 영화
-    movie = get_object_or_404(Movie, pk=movie_pk)
-    after_score = request.data.get('score')
-    if request.method == "PUT":
-        my_movie = Record.objects.get(user=request.user.pk, movie=movie.pk)
-        before_score = my_movie.score
-        my_movie.score = after_score
-        my_movie.save()
-        # 이거는 내가 담아놓은 모든 장르 가져오는 필터
-        my_recommends = Recommend.objects.filter(user=request.user.pk).values('genre')
-        movie_genres = movie.genres.all()
-        for movie_genre in movie_genres:
-            for recommend in my_recommends:
-                if movie_genre.pk == recommend.genre: # 이거 값들은 나중에 찍어보면서 확인
-                    recommend.score += (after_score - before_score)
-                    recommend.save()
-
-    elif request.mehtod == "POST":
-        # 보고싶어요가 체크되어 있는 상태라면
-        if Record.objects.filter(user=request.user.pk, movie=movie_pk).exists():
+    if request.method == "GET":
+        pass
+    else:
+        # 선택한 영화
+        movie = get_object_or_404(Movie, pk=movie_pk)
+        after_score = request.data.get('score')
+        if request.method == "PUT":
             my_movie = Record.objects.get(user=request.user.pk, movie=movie.pk)
-            my_movie.wanted = False
+            before_score = my_movie.score
             my_movie.score = after_score
             my_movie.save()
+            # 이거는 내가 담아놓은 모든 장르 가져오는 필터
             my_recommends = Recommend.objects.filter(user=request.user.pk).values('genre')
             movie_genres = movie.genres.all()
             for movie_genre in movie_genres:
                 for recommend in my_recommends:
-                    if movie_genre.pk == recommend.genre: 
-                        recommend.score += after_score
-                        recommend.count += 1
-                        recommend.save()
-        else: # 보고싶어요 체크 안된 상태라면
-            my_movie = Record.objects.create(
-                title=movie.title,
-                poster_path=movie.poster_path,
-                score=after_score,
-                wanted=False,
-            )
-            """
-            아래가 맞는 표현인지 Vue 후에 확인 필요
-            """
-            my_movie.user.add(request.user)
-            my_movie.movie.add(movie)
-            my_recommends = Recommend.objects.filter(user=request.user.pk).values('genre')
-            movie_genres = movie.genres.all()
-            for movie_genre in movie_genres:
-                for recommend in my_recommends:
-                    if movie_genre.pk == recommend.genre: 
-                        recommend.score += after_score
-                        recommend.count += 1
+                    if movie_genre.pk == recommend.genre: # 이거 값들은 나중에 찍어보면서 확인
+                        recommend.score += (after_score - before_score)
                         recommend.save()
 
-    elif request.mehtod == "DELETE":  # 0점을 줬어! 삭제할거야!
-        my_movie = Record.objects.get(user=request.user.pk, movie=movie.pk)
-        before_score = my_movie.score
-        my_recommends = Recommend.objects.filter(user=request.user.pk).values('genre')
-        movie_genres = movie.genres.all()
-        for movie_genre in movie_genres:
-            for recommend in my_recommends:
-                if movie_genre.pk == recommend.genre: 
-                    recommend.score -= before_score
-                    recommend.count -= 1
-                    recommend.save()
-        my_movie.delete()
+        elif request.mehtod == "POST":
+            # 보고싶어요가 체크되어 있는 상태라면
+            if Record.objects.filter(user=request.user.pk, movie=movie_pk).exists():
+                my_movie = Record.objects.get(user=request.user.pk, movie=movie.pk)
+                my_movie.wanted = False
+                my_movie.score = after_score
+                my_movie.save()
+                my_recommends = Recommend.objects.filter(user=request.user.pk).values('genre')
+                movie_genres = movie.genres.all()
+                for movie_genre in movie_genres:
+                    for recommend in my_recommends:
+                        if movie_genre.pk == recommend.genre: 
+                            recommend.score += after_score
+                            recommend.count += 1
+                            recommend.save()
+            else: # 보고싶어요 체크 안된 상태라면
+                my_movie = Record.objects.create(
+                    title=movie.title,
+                    poster_path=movie.poster_path,
+                    score=after_score,
+                    wanted=False,
+                )
+                """
+                아래가 맞는 표현인지 Vue 후에 확인 필요
+                """
+                my_movie.user.add(request.user)
+                my_movie.movie.add(movie)
+                my_recommends = Recommend.objects.filter(user=request.user.pk).values('genre')
+                movie_genres = movie.genres.all()
+                for movie_genre in movie_genres:
+                    for recommend in my_recommends:
+                        if movie_genre.pk == recommend.genre: 
+                            recommend.score += after_score
+                            recommend.count += 1
+                            recommend.save()
+
+        elif request.mehtod == "DELETE":  # 0점을 줬어! 삭제할거야!
+            my_movie = Record.objects.get(user=request.user.pk, movie=movie.pk)
+            before_score = my_movie.score
+            my_recommends = Recommend.objects.filter(user=request.user.pk).values('genre')
+            movie_genres = movie.genres.all()
+            for movie_genre in movie_genres:
+                for recommend in my_recommends:
+                    if movie_genre.pk == recommend.genre: 
+                        recommend.score -= before_score
+                        recommend.count -= 1
+                        recommend.save()
+            my_movie.delete()
 
 
 
 
 # 영화를 보고싶어하면 wanted를 true로 Record에 넣기
-@api_view(['POST'])
-def update_wanted(request, movie_pk):
+@api_view(['GET','POST'])
+def read_update_wanted(request, movie_pk):
     # 선택한 영화
-    movie = Movie.objects.get(pk=movie_pk)
-    # 그 영화가 Record에 이미 담겨있을까? 그럴수도 있고~ 아닐수도 있고
-    if not Record.objects.filter(user=request.user.pk, movie=movie_pk).exists():
-        my_movie = Record.objects.create(
-            title=movie.title,
-            poster_path=movie.poster_path,
-            wanted=True,
-        )
-        """
-        아래가 맞는 표현인지 Vue 후에 확인 필요
-        """
-        my_movie.user.add(request.user)
-        my_movie.movie.add(movie)
-        wanted = True
-    else:
-        my_movie = Record.objects.get(user=request.user.pk, movie=movie_pk)
-        if my_movie.wanted:  #보고싶어요를 취소하고있음
-            my_movie.delete()
-            wanted = False
+    if request.method =="GET":
+        if Record.objects.filter(user=request.user.pk, movie=movie_pk).exists():
+            my_movie = Record.objects.get(user=request.user.pk, movie=movie_pk)
+            wanted = my_movie.wanted
         else:
-            return Response({ 'error': '이미 본 영화입니다.' }, status=status.HTTP_400_BAD_REQUEST)
-    context = {
-        'wanted': wanted,
-    }
-    return JsonResponse(context)
+            wanted = False
+        context = {
+            'wanted': wanted,
+        }
+        return JsonResponse(context)
+
+    elif request.method == "POST":
+        movie = Movie.objects.get(pk=movie_pk)
+        # 그 영화가 Record에 이미 담겨있을까? 그럴수도 있고~ 아닐수도 있고
+        if not Record.objects.filter(user=request.user.pk, movie=movie_pk).exists():
+            my_movie = Record.objects.create(
+                title=movie.title,
+                poster_path=movie.poster_path,
+                wanted=True,
+                user = request.user,
+                movie = movie
+            )
+            wanted = True
+        else:
+            my_movie = Record.objects.get(user=request.user.pk, movie=movie_pk)
+            if my_movie.wanted:  #보고싶어요를 취소하고있음
+                my_movie.delete()
+                wanted = False
+            else:
+                return Response({ 'error': '이미 본 영화입니다.' }, status=status.HTTP_400_BAD_REQUEST)
+        context = {
+            'wanted': wanted,
+        }
+        return JsonResponse(context)
 
 
 # 유저의 최신순 리뷰
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def read_recent_reviews_by_user(request, username):
     person=get_object_or_404(get_user_model(), username=username)
     recent_reviews = person.reviews.order_by('-updated_at')[:3]
@@ -219,30 +237,41 @@ def read_recent_reviews_by_user(request, username):
 
 # 유저의 인기순 리뷰
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def read_popular_reviews_by_user(request, username):
-    person=get_object_or_404(get_user_model(), username=username)
-    reviews = []
-    my_reviews = person.reviews.all()
-    for review in my_reviews:
-        reviews.append(review.like_users.count(), review)
-    # 좋아요 순 정렬
-    popular_reviews = sorted(reviews)[:3]
-    return JsonResponse(popular_reviews, safe=False)
+    # person=get_object_or_404(get_user_model(), username=username)
+    person = get_user_model().objects.get(username=username)
+    if person:
+        reviews = []
+        my_reviews = person.reviews.all()
+        for review in my_reviews:
+            reviews.append(review.like_users.count(), review)
+        # 좋아요 순 정렬
+        popular_reviews = sorted(reviews)[:3]
+        return JsonResponse(popular_reviews, safe=False)
+    else:
+        return Response({'error': '본 영화가 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
 
 
 
 # 유저의 최신 리뷰 영화
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def read_recent_movies_by_user(request, username):
     person=get_object_or_404(get_user_model(), username=username)
+    # if Record.objects.filter(user__pk=person.pk).exists():
+        # person = get_user_model().objects.get(username=username)
     recent_movies = []
     for review in person.reviews.order_by('-updated_at')[:10]:
         recent_movies.append(review.movie)
     return Response(MovieListSerializer(recent_movies, many=True).data)
+    # else:
+    #     return Response({'error': '본 영화가 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
     
 
 # 유저의 최고 리뷰 영화
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def read_favorite_movies_by_user(request, username):
     person=get_object_or_404(get_user_model(), username=username)
     favorite_movies = person.movies.order_by('-score')[:10]
@@ -252,6 +281,7 @@ def read_favorite_movies_by_user(request, username):
 
 # 리뷰 전체 조회, 생성
 @api_view(['GET','POST'])
+@permission_classes([IsAuthenticated])
 def review_list(request, movie_pk):
     if request.method =='GET':
         reviews = Review.objects.filter(movie__pk=movie_pk)
@@ -268,6 +298,7 @@ def review_list(request, movie_pk):
 
 # 리뷰 상세 조회, 삭제, 수정
 @api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
 def review_detail(request, review_pk):
     review = get_object_or_404(Review, pk=review_pk)
     if request.method == 'GET':
