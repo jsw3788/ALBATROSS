@@ -1,6 +1,7 @@
 <template>
   <div>
     <ul>
+      <h3>가장 좋아하는 영화</h3>
       <profile-movie-item
        v-for="movie in favorite_movies"
        :key="movie.id"
@@ -10,6 +11,7 @@
       </profile-movie-item>
     </ul>
     <ul>
+      <h3>최근 감상 영화</h3>
       <profile-movie-item
        v-for="movie in recent_movies"
        :key="movie.id"
@@ -46,9 +48,9 @@ export default {
         // headers: this.setToken(),
       
       }).then(res => {
-        
-        console.log(res)
-        // this.favorite_movies = 
+        // console.log('favorite_movies')
+        // console.log(res)
+        this.favorite_movies = res.data
 
       }).catch(err => { console.log(err) })
 
@@ -60,9 +62,9 @@ export default {
         // headers: this.setToken(),
       
       }).then(res => {
-        
-        console.log(res)
-        // this.recent_movies = 
+        // console.log('recent_movies')
+        // console.log(res)
+        this.recent_movies = res.data
 
 
       }).catch(err => { console.log(err) })
