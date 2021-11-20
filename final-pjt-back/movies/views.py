@@ -254,10 +254,13 @@ def read_popular_reviews_by_user(request, username):
         reviews = []
         my_reviews = person.reviews.all()
         for review in my_reviews:
-            reviews.append(review.like_users.count(), review)
+            reviews.append((review.like_users.count(), review))
         # 좋아요 순 정렬
-        popular_reviews = sorted(reviews)[:3]
-        return JsonResponse(popular_reviews, safe=False)
+        sorted_reviews = sorted(reviews, key=lambda x: x[0])[:3]
+        popular_reviews=[]
+        for cnt, review in sorted_reviews:
+            popular_reviews.append(review)
+        return Response(ReviewListSerializer(popular_reviews, many=True).data)
     else:
         return Response({'error': '본 영화가 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -299,7 +302,6 @@ def review_list(request, movie_pk):
     elif request.method == 'POST':
         movie = get_object_or_404(Movie, pk=movie_pk)
         serializer = ReviewSerializer(data=request.data)
-        print(serializer)
         if serializer.is_valid(raise_exception=True):
             serializer.save(user=request.user, movie=movie)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
