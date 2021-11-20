@@ -121,8 +121,8 @@ export default new Vuex.Store({
     },
     config: function (state) {
       return {
-            Authorization: `JWT ${state.jwtToken}`
-          }
+        Authorization: `JWT ${state.jwtToken}`
+      }
     }
   },
   modules: {

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Genre, Movie, Record, Comment, Movie, Review, Director, Actor
+from accounts.serializers import UserProfileUpdateSerializer
 
 
 class MovieListSerializer(serializers.ModelSerializer):
@@ -27,6 +28,7 @@ class MovieSerializer(serializers.ModelSerializer):
             fields = ('id', 'name')
 
     genres = GenreSerializer(many=True, read_only=True)
+
     class Meta:
         model = Movie
         fields = (
@@ -45,8 +47,10 @@ class MovieSerializer(serializers.ModelSerializer):
             'backdrop_path',
         )
 
-# 일단 ReviewSerializer 하나만 사용해보자
+
 class ReviewListSerializer(serializers.ModelSerializer):
+
+    user = UserProfileUpdateSerializer(read_only=True)
 
     class Meta:
         model = Review
@@ -71,15 +75,14 @@ class ReviewSerializer(serializers.ModelSerializer):
             'id',
             'user',
             'movie',
-            'like_users',
-            'dislike_users',
             'content',
             'is_spoiled',
             'created_at',
             'updated_at',
         )
+        read_only_fields = ('movie', 'user')
 
-        
+
 class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -96,7 +99,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class DirectorListSerializer(serializers.ModelSerializer):
-    
+
     class Meta:
         model = Director
         fields = (
@@ -106,8 +109,9 @@ class DirectorListSerializer(serializers.ModelSerializer):
             'popularity'
         )
 
+
 class ActorListSerializer(serializers.ModelSerializer):
-    
+
     class Meta:
         model = Actor
         fields = (
@@ -120,7 +124,7 @@ class ActorListSerializer(serializers.ModelSerializer):
 
 # nested serializer로 변경해야함 : movies
 class DirectorSerializer(serializers.ModelSerializer):
-    
+
     class MovieSerializer(serializers.ModelSerializer):
         class Meta:
             model = Movie
@@ -130,6 +134,7 @@ class DirectorSerializer(serializers.ModelSerializer):
             )
 
     movies = MovieSerializer(many=True, read_only=True)
+
     class Meta:
         model = Director
         fields = (
@@ -140,8 +145,9 @@ class DirectorSerializer(serializers.ModelSerializer):
             'popularity'
         )
 
+
 class ActorSerializer(serializers.ModelSerializer):
-    
+
     class MovieSerializer(serializers.ModelSerializer):
         class Meta:
             model = Movie

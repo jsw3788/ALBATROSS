@@ -1,6 +1,6 @@
 <template>
   <div>
-    <input type="text" v-model="newReview" />
+    <input type="text" v-model="newReview" @keyup.enter="writeReview" />
     <button @click="writeReview">작성</button>
   </div>
 </template>
@@ -22,9 +22,12 @@ export default {
       axios({
         method: "post",
         url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/${this.movieId}/reviews/`,
-        params: {
-          movie_pk: this.movieId,
+        headers: this.$store.getters.config,
+        data: {
+          content: this.newReview,
         },
+      }).catch((err) => {
+        console.log(err);
       });
     },
   },

@@ -7,6 +7,7 @@
         :movie="movie"
       ></movie-item>
     </div>
+
     <hr />
     <div class="d-flex">
       <movie-item
@@ -56,19 +57,6 @@ export default {
     axios({
       method: "get",
       url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/popularity/`,
-      // headers: this.setToken(),
-    })
-      .then((res) => {
-        this.$store.dispatch("getPopularMovies", res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    axios({
-      method: "get",
-      url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/popularity/`,
-      // headers: this.setToken(),
     })
       .then((res) => {
         this.$store.dispatch("getPopularMovies", res.data);
@@ -80,7 +68,7 @@ export default {
     axios({
       method: "get",
       url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/recommend/`,
-      // headers: this.setToken(),
+      headers: this.$store.getters.config,
     })
       .then((res) => {
         this.$store.dispatch("getRecommendMovies", res.data);
@@ -92,7 +80,6 @@ export default {
     axios({
       method: "get",
       url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/release_date/`,
-      // headers: this.setToken(),
     })
       .then((res) => {
         this.$store.dispatch("getReleasedMovies", res.data);
@@ -104,7 +91,6 @@ export default {
     axios({
       method: "get",
       url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/score/`,
-      // headers: this.setToken(),
     })
       .then((res) => {
         this.$store.dispatch("getScoreMovies", res.data);
@@ -115,6 +101,3 @@ export default {
   },
 };
 </script>
-
-<style>
-</style>
