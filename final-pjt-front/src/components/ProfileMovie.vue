@@ -38,25 +38,16 @@ export default {
       recent_movies: null,
     }
   },
-  methods: {
-    setToken: function () {
-      const token = localStorage.getItem("jwt");
-      const config = {
-        Authorization: `JWT ${token}`,
-      };
-      return config;
-    },
-  },
   created: function() {
     axios({
         method: 'get',
         
-        url: `http://127.0.0.1:8000/api/v2/${this.username}/movies/favorite/`,
-        headers: this.setToken(),
+        url: `http://127.0.0.1:8000/api/v1/${this.username}/movies/favorite/`,
+        // headers: this.setToken(),
       
       }).then(res => {
         
-        console.log(res.data)
+        console.log(res)
         // this.favorite_movies = 
 
       }).catch(err => { console.log(err) })
@@ -65,12 +56,12 @@ export default {
       axios({
         method: 'get',
         
-        url: `http://127.0.0.1:8000/api/v2/${this.username}/movies/recent/`,
-        headers: this.setToken(),
+        url: `http://127.0.0.1:8000/api/v1/${this.username}/movies/recent/`,
+        // headers: this.setToken(),
       
       }).then(res => {
         
-        console.log(res.data)
+        console.log(res)
         // this.recent_movies = 
 
 

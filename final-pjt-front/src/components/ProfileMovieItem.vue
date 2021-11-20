@@ -14,7 +14,7 @@ export default {
   },
   methods: {
     goToDetail: function() {
-      this.$router.push({ name: 'Detail' , params: { movie_pk: this.movie.id } })
+      this.$router.push({ name: 'Detail' , params: { movie_id: this.movie.id } })
     }
 
   }
