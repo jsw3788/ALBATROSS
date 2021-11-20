@@ -38,7 +38,7 @@
                 </router-link>
               </div>
               <div>
-                <b-button @click="goToProfile">My profile</b-button>
+                <b-button @click="goToMyProfile">My profile</b-button>
               </div>
             </div>
             <div v-else>
@@ -87,13 +87,14 @@ export default {
       // localStorage.removeItem("jwt");
       // this.$router.push({ name: "Home" });
     },
-    goToProfile: function () {
+    goToMyProfile: function () {
       // console.log(this.username)
-      this.$router.push({
-        name: "Profile",
-        params: { username: this.username },
-      });
-    },
+      if (this.username){
+        this.$router.push({ name: 'Profile' , params: { username: this.username } })
+      }else{
+        alert('로그인을 해주세요')
+      }
+    }
   },
   computed: {
     ...mapGetters(["isLogin"]),
