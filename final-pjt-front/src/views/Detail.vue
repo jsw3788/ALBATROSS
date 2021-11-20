@@ -1,11 +1,56 @@
 <template>
-  <div>
-    <p>{{ movie.title }}</p>
-    <img :src="movie.poster_path" alt="" />
+  <div id="detail">
     <div>
-      <review-form :movieId="movie.id"></review-form>
-      <review-list :movieId="movie.id"></review-list>
+      <b-img :src="movie.backdrop_path" fluid :alt="movie.poster_path"></b-img>
     </div>
+    <b-container class="bv-example-row">
+      <b-row class="text-center">
+        <b-col cols="3">
+          <div>
+            <div>
+              <b-card
+                :title="movie.title"
+                :img-src="movie.poster_path"
+                img-alt="Poster"
+                img-top
+                tag="article"
+                class="mb-2 side-card"
+              >
+                <b-card-text>
+                  <p>{{ movie.release_date }}</p>
+                  <p v-if="movie.tmdb_vote_cnt">
+                    평점: {{ movie.tmdb_vote_sum / movie.tmdb_vote_cnt }}
+                  </p>
+                  <p v-else>등록된 평점이 없습니다.</p>
+                  <p>
+                    <span v-for="genre in movie.genres" :key="genre.id"
+                      >{{ genre.name }}
+                    </span>
+                  </p>
+                </b-card-text>
+              </b-card>
+            </div>
+          </div>
+        </b-col>
+        <b-col cols="9">
+          <div>
+            <p>줄거리</p>
+            <p>{{ movie.overview }}</p>
+          </div>
+          <div>
+            <review-form :movieId="movie.id"></review-form>
+            <review-list
+              v-for="review in reviews"
+              :key="review.id"
+              :review="review"
+              :movieId="movie.id"
+            ></review-list>
+          </div>
+        </b-col>
+      </b-row>
+    </b-container>
+    <div></div>
+    <div></div>
   </div>
 </template>
 
@@ -30,6 +75,7 @@ export default {
     axios({
       method: "get",
       url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/detail/${this.$route.params.movie_id}`,
+      // headers: this.$store.getters.config,
     })
       .then((res) => {
         console.log(res);
@@ -39,10 +85,10 @@ export default {
       .catch((err) => {
         console.log(err);
       });
-
     axios({
       method: "get",
       url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/${this.$route.params.movie_id}/reviews/`,
+      headers: this.$store.getters.config,
     })
       .then((res) => {
         console.log(res);
@@ -55,5 +101,11 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+#detail {
+  color: white;
+}
+.side-card {
+  background-color: black;
+}
 </style>

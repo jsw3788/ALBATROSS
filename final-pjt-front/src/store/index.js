@@ -13,7 +13,7 @@ export default new Vuex.Store({
     scoreMovies: null,
     actors: [],
     directors: [],
-    jwtToken: localStorage.getItem("jwt")
+    jwtToken: localStorage.getItem("jwt"),
     username: null,
   },
   mutations: {
@@ -46,7 +46,7 @@ export default new Vuex.Store({
       state.directors = res.data
       // console.log(state.directors)
     },
-    SET_USERNAME: function(state, username) {
+    SET_USERNAME: function (state, username) {
       state.username = username
     }
   },
@@ -111,6 +111,11 @@ export default new Vuex.Store({
   getters: {
     isLogin: function (state) {
       return state.jwtToken ? true : false
+    },
+    config: function (state) {
+      return {
+        Authorization: `JWT ${state.jwtToken}`
+      }
     }
   },
   modules: {
