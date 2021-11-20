@@ -8,6 +8,8 @@ import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 // Import Bootstrap an BootstrapVue CSS files (order is important)
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
+import StarRating from 'vue-star-rating'
+Vue.component('star-rating', StarRating);
 
 // Make BootstrapVue available throughout your project
 Vue.use(BootstrapVue)
