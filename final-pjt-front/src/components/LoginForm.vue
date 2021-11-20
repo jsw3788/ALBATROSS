@@ -35,6 +35,7 @@ export default {
   methods: {
     // ...mapActions(["login"]),
     login: function () {
+      this.$store.dispatch("setUsername", this.credentials.username)
       this.$store.dispatch("login", this.credentials);
     },
     // login: function () {

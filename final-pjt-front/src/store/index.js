@@ -13,8 +13,8 @@ export default new Vuex.Store({
     scoreMovies: null,
     actors: [],
     directors: [],
-    jwtToken: localStorage.getItem("jwt")
-    username: null,
+    jwtToken: localStorage.getItem("jwt"),
+    username: localStorage.getItem("username"),
   },
   mutations: {
     SET_TOKEN: function (state, token) {
@@ -47,7 +47,12 @@ export default new Vuex.Store({
       // console.log(state.directors)
     },
     SET_USERNAME: function(state, username) {
+      localStorage.setItem("username", username);
       state.username = username
+    },
+    EXP_USERNAME: function(state) {
+      localStorage.removeItem("username")
+      state.username = null
     }
   },
   actions: {
@@ -71,10 +76,12 @@ export default new Vuex.Store({
     },
     logout: function ({ commit }) {
       commit("EXP_TOKEN")
+      commit("EXP_USERNAME")
     },
     setUsername: function ({ commit }, username) {
       commit('SET_USERNAME', username)
     },
+    
     getPopularMovies: function ({ commit }, popularMovieList) {
       commit('GET_POPULAR_MOVIE_LIST', popularMovieList)
     },
