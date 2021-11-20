@@ -1,12 +1,13 @@
 <template>
   <div>
-    <input type="text" v-model="newReview" @keyup.enter="writeReview" />
+    <input type="text" v-model.trim="newReview" @keyup.enter="writeReview" />
     <button @click="writeReview">작성</button>
   </div>
 </template>
 
 <script>
 import axios from "axios";
+
 export default {
   name: "ReviewForm",
   data: function () {
@@ -26,9 +27,14 @@ export default {
         data: {
           content: this.newReview,
         },
-      }).catch((err) => {
-        console.log(err);
-      });
+      })
+        .then((res) => {
+          this.$emit("add-review", res.data);
+          this.newReview = null;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
   },
 };

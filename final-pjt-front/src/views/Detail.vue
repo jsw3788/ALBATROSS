@@ -19,9 +19,25 @@
                 <b-card-text>
                   <p>{{ movie.release_date }}</p>
                   <p v-if="movie.tmdb_vote_cnt">
-                    평점: {{ movie.tmdb_vote_sum / movie.tmdb_vote_cnt }}
+                    평점: {{ movie.tmdb_vote_sum / movie.tmdb_vote_cnt / 2 }}
                   </p>
                   <p v-else>등록된 평점이 없습니다.</p>
+                  <!-- <star-rating :increment="0.5"></star-rating> -->
+                  <div
+                    @click="showCurrentRating(0)"
+                    @mouseleave="showCurrentRating(0)"
+                    style="display: inline-block"
+                  >
+                    <star-rating
+                      :show-rating="false"
+                      @current-rating="showCurrentRating"
+                      @rating-selected="setCurrentSelectedRating"
+                      :increment="0.5"
+                    ></star-rating>
+                  </div>
+                  <div style="margin-top: 10px; font-weight: bold">
+                    {{ currentRating }}
+                  </div>
                   <p>
                     <span v-for="genre in movie.genres" :key="genre.id"
                       >{{ genre.name }}
@@ -38,12 +54,16 @@
             <p>{{ movie.overview }}</p>
           </div>
           <div>
-            <review-form :movieId="movie.id"></review-form>
+            <review-form
+              :movieId="movie.id"
+              @add-review="addReview"
+            ></review-form>
             <review-list
               v-for="review in reviews"
               :key="review.id"
               :review="review"
               :movieId="movie.id"
+              @delete-review="deleteReview"
             ></review-list>
           </div>
         </b-col>
@@ -52,12 +72,8 @@
     <div></div>
     <div></div>
     <div v-if="isLogin">
-      <button v-if="wanted" @click="updatedWanted">
-        보고싶어요 취소
-      </button>
-      <button v-else @click="updatedWanted">
-        보고싶어요
-      </button>
+      <button v-if="wanted" @click="updatedWanted">보고싶어요 취소</button>
+      <button v-else @click="updatedWanted">보고싶어요</button>
     </div>
   </div>
 </template>
@@ -66,8 +82,7 @@
 import axios from "axios";
 import ReviewForm from "@/components/review/ReviewForm";
 import ReviewList from "@/components/review/ReviewList";
-import { mapGetters } from 'vuex'
-
+import { mapGetters } from "vuex";
 export default {
   name: "Detail",
   components: {
@@ -80,6 +95,11 @@ export default {
       reviews: "",
       wanted: null,
       score: null,
+
+      rating: "No Rating Selected",
+      currentRating: "",
+      currentSelectedRating: "No Current Rating",
+      boundRating: 3,
     };
   },
   methods: {
@@ -89,13 +109,13 @@ export default {
         url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/wanted/${this.$route.params.movie_id}/`,
         headers: this.config,
       })
-      .then((res) => {
-        console.log(res);
-        this.wanted = res.data.wanted
-      })
-      .catch((err) => {
-        console.log(err);
-      })
+        .then((res) => {
+          console.log(res);
+          this.wanted = res.data.wanted;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
     checkWanted: function () {
       axios({
@@ -103,25 +123,36 @@ export default {
         url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/wanted/${this.$route.params.movie_id}/`,
         headers: this.config,
       })
-      .then((res) => {
-        this.wanted = res.data.wanted
-      })
-      .catch((err) => {
-        console.log(err);
-      })
+        .then((res) => {
+          this.wanted = res.data.wanted;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
-    checkScore: function () {
+    addReview: function (review) {
+      this.reviews.push(review);
+    },
+    deleteReview: function (delReview) {
+      const idx = this.reviews.indexOf(delReview);
+      this.reviews.splice(idx, 1);
+    },
+    checkScore: function () {},
 
-    }
-
+    setRating: function (rating) {
+      this.rating = "Selected: " + rating + " stars";
+    },
+    showCurrentRating: function (rating) {
+      this.currentRating = rating === 0 ? this.currentSelectedRating : "";
+    },
+    setCurrentSelectedRating: function (rating) {
+      this.currentSelectedRating = "Selected: " + rating + " stars";
+      // 평점 주는 함수 axios "raing"을 data로 줘서 실행하면 될듯
+    },
   },
   computed: {
-    ...mapGetters([
-      'isLogin',
-      'config'
-    ])
+    ...mapGetters(["isLogin", "config"]),
   },
-  
   created: function () {
     axios({
       method: "get",
@@ -148,10 +179,9 @@ export default {
       .catch((err) => {
         console.log(err);
       });
-
-    if(this.isLogin){
-      this.checkWanted()
-      this.checkScore()
+    if (this.isLogin) {
+      this.checkWanted();
+      this.checkScore();
     }
   },
 };
