@@ -11,10 +11,10 @@
     </div>
     <div v-if="!isMySelf">
       <button v-if="isfollowing" @click="follow">
-        Unfollow
+        언팔로우
       </button>
       <button v-else @click="follow">
-        Follow
+        팔로우
       </button>
     </div>
     <profile-movie></profile-movie>
@@ -49,7 +49,7 @@ export default {
       axios({
         method: 'post',
         url: `http://127.0.0.1:8000/api/v2/${this.username}/follow/`,
-        headers: this.Config
+        headers: this.config
       }).then(res =>{
         this.isfollowing = res.data.following
         this.follower = res.data.followingCnt
@@ -61,7 +61,7 @@ export default {
     axios({
         method: 'get',
         url: `http://127.0.0.1:8000/api/v2/${this.$route.params.username}/profile/`,
-        headers: this.Config
+        headers: this.config
         
       }).then(res => {
         
@@ -85,7 +85,7 @@ export default {
       }
     },
     ...mapGetters([
-      'Config'
+      'config'
     ])
   }
 

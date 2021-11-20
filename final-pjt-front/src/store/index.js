@@ -119,7 +119,7 @@ export default new Vuex.Store({
     isLogin: function (state) {
       return state.jwtToken ? true : false
     },
-    Config: function (state) {
+    config: function (state) {
       return {
             Authorization: `JWT ${state.jwtToken}`
           }
