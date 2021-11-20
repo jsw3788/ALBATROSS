@@ -1,6 +1,7 @@
 <template>
   <div>
     <ul>
+      <h3>리뷰 좋아요순</h3>
       <profile-review-item
        v-for="review in popular_reviews"
        :key="review.id"
@@ -10,13 +11,14 @@
       </profile-review-item>
     </ul>
     <ul>
-      <profile-movie-item
+      <h3>리뷰 작성일순</h3>
+      <profile-review-item
        v-for="review in recent_reviews"
        :key="review.id"
        :review="review"
       >
 
-      </profile-movie-item>
+      </profile-review-item>
     </ul>
   </div>
 </template>
@@ -46,9 +48,9 @@ name: 'ProfileReview',
         // headers: this.setToken(),
       
       }).then(res => {
-        
+        console.log('popular_reviews')
         console.log(res)
-        // this.favorite_movies = 
+        this.popular_reviews = res.data
 
       }).catch(err => { console.log(err) })
 
@@ -60,9 +62,9 @@ name: 'ProfileReview',
         // headers: this.setToken(),
       
       }).then(res => {
-        
+        console.log('recent_reviews')
         console.log(res)
-        // this.recent_movies = 
+        this.recent_reviews = res.data 
 
 
       }).catch(err => { console.log(err) })
