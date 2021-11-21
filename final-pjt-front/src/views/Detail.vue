@@ -28,21 +28,27 @@
                     </button>
                     <button v-else @click="updatedWanted">보고싶어요</button>
                   </div>
-                  <!-- <star-rating :increment="0.5"></star-rating> -->
-                  <div
-                    @click="showCurrentRating(0)"
-                    @mouseleave="showCurrentRating(0)"
-                    style="display: inline-block"
-                  >
-                    <star-rating
-                      :show-rating="false"
-                      @current-rating="showCurrentRating"
-                      @rating-selected="setCurrentSelectedRating"
-                      :increment="0.5"
-                    ></star-rating>
-                  </div>
-                  <div style="margin-top: 10px; font-weight: bold">
-                    {{ currentRating }}
+                  <div v-if="isLogin">
+                    <div
+                      @click="showCurrentRating(0)"
+                      @mouseleave="showCurrentRating(0)"
+                      style="display: inline-block"
+                    >
+                      <star-rating
+                        :rating="score"
+                        :rounded-corners="true"
+                        :show-rating="false"
+                        @current-rating="showCurrentRating(score)"
+                        @rating-selected="setCurrentSelectedRating"
+                        :increment="0.5"
+                      ></star-rating>
+                    </div>
+                    <div style="margin-top: 10px; font-weight: bold">
+                      {{ currentRating }}
+                    </div>
+                    <div v-if="isScored">
+                      <button @click="deleteScore">평가 지우기</button>
+                    </div>
                   </div>
                   <p>
                     <span v-for="genre in movie.genres" :key="genre.id"
@@ -100,9 +106,9 @@ export default {
       score: null,
 
       rating: "No Rating Selected",
-      currentRating: "",
-      currentSelectedRating: "No Current Rating",
-      boundRating: 3,
+      currentRating: "별점을 매겨주세요",
+      currentSelectedRating: "",
+      // boundRating: 3,
     };
   },
   methods: {
@@ -133,6 +139,7 @@ export default {
           console.log(err);
         });
     },
+
     addReview: function (review) {
       this.reviews.push(review);
     },
@@ -140,7 +147,6 @@ export default {
       const idx = this.reviews.indexOf(delReview);
       this.reviews.splice(idx, 1);
     },
-    checkScore: function () {},
 
     setRating: function (rating) {
       this.rating = "Selected: " + rating + " stars";
@@ -148,15 +154,92 @@ export default {
     showCurrentRating: function (rating) {
       this.currentRating = rating === 0 ? this.currentSelectedRating : "";
     },
-    setCurrentSelectedRating: function (rating) {
-      this.currentSelectedRating = "Selected: " + rating + " stars";
-      // 평점 주는 함수 axios "raing"을 data로 줘서 실행하면 될듯
+    checkScore: function () {
+      // score 데이터 가져오기
+      axios({
+        method: "get",
+        url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/score/${this.$route.params.movie_id}/`,
+        headers: this.$store.getters.config,
+      })
+        .then((res) => {
+          // console.log(res)
+          const tempscore = res.data.score;
+
+          if (tempscore === 0) {
+            this.currentRating = "별점을 매겨주세요";
+          } else {
+            this.showCurrentRating(0);
+            this.currentRating = "평가함 ☆: " + tempscore;
+          }
+          this.score = tempscore;
+          console.log(this.score);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+
+    setCurrentSelectedRating: function (score) {
+      // 평가한 데이터가 없으면 생성
+      if (!this.score) {
+        axios({
+          method: "post",
+          url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/score/${this.$route.params.movie_id}/`,
+          headers: this.$store.getters.config,
+          data: {
+            score: score,
+          },
+        })
+          .then((res) => {
+            this.wanted = res.data.wanted;
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      } else {
+        // 평가한 데이터가 있으면 수정
+        axios({
+          method: "put",
+          url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/score/${this.$route.params.movie_id}/`,
+          headers: this.$store.getters.config,
+          data: {
+            score: score,
+          },
+        })
+          .then((res) => {
+            this.wanted = res.data.wanted;
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+      this.currentSelectedRating = "평가함 ☆: " + score;
+      this.score = score;
+    },
+    deleteScore: function () {
+      axios({
+        method: "delete",
+        url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/score/${this.$route.params.movie_id}/`,
+        headers: this.$store.getters.config,
+      })
+        .then(() => {
+          this.score = 0;
+          this.currentSelectedRating = "";
+          this.showCurrentRating(0);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
   },
   computed: {
+    isScored: function () {
+      return this.score;
+    },
     ...mapGetters(["isLogin", "config"]),
   },
   created: function () {
+    // 영화 디테일 가져오기
     axios({
       method: "get",
       url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/detail/${this.$route.params.movie_id}`,
@@ -170,18 +253,20 @@ export default {
       .catch((err) => {
         console.log(err);
       });
+
+    // 영화에 달린 리뷰 가져오기
     axios({
       method: "get",
       url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/${this.$route.params.movie_id}/reviews/`,
       headers: this.$store.getters.config,
     })
       .then((res) => {
-        console.log(res);
         this.reviews = res.data;
       })
       .catch((err) => {
         console.log(err);
       });
+
     if (this.isLogin) {
       this.checkWanted();
       this.checkScore();
