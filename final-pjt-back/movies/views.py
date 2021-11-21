@@ -137,6 +137,7 @@ def read_update_score(request, movie_pk):
     else:
         # 선택한 영화
         movie = get_object_or_404(Movie, pk=movie_pk)
+        
         after_score = request.data.get('score')
         if request.method == "PUT":
             my_movie = Record.objects.get(user=request.user.pk, movie=movie.pk)
@@ -146,7 +147,9 @@ def read_update_score(request, movie_pk):
             # 이거는 내가 담아놓은 모든 장르 가져오는 필터
             my_recommends = Recommend.objects.filter(
                 user=request.user.pk).values('genre')
+            # print(my_recommends)
             movie_genres = movie.genres.all()
+            # print(movie_genres)
             for movie_genre in movie_genres:
                 for recommend in my_recommends:
                     if movie_genre.pk == recommend.genre:  # 이거 값들은 나중에 찍어보면서 확인
@@ -183,10 +186,20 @@ def read_update_score(request, movie_pk):
                     user=request.user,
                     movie=movie
                 )
-                
+                # for genre in movie.genres.all():
+                #     Recommend.objects.create(
+                #         user=request.user,
+                #         genre=genre,
+                #         score = after_score,
+                #         count = 
+                #     )
+
+
                 my_recommends = Recommend.objects.filter(
                     user=request.user.pk).values('genre')
+                # print(my_recommends)
                 movie_genres = movie.genres.all()
+                # print(movie_genres)
                 for movie_genre in movie_genres:
                     for recommend in my_recommends:
                         if movie_genre.pk == recommend.genre:
@@ -198,7 +211,7 @@ def read_update_score(request, movie_pk):
             }
             return JsonResponse(context)
 
-        elif request.mehtod == "DELETE":  # 0점을 줬어! 삭제할거야!
+        elif request.method == "DELETE":  # 0점을 줬어! 삭제할거야!
             my_movie = Record.objects.get(user=request.user.pk, movie=movie.pk)
             before_score = my_movie.score
             my_recommends = Recommend.objects.filter(
@@ -211,6 +224,11 @@ def read_update_score(request, movie_pk):
                         recommend.count -= 1
                         recommend.save()
             my_movie.delete()
+
+            context={
+                'deleted': '평점데이터가 삭제되었습니다.'
+            }
+            return JsonResponse(context) 
 
 
 # 영화를 보고싶어하면 wanted를 true로 Record에 넣기
@@ -432,6 +450,7 @@ def comment_detail(request, comment_pk):
 
 # db 장르 데이터 불러오기
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def get_genre(request):
     API_KEY = config('API_KEY')
     URL = f'https://api.themoviedb.org/3/genre/movie/list?api_key={API_KEY}&language=ko-KR'
@@ -446,9 +465,8 @@ def get_genre(request):
     return Response({'database': '성공'}, status=status.HTTP_201_CREATED)
 
 # db 영화 데이터 불러오기
-
-
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def get_movies(request):
     API_KEY = config('API_KEY')
     for page in range(1, 2):
@@ -490,9 +508,8 @@ def get_movies(request):
     return Response({'database': '성공'}, status=status.HTTP_201_CREATED)
 
 # db 영화인 데이터 불러오기
-
-
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def get_credits(request):
     API_KEY = config('API_KEY')
     movie_data = get_list_or_404(Movie)

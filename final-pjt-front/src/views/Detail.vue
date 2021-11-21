@@ -22,21 +22,28 @@
                     평점: {{ movie.tmdb_vote_sum / movie.tmdb_vote_cnt / 2 }}
                   </p>
                   <p v-else>등록된 평점이 없습니다.</p>
-                  <!-- <star-rating :increment="0.5"></star-rating> -->
-                  <div
-                    @click="showCurrentRating(0)"
-                    @mouseleave="showCurrentRating(0)"
-                    style="display: inline-block"
-                  >
-                    <star-rating
-                      :show-rating="false"
-                      @current-rating="showCurrentRating"
-                      @rating-selected="setCurrentSelectedRating"
-                      :increment="0.5"
-                    ></star-rating>
-                  </div>
-                  <div style="margin-top: 10px; font-weight: bold">
-                    {{ currentRating }}
+                  
+                  <div v-if="isLogin">
+                    <div
+                      @click="showCurrentRating(0)"
+                      @mouseleave="showCurrentRating(0)"
+                      style="display: inline-block"
+                    >
+                      <star-rating
+                        :rating="score"
+                        :rounded-corners="true"
+                        :show-rating="false"
+                        @current-rating="showCurrentRating(score)"
+                        @rating-selected="setCurrentSelectedRating"
+                        :increment="0.5"
+                      ></star-rating>
+                    </div>
+                    <div style="margin-top: 10px; font-weight: bold">
+                      {{ currentRating }}
+                    </div>
+                    <div v-if="isScored">
+                      <button @click="deleteScore">평가 지우기</button>
+                    </div>
                   </div>
                   <p>
                     <span v-for="genre in movie.genres" :key="genre.id"
@@ -130,30 +137,6 @@ export default {
           console.log(err);
         });
     },
-    checkScore: function () {
-      // score 데이터 가져오기
-      axios({
-            method: "get",
-            url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/score/${this.$route.params.movie_id}/`,
-            headers: this.$store.getters.config,
-            
-        }).then((res) => {
-          // console.log(res)
-          const tempscore = res.data.score
-          console.log("tempscore:"+tempscore)
-          if (tempscore === 0){
-            this.currentRating = "별점을 매겨주세요"
-          }else{
-            this.currentRating = "평가함 ☆: " + tempscore 
-          }
-          this.showCurrentRating()
-          console.log(this.currentRating)
-            
-          })
-          .catch((err) => {
-            console.log(err);
-          })
-    },
 
     addReview: function (review) {
       this.reviews.push(review);
@@ -169,10 +152,36 @@ export default {
     showCurrentRating: function (rating) {
       this.currentRating = rating === 0 ? this.currentSelectedRating : "";
     },
+    checkScore: function () {
+      // score 데이터 가져오기
+      axios({
+            method: "get",
+            url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/score/${this.$route.params.movie_id}/`,
+            headers: this.$store.getters.config,
+            
+        }).then((res) => {
+          // console.log(res)
+          const tempscore = res.data.score
+          
+          if (tempscore === 0){
+            this.currentRating = "별점을 매겨주세요"
+          }else{
+            this.showCurrentRating(0)
+            this.currentRating = "평가함 ☆: " + tempscore 
+          }
+          this.score = tempscore
+          console.log(this.score)
+            
+          })
+          .catch((err) => {
+            console.log(err);
+          })
+      },
+
+
     setCurrentSelectedRating: function (score) {
       // 평가한 데이터가 없으면 생성
-      console.log(this.currentSelectedRating)
-      if (!this.currentSelectedRating){
+      if (!this.score){
         axios({
           method: "post",
           url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/score/${this.$route.params.movie_id}/`,
@@ -204,9 +213,27 @@ export default {
         })
       }
       this.currentSelectedRating = "평가함 ☆: " + score ;
+      this.score=score
     },
+    deleteScore: function () {
+      axios({
+        method: "delete",
+        url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/score/${this.$route.params.movie_id}/`,
+        headers: this.$store.getters.config,
+      }).then(() => {
+          this.score = 0
+          this.currentSelectedRating=""
+          this.showCurrentRating(0)
+
+        }).catch((err) => {
+          console.log(err);
+        })
+    }
   },
   computed: {
+    isScored: function () {
+      return this.score
+    },
     ...mapGetters(["isLogin", "config"]),
   },
   created: function () {
@@ -243,7 +270,6 @@ export default {
     if (this.isLogin) {
       this.checkWanted();
       this.checkScore();
-      
     }
   },
 };
