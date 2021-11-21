@@ -22,6 +22,12 @@
                     평점: {{ movie.tmdb_vote_sum / movie.tmdb_vote_cnt / 2 }}
                   </p>
                   <p v-else>등록된 평점이 없습니다.</p>
+                  <div v-if="isLogin">
+                    <button v-if="wanted" @click="updatedWanted">
+                      보고싶어요 취소
+                    </button>
+                    <button v-else @click="updatedWanted">보고싶어요</button>
+                  </div>
                   <!-- <star-rating :increment="0.5"></star-rating> -->
                   <div
                     @click="showCurrentRating(0)"
@@ -53,7 +59,8 @@
             <p>줄거리</p>
             <p>{{ movie.overview }}</p>
           </div>
-          <div>
+          <!-- 이하 리뷰칸 -->
+          <div class="review">
             <review-form
               :movieId="movie.id"
               @add-review="addReview"
@@ -71,10 +78,6 @@
     </b-container>
     <div></div>
     <div></div>
-    <div v-if="isLogin">
-      <button v-if="wanted" @click="updatedWanted">보고싶어요 취소</button>
-      <button v-else @click="updatedWanted">보고싶어요</button>
-    </div>
   </div>
 </template>
 
@@ -192,6 +195,9 @@ export default {
   color: white;
 }
 .side-card {
+  background-color: black;
+}
+.review {
   background-color: black;
 }
 </style>

@@ -1,7 +1,6 @@
 from django.http.response import JsonResponse
-from requests.api import get
 from rest_framework.decorators import api_view, authentication_classes
-from rest_framework import status
+from rest_framework import serializers, status
 from rest_framework.response import Response
 import requests
 from django.shortcuts import get_list_or_404, get_object_or_404
@@ -61,7 +60,8 @@ def read_movies_by_release(request):
 
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
+@authentication_classes([JSONWebTokenAuthentication])
+@permission_classes([IsAuthenticated])
 def read_movies_by_recommend(request):
     my_genre = Recommend.objects.filter(user__pk=request.user.pk)
     most_prefer_point = 0
@@ -85,7 +85,6 @@ def read_movies_by_recommend(request):
 
 # 인기순 상위 감독 리스트
 @api_view(['GET'])
-@permission_classes([AllowAny])
 @permission_classes([AllowAny])
 def director_list(request):
     directors = Director.objects.order_by('-popularity')[:20]
@@ -261,7 +260,7 @@ def read_popular_reviews_by_user(request, username):
             reviews.append((review.like_users.count(), review))
         # 좋아요 순 정렬
         sorted_reviews = sorted(reviews, key=lambda x: x[0])[:3]
-        popular_reviews=[]
+        popular_reviews = []
         for cnt, review in sorted_reviews:
             popular_reviews.append(review)
         return Response(ReviewListSerializer(popular_reviews, many=True).data)
@@ -317,7 +316,6 @@ def review_list(request, movie_pk):
 @permission_classes([IsAuthenticated])
 def review_detail(request, review_pk):
     review = get_object_or_404(Review, pk=review_pk)
-    print(1111)
     if request.method == 'GET':
         serializer = ReviewSerializer(review)
         return Response(serializer.data)
@@ -392,7 +390,9 @@ def comment_list(request, review_pk):
         return Response(serializer.data)
     elif request.method == 'POST':
         serializer = CommentSerializer(data=request.data)
+        print(serializer)
         if serializer.is_valid(raise_exception=True):
+            print(13451235)
             serializer.save(user=request.user, review=review)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 

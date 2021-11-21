@@ -44,10 +44,7 @@ export default {
         url: `http://127.0.0.1:8000/api/v2/signup/`,
         data: this.credentials,
       })
-        .then((res) => {
-          console.log("확인");
-          localStorage.setItem("jwt", res.data.token);
-          // this.$emit("login")
+        .then(() => {
           this.$router.go();
         })
         .catch((err) => {

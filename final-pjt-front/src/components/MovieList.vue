@@ -1,15 +1,14 @@
 <template>
   <div>
-    <div class="d-flex">
+    <slick ref="slick" :options="slickOptions">
       <movie-item
         v-for="movie in popularMovies"
         :key="movie.tmdb_id"
         :movie="movie"
       ></movie-item>
-    </div>
-
+    </slick>
     <hr />
-    <div class="d-flex">
+    <div class="d-flex recommend-movie-list">
       <movie-item
         v-for="movie in recommendMovies"
         :key="movie.tmdb_id"
@@ -17,7 +16,7 @@
       ></movie-item>
     </div>
     <hr />
-    <div class="d-flex">
+    <div class="d-flex released-movie-list">
       <movie-item
         v-for="movie in releasedMovies"
         :key="movie.tmdb_id"
@@ -25,7 +24,7 @@
       ></movie-item>
     </div>
     <hr />
-    <div class="d-flex">
+    <div class="d-flex score-movie-list">
       <movie-item
         v-for="movie in scoreMovies"
         :key="movie.tmdb_id"
@@ -39,12 +38,32 @@
 import MovieItem from "@/components/MovieItem";
 import axios from "axios";
 import { mapState } from "vuex";
+import Slick from "vue-slick";
+import "slick-carousel/slick/slick.css";
 
 export default {
   name: "MovieList",
   components: {
     MovieItem,
+    Slick,
   },
+  data: function () {
+    return {
+      slickOptions: {
+        slidesToShow: 5,
+        shileToScroll: 5,
+      },
+    };
+  },
+  // methods: {
+  //   next() {
+  //     this.$refs.slick.next();
+  //   },
+
+  //   prev() {
+  //     this.$refs.slick.prev();
+  //   },
+  // },
   computed: {
     ...mapState([
       "popularMovies",

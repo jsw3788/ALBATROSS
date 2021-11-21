@@ -1,6 +1,8 @@
 <template>
-  <div>
+  <div id="review-from">
     <input type="text" v-model.trim="newReview" @keyup.enter="writeReview" />
+    <input type="checkbox" id="spoiler" v-model="newReviewSpoil" />
+    <label for="spoiler">스포일러</label>
     <button @click="writeReview">작성</button>
   </div>
 </template>
@@ -13,6 +15,7 @@ export default {
   data: function () {
     return {
       newReview: null,
+      newReviewSpoil: false,
     };
   },
   props: {
@@ -26,6 +29,7 @@ export default {
         headers: this.$store.getters.config,
         data: {
           content: this.newReview,
+          is_spoiled: this.newReviewSpoil,
         },
       })
         .then((res) => {
@@ -39,6 +43,3 @@ export default {
   },
 };
 </script>
-
-<style>
-</style>

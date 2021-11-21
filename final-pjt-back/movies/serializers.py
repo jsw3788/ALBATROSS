@@ -85,6 +85,8 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
 
+    user = UserProfileUpdateSerializer(read_only=True)
+
     class Meta:
         model = Comment
         fields = (
@@ -96,6 +98,7 @@ class CommentSerializer(serializers.ModelSerializer):
             'updated_at',
             'is_spoiled'
         )
+        read_only_fields = ('user', 'review')
 
 
 class DirectorListSerializer(serializers.ModelSerializer):

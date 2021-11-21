@@ -6,29 +6,25 @@
         :key="actor.actor_id"
         :actor="actor"
       >
-
       </people-actor-list-item>
     </ul>
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex'
-import PeopleActorListItem from '@/components/PeopleActorListItem'
+import { mapState } from "vuex";
+import PeopleActorListItem from "@/components/people/PeopleActorListItem";
 
 export default {
-  name: 'PeopleActorList',
+  name: "PeopleActorList",
   components: {
-    PeopleActorListItem
+    PeopleActorListItem,
   },
   computed: {
-    ...mapState([
-      'actors',
-    ])
-  }
-}
+    ...mapState(["actors"]),
+  },
+};
 </script>
 
 <style>
-
 </style>

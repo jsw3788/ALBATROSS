@@ -9,18 +9,18 @@
 </template>
 
 <script>
-import PeopleActorList from '@/components/PeopleActorList'
-import PeopleDirectorList from '@/components/PeopleDirectorList'
+import PeopleActorList from "@/components/people/PeopleActorList";
+import PeopleDirectorList from "@/components/people/PeopleDirectorList";
 
 export default {
   name: "People",
   components: {
     PeopleActorList,
-    PeopleDirectorList
+    PeopleDirectorList,
   },
   created: function () {
-    this.$store.dispatch('getPeople')
-  }
+    this.$store.dispatch("getPeople");
+  },
 };
 </script>
 
