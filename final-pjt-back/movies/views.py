@@ -125,7 +125,15 @@ def read_update_score(request, movie_pk):
     # PUT 요청은 사용자가 매긴 평점을 수정할 경우
     # DELETE 요청은 사용자가 평점을 0으로 바꿀 경우
     if request.method == "GET":
-        pass
+        if Record.objects.filter(user=request.user.pk, movie=movie_pk).exists():
+            my_movie = Record.objects.get(user=request.user.pk, movie=movie_pk)
+            score = my_movie.score
+        else:
+            score = 0
+        context = {
+            'score': score,
+        }
+        return JsonResponse(context)
     else:
         # 선택한 영화
         movie = get_object_or_404(Movie, pk=movie_pk)
@@ -144,8 +152,12 @@ def read_update_score(request, movie_pk):
                     if movie_genre.pk == recommend.genre:  # 이거 값들은 나중에 찍어보면서 확인
                         recommend.score += (after_score - before_score)
                         recommend.save()
+            context={
+                'wanted': my_movie.wanted
+            }
+            return JsonResponse(context)
 
-        elif request.mehtod == "POST":
+        elif request.method == "POST":
             # 보고싶어요가 체크되어 있는 상태라면
             if Record.objects.filter(user=request.user.pk, movie=movie_pk).exists():
                 my_movie = Record.objects.get(
@@ -168,12 +180,10 @@ def read_update_score(request, movie_pk):
                     poster_path=movie.poster_path,
                     score=after_score,
                     wanted=False,
+                    user=request.user,
+                    movie=movie
                 )
-                """
-                아래가 맞는 표현인지 Vue 후에 확인 필요
-                """
-                my_movie.user.add(request.user)
-                my_movie.movie.add(movie)
+                
                 my_recommends = Recommend.objects.filter(
                     user=request.user.pk).values('genre')
                 movie_genres = movie.genres.all()
@@ -183,6 +193,10 @@ def read_update_score(request, movie_pk):
                             recommend.score += after_score
                             recommend.count += 1
                             recommend.save()
+            context={
+                'wanted': my_movie.wanted
+            }
+            return JsonResponse(context)
 
         elif request.mehtod == "DELETE":  # 0점을 줬어! 삭제할거야!
             my_movie = Record.objects.get(user=request.user.pk, movie=movie.pk)
@@ -317,7 +331,6 @@ def review_list(request, movie_pk):
 @permission_classes([IsAuthenticated])
 def review_detail(request, review_pk):
     review = get_object_or_404(Review, pk=review_pk)
-    print(1111)
     if request.method == 'GET':
         serializer = ReviewSerializer(review)
         return Response(serializer.data)
