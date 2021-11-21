@@ -58,8 +58,8 @@
 
 <script>
 import { mapState } from "vuex";
-import SignupForm from "@/components/SignupForm";
-import LoginForm from "@/components/LoginForm";
+import SignupForm from "@/components/authform/SignupForm";
+import LoginForm from "@/components/authform/LoginForm";
 import { mapGetters } from "vuex";
 
 export default {
@@ -89,12 +89,15 @@ export default {
     },
     goToMyProfile: function () {
       // console.log(this.username)
-      if (this.username){
-        this.$router.push({ name: 'Profile' , params: { username: this.username } })
-      }else{
-        alert('로그인을 해주세요')
+      if (this.username) {
+        this.$router.push({
+          name: "Profile",
+          params: { username: this.username },
+        });
+      } else {
+        alert("로그인을 해주세요");
       }
-    }
+    },
   },
   computed: {
     ...mapGetters(["isLogin"]),
@@ -110,6 +113,7 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  background-color: #2c3e50;
+  background-color: #14181c;
+  color: white;
 }
 </style>

@@ -6,29 +6,25 @@
         :key="director.director_id"
         :director="director"
       >
-
       </people-director-list-item>
     </ul>
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex'
-import PeopleDirectorListItem from '@/components/PeopleDirectorListItem'
+import { mapState } from "vuex";
+import PeopleDirectorListItem from "@/components/people/PeopleDirectorListItem";
 
 export default {
-  name: 'PeopleDirectorList',
+  name: "PeopleDirectorList",
   components: {
     PeopleDirectorListItem,
   },
   computed: {
-    ...mapState([
-      'directors',
-    ])
-  }
-}
+    ...mapState(["directors"]),
+  },
+};
 </script>
 
 <style>
-
 </style>
