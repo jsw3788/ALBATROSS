@@ -97,9 +97,9 @@ export default {
       score: null,
 
       rating: "No Rating Selected",
-      currentRating: "",
-      currentSelectedRating: "No Current Rating",
-      boundRating: 3,
+      currentRating: "별점을 매겨주세요",
+      currentSelectedRating: "",
+      // boundRating: 3,
     };
   },
   methods: {
@@ -130,6 +130,31 @@ export default {
           console.log(err);
         });
     },
+    checkScore: function () {
+      // score 데이터 가져오기
+      axios({
+            method: "get",
+            url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/score/${this.$route.params.movie_id}/`,
+            headers: this.$store.getters.config,
+            
+        }).then((res) => {
+          // console.log(res)
+          const tempscore = res.data.score
+          console.log("tempscore:"+tempscore)
+          if (tempscore === 0){
+            this.currentRating = "별점을 매겨주세요"
+          }else{
+            this.currentRating = "평가함 ☆: " + tempscore 
+          }
+          this.showCurrentRating()
+          console.log(this.currentRating)
+            
+          })
+          .catch((err) => {
+            console.log(err);
+          })
+    },
+
     addReview: function (review) {
       this.reviews.push(review);
     },
@@ -137,7 +162,6 @@ export default {
       const idx = this.reviews.indexOf(delReview);
       this.reviews.splice(idx, 1);
     },
-    checkScore: function () {},
 
     setRating: function (rating) {
       this.rating = "Selected: " + rating + " stars";
@@ -145,15 +169,49 @@ export default {
     showCurrentRating: function (rating) {
       this.currentRating = rating === 0 ? this.currentSelectedRating : "";
     },
-    setCurrentSelectedRating: function (rating) {
-      this.currentSelectedRating = "Selected: " + rating + " stars";
-      // 평점 주는 함수 axios "raing"을 data로 줘서 실행하면 될듯
+    setCurrentSelectedRating: function (score) {
+      // 평가한 데이터가 없으면 생성
+      console.log(this.currentSelectedRating)
+      if (!this.currentSelectedRating){
+        axios({
+          method: "post",
+          url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/score/${this.$route.params.movie_id}/`,
+          headers: this.$store.getters.config,
+          data: {
+            score: score,
+          }
+      }).then((res) => {
+        
+          this.wanted=res.data.wanted
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+      } else{
+        // 평가한 데이터가 있으면 수정
+        axios({
+          method: "put",
+          url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/score/${this.$route.params.movie_id}/`,
+          headers: this.$store.getters.config,
+          data: {
+            score: score,
+          }
+      }).then((res) => {
+          this.wanted = res.data.wanted
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+      }
+      this.currentSelectedRating = "평가함 ☆: " + score ;
     },
   },
   computed: {
     ...mapGetters(["isLogin", "config"]),
   },
   created: function () {
+
+    // 영화 디테일 가져오기
     axios({
       method: "get",
       url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/detail/${this.$route.params.movie_id}`,
@@ -167,21 +225,25 @@ export default {
       .catch((err) => {
         console.log(err);
       });
+
+    // 영화에 달린 리뷰 가져오기
     axios({
       method: "get",
       url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/${this.$route.params.movie_id}/reviews/`,
       headers: this.$store.getters.config,
     })
       .then((res) => {
-        console.log(res);
         this.reviews = res.data;
       })
       .catch((err) => {
         console.log(err);
       });
+    
+      
     if (this.isLogin) {
       this.checkWanted();
       this.checkScore();
+      
     }
   },
 };
