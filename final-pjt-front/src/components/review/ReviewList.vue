@@ -12,7 +12,7 @@
         <p>{{ review.updated_at }}</p>
       </div>
       <div v-if="review.user.username === this.username">
-        <button>수정</button>
+        <button @click="updateReview">수정</button>
         <button @click="deleteReview">삭제</button>
       </div>
     </div>
@@ -32,6 +32,7 @@
         v-for="comment in comments"
         :key="comment.id"
         :comment="comment"
+        @update-comment="updateComment"
         @delete-comment="deleteComment"
       ></review-comment>
     </div>
@@ -60,6 +61,9 @@ export default {
     review: Object,
   },
   methods: {
+    updateReview: function () {
+
+    },
     deleteReview: function () {
       const delReview = this.review;
       axios({
@@ -88,6 +92,20 @@ export default {
           console.log(err);
         });
     },
+    updateComment: function (updatedcomment, beforecomment) {
+      this.comments = this.comments.map(comment => {
+        if (comment===updatedcomment){
+          return updatedcomment
+          }else{
+            return comment
+          }
+        }
+      )
+      const idx = this.comments.indexOf(beforecomment)
+      this.comments[idx] = updatedcomment
+    },
+
+
     deleteComment: function (delComment) {
       const idx = this.comments.indexOf(delComment);
       this.comments.splice(idx, 1);
@@ -99,8 +117,8 @@ export default {
       url: `${process.env.VUE_APP_SERVER_URL}/api/v1/reviews/${this.review.id}/`,
       headers: this.$store.getters.config,
     })
-      .then((res) => {
-        console.log(res);
+      .then(() => {
+        // console.log(res);
       })
       .catch((err) => {
         console.log(err);
@@ -112,13 +130,14 @@ export default {
       headers: this.$store.getters.config,
     })
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         this.comments = res.data;
       })
       .catch((err) => {
         console.log(err);
       });
   },
+  
   computed: {
     ...mapState(["username"]),
   },

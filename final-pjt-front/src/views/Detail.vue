@@ -172,7 +172,7 @@ export default {
             this.currentRating = "평가함 ☆: " + tempscore;
           }
           this.score = tempscore;
-          console.log(this.score);
+          // console.log(this.score);
         })
         .catch((err) => {
           console.log(err);
