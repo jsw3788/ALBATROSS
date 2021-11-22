@@ -69,7 +69,7 @@ def read_movies_by_recommend(request):
     for genre in my_genre:
         if most_prefer_point < genre.score:
             most_prefer_point = genre.score
-            most_prefer_genre = genre.genre
+            most_prefer_genre = Genre.objects.get(pk=genre.genre_id).tmdb_id
     if most_prefer_genre == 0:
         most_prefer_genre = choice(
             [28, 12, 16, 35, 80, 99, 18, 10751, 14, 36, 27, 10402, 9648, 10749, 878, 10770, 53, 10752, 37])
@@ -139,19 +139,22 @@ def read_update_score(request, movie_pk):
         
         after_score = request.data.get('score')
         if request.method == "PUT":
+            # 원래 평점이 있잔아
             my_movie = Record.objects.get(user=request.user.pk, movie=movie.pk)
             before_score = my_movie.score
             my_movie.score = after_score
             my_movie.save()
             # 이거는 내가 담아놓은 모든 장르 가져오는 필터
-            my_recommends = Recommend.objects.filter(
-                user=request.user.pk).values('genre')
+            my_recommends = Recommend.objects.filter(user=request.user.pk)
             # print(my_recommends)
+            # 이거는 고른 영화의 모든 장르 가져오는 것
             movie_genres = movie.genres.all()
             # print(movie_genres)
             for movie_genre in movie_genres:
                 for recommend in my_recommends:
-                    if movie_genre.pk == recommend.genre:  # 이거 값들은 나중에 찍어보면서 확인
+                    # print(movie_genre, movie_genre.pk)
+                    if movie_genre.pk == recommend.genre_id:  # 이거 값들은 나중에 찍어보면서 확인
+                        # print(after_score - before_score)
                         recommend.score += (after_score - before_score)
                         recommend.save()
             context={
@@ -167,15 +170,24 @@ def read_update_score(request, movie_pk):
                 my_movie.wanted = False
                 my_movie.score = after_score
                 my_movie.save()
-                my_recommends = Recommend.objects.filter(
-                    user=request.user.pk).values('genre')
-                movie_genres = movie.genres.all()
-                for movie_genre in movie_genres:
-                    for recommend in my_recommends:
-                        if movie_genre.pk == recommend.genre:
-                            recommend.score += after_score
-                            recommend.count += 1
-                            recommend.save()
+                for genre in movie.genres.all():
+                    is_recommend = Recommend.objects.filter(genre=genre).exists()
+                    if is_recommend:
+                        my_recommends = Recommend.objects.filter(user=request.user.pk)
+                        # movie_genres = movie.genres.all()
+                        # for movie_genre in movie_genres:
+                        for recommend in my_recommends:
+                            if genre.pk == recommend.genre_id:
+                                recommend.score += after_score
+                                recommend.count += 1
+                                recommend.save()
+                    else:
+                        Recommend.objects.create(
+                            user=request.user,
+                            genre=genre,
+                            score = after_score,
+                            count = 1
+                        )
             else:  # 보고싶어요 체크 안된 상태라면
                 my_movie = Record.objects.create(
                     title=movie.title,
@@ -185,26 +197,29 @@ def read_update_score(request, movie_pk):
                     user=request.user,
                     movie=movie
                 )
-                # for genre in movie.genres.all():
-                #     Recommend.objects.create(
-                #         user=request.user,
-                #         genre=genre,
-                #         score = after_score,
-                #         count = 
-                #     )
-
-
-                my_recommends = Recommend.objects.filter(
-                    user=request.user.pk).values('genre')
-                # print(my_recommends)
-                movie_genres = movie.genres.all()
-                # print(movie_genres)
-                for movie_genre in movie_genres:
-                    for recommend in my_recommends:
-                        if movie_genre.pk == recommend.genre:
-                            recommend.score += after_score
-                            recommend.count += 1
-                            recommend.save()
+                # 영화의 장르를 돌면서, Recommend에 장르가 있는지 확인하자
+                for genre in movie.genres.all():
+                    # print(genre)
+                    is_recommend = Recommend.objects.filter(genre=genre).exists()
+                    # 이미 좋아하는 장르에 있는 데이터면, 수정해줘야하고
+                    if is_recommend:
+                        # 새로 만들고나면 
+                        my_recommends = Recommend.objects.filter(user=request.user.pk)
+                        # movie_genres = movie.genres.all()
+                        # for movie_genre in movie_genres:
+                        for recommend in my_recommends:
+                            if genre.pk == recommend.genre_id:
+                                recommend.score += after_score
+                                recommend.count += 1
+                                recommend.save()
+                    # 아니면 새로 만들어야함
+                    else:
+                        Recommend.objects.create(
+                            user=request.user,
+                            genre=genre,
+                            score = after_score,
+                            count = 1
+                        )
             context={
                 'wanted': my_movie.wanted
             }
@@ -213,15 +228,17 @@ def read_update_score(request, movie_pk):
         elif request.method == "DELETE":  # 0점을 줬어! 삭제할거야!
             my_movie = Record.objects.get(user=request.user.pk, movie=movie.pk)
             before_score = my_movie.score
-            my_recommends = Recommend.objects.filter(
-                user=request.user.pk).values('genre')
+            my_recommends = Recommend.objects.filter(user=request.user.pk)
             movie_genres = movie.genres.all()
             for movie_genre in movie_genres:
                 for recommend in my_recommends:
-                    if movie_genre.pk == recommend.genre:
+                    if movie_genre.pk == recommend.genre_id:
                         recommend.score -= before_score
                         recommend.count -= 1
-                        recommend.save()
+                        if recommend.count:
+                            recommend.save()
+                        else:
+                            recommend.delete()
             my_movie.delete()
 
             context={
@@ -321,7 +338,10 @@ def read_recent_movies_by_user(request, username):
 def read_favorite_movies_by_user(request, username):
     person = get_object_or_404(get_user_model(), username=username)
     favorite_movies = person.movies.order_by('-score')[:10]
-    return Response(MovieListSerializer(favorite_movies, many=True).data)
+    ret = []
+    for favorite_movie in favorite_movies:
+        ret.append(favorite_movie.movie)
+    return Response(MovieListSerializer(ret, many=True).data)
 
 
 # 리뷰 전체 조회, 생성

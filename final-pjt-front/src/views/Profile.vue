@@ -11,8 +11,8 @@
       <button v-if="isfollowing" @click="follow">언팔로우</button>
       <button v-else @click="follow">팔로우</button>
     </div>
-    <profile-movie></profile-movie>
-    <profile-review></profile-review>
+    <profile-movie :person="username"></profile-movie>
+    <profile-review :person="username"></profile-review>
   </div>
 </template>
 

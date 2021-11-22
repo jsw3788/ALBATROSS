@@ -31,6 +31,9 @@ export default {
   components: {
     ProfileMovieItem,
   },
+  props: {
+    person: String,
+  },
   data: function () {
     return {
       // 이 두 리스트는 형태가 같아야함
@@ -42,7 +45,7 @@ export default {
     axios({
       method: "get",
 
-      url: `http://127.0.0.1:8000/api/v1/${this.username}/movies/favorite/`,
+      url: `http://127.0.0.1:8000/api/v1/${this.person}/movies/favorite/`,
       // headers: this.setToken(),
     })
       .then((res) => {
@@ -57,7 +60,7 @@ export default {
     axios({
       method: "get",
 
-      url: `http://127.0.0.1:8000/api/v1/${this.username}/movies/recent/`,
+      url: `http://127.0.0.1:8000/api/v1/${this.person}/movies/recent/`,
       // headers: this.setToken(),
     })
       .then((res) => {
