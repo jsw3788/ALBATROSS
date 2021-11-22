@@ -12,6 +12,9 @@
             <b-nav-item
               ><router-link to="/people">People</router-link></b-nav-item
             >
+          <b-nav-item>
+          <search-bar></search-bar>
+          </b-nav-item>
           </b-navbar-nav>
 
           <!-- Right aligned nav items -->
@@ -61,19 +64,17 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import SearchBar from "@/components/SearchBar"
 import SignupForm from "@/components/authform/SignupForm";
 import LoginForm from "@/components/authform/LoginForm";
 import { mapGetters } from "vuex";
+import { mapState } from "vuex";
+
 
 export default {
   name: "App",
-  // data: function () {
-  //   return {
-  //     isLogin: false,
-  //   };
-  // },
   components: {
+    SearchBar,
     SignupForm,
     LoginForm,
   },
@@ -84,6 +85,7 @@ export default {
   //   }
   // },
   methods: {
+    
     logout: function () {
       this.$store.dispatch("logout");
 

@@ -5,7 +5,7 @@ from rest_framework.response import Response
 import requests
 from django.shortcuts import get_list_or_404, get_object_or_404
 from decouple import config
-from .serializers import ActorListSerializer, ActorSerializer, CommentSerializer, DirectorListSerializer, DirectorSerializer, MovieListSerializer, ReviewListSerializer, ReviewSerializer, MovieSerializer
+from .serializers import AllMovieListSerializer, ActorListSerializer, ActorSerializer, CommentSerializer, DirectorListSerializer, DirectorSerializer, MovieListSerializer, ReviewListSerializer, ReviewSerializer, MovieSerializer
 from .models import Genre, Movie, Actor, Director, Recommend, Review, Comment, Record
 from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -17,7 +17,6 @@ from random import choice
 
 # 영화 상세 조회
 
-
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def read_movie_detail(request, movie_pk):
@@ -25,7 +24,18 @@ def read_movie_detail(request, movie_pk):
     return Response(MovieSerializer(movie).data)
 
 
+
 # 영화리스트 데이터 조회
+
+# 전체
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def read_all_movies(request):
+    movies = Movie.objects.all()
+    return Response(AllMovieListSerializer(movies, many=True).data)
+
+
+
 # 인기순
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -34,7 +44,6 @@ def read_movies_by_popularity(request):
     return Response(MovieListSerializer(movies, many=True).data)
 
 # 평점순
-
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -56,7 +65,6 @@ def read_movies_by_release(request):
     return Response(MovieListSerializer(movies, many=True).data)
 
 # 추천 알고리즘
-
 
 @api_view(['GET'])
 @authentication_classes([JSONWebTokenAuthentication])
