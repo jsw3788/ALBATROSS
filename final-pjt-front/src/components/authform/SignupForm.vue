@@ -37,6 +37,7 @@
 </template>
 
 <script>
+import Vue from "vue";
 import axios from "axios";
 
 export default {
@@ -62,7 +63,12 @@ export default {
           this.$router.go();
         })
         .catch((err) => {
-          console.log("에러났어!");
+          Vue.notify({
+            group: "auth_notify",
+            title: "회원가입 실패",
+            text: "이미 존재하는 계정이거나 비밀번호가 일치하지 않습니다!",
+            type: "error",
+          });
           console.log(err);
         });
     },
