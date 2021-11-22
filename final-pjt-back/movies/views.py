@@ -460,7 +460,9 @@ def comment_list(request, review_pk):
         return Response(serializer.data)
     elif request.method == 'POST':
         serializer = CommentSerializer(data=request.data)
+        print(serializer)
         if serializer.is_valid(raise_exception=True):
+            print(13451235)
             serializer.save(user=request.user, review=review)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
