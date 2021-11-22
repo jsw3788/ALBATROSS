@@ -1,24 +1,38 @@
 <template>
   <div id="signup">
-    <h1>Signup</h1>
-    <div>
-      <label for="username">ID : </label>
-      <input type="text" id="username" v-model="credentials.username" />
+    <h3>회원가입</h3>
+    <hr />
+    <div class="mb-3">
+      <label for="username">아이디</label>
+      <input
+        type="text"
+        id="username"
+        class="form-control"
+        v-model="credentials.username"
+      />
     </div>
-    <div>
-      <label for="password">PW : </label>
-      <input type="password" id="password" v-model="credentials.password" />
+    <div class="mb-3">
+      <label for="password">비밀번호</label>
+      <input
+        type="password"
+        id="password"
+        class="form-control"
+        v-model="credentials.password"
+      />
     </div>
-    <div>
-      <label for="password-confirmation">PW : </label>
+    <div class="mb-3">
+      <label for="password-confirmation">비밀번호 확인</label>
       <input
         type="password"
         id="password-confirmation"
+        class="form-control"
         v-model="credentials.passwordConfirmation"
         @keyup.enter="signup"
       />
     </div>
-    <b-button @click="signup">회원가입</b-button>
+    <div class="d-flex justify-content-end">
+      <b-button @click="signup">회원가입</b-button>
+    </div>
   </div>
 </template>
 
@@ -55,3 +69,6 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+</style>

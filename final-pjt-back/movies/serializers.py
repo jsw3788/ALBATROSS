@@ -69,6 +69,8 @@ class ReviewListSerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
 
+    user = UserProfileUpdateSerializer(read_only=True)
+
     class Meta:
         model = Review
         fields = (
