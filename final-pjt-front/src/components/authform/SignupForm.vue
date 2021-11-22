@@ -18,7 +18,7 @@
         @keyup.enter="signup"
       />
     </div>
-    <button @click="signup">회원가입</button>
+    <b-button @click="signup">회원가입</b-button>
   </div>
 </template>
 

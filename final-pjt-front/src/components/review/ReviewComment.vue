@@ -1,13 +1,19 @@
 <template>
   <div>
     <p>
-      댓글 // {{ comment.user.username }} : {{ comment.content }} |
-      {{ comment.id }}
+      댓글 // {{ comment.user.username }} : {{ comment.content }}
       <span v-if="comment.user.username === this.username">
-        <b-button v-b-modal="comment.id">수정</b-button>
+        <b-button v-b-modal="'update'+comment.id">수정</b-button>
 
-        <b-modal :id="comment.id" title="BootstrapVue">
-          <p class="my-4">Hello from modal!</p>
+        <b-modal title="댓글 수정" :id="'update'+comment.id" ok-only hide-footer>
+        <template #default="{ close }">
+          <input
+            type="text"
+            v-model.trim="updatedcontent"
+            @keyup.enter="updateComment"  
+          >
+          <b-button @click="[updateComment(), close()]">수정</b-button>
+        </template>
         </b-modal>
         <b-button @click="deleteComment">삭제</b-button>
       </span>
@@ -24,10 +30,28 @@ export default {
   props: {
     comment: Object,
   },
-  data: function () {
-    return { commentId: this.comment.id };
+  data: function(){
+    return {
+      updatedcontent: this.comment.content
+    }
   },
   methods: {
+    updateComment: function () {
+      axios({
+        method:"put",
+        url: `${process.env.VUE_APP_SERVER_URL}/api/v1/comments/${this.comment.id}/`,
+        headers: this.$store.getters.config,
+        data: {
+          content:this.updatedcontent
+        }
+      }).then(() => {
+        const updatedcomment = {
+          ...this.comment,
+          content: this.updatedcontent
+        }
+        this.$emit("update-comment", updatedcomment, this.comment)
+      })
+    },
     deleteComment: function () {
       const delComment = this.comment;
       axios({

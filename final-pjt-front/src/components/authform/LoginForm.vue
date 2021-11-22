@@ -14,7 +14,7 @@
         @keyup.enter="login"
       />
     </div>
-    <button @click="login">로그인</button>
+    <b-button @click="login">로그인</b-button>
   </div>
 </template>
 

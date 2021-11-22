@@ -10,10 +10,31 @@
         <p>{{ review.content }}</p>
         <p>{{ review.created_at }}</p>
         <p>{{ review.updated_at }}</p>
+        <p>{{ commentCnt }}개의 댓글이 있습니다</p>
+        <p>{{ likeCnt }} 명이 이 리뷰를 좋아해요</p>
+        <p>{{ dislikeCnt }} 명이 이 리뷰를 싫어해요</p>
+
       </div>
+      <div v-if="isLogin">
+        <b-button v-if="!isLiked" @click="like">좋아요</b-button>
+        <b-button v-else @click="like">좋아요 취소</b-button>
+        <b-button v-if="!isDisliked" @click="dislike">싫어요</b-button>
+        <b-button v-else @click="dislike">싫어요 취소</b-button>
+      </div>
+
       <div v-if="review.user.username === this.username">
-        <button>수정</button>
-        <button @click="deleteReview">삭제</button>
+        <b-button v-b-modal="'update'+review.id">수정</b-button>
+        <b-modal title="리뷰 수정" :id="'update'+review.id" ok-only hide-footer>
+        <template #default="{ close }">
+          <input
+            type="text"
+            v-model.trim="updatedcontent"
+            @keyup.enter="updateReview"  
+          >
+          <b-button @click="[updateReview(), close()]">수정</b-button>
+        </template>
+        </b-modal>
+        <b-button @click="deleteReview">삭제</b-button>
       </div>
     </div>
     <!-- comment -->
@@ -32,6 +53,7 @@
         v-for="comment in comments"
         :key="comment.id"
         :comment="comment"
+        @update-comment="updateComment"
         @delete-comment="deleteComment"
       ></review-comment>
     </div>
@@ -43,6 +65,7 @@
 import axios from "axios";
 import ReviewComment from "@/components/review/ReviewComment";
 import { mapState } from "vuex";
+import { mapGetters } from "vuex";
 
 export default {
   name: "reviewList",
@@ -51,15 +74,63 @@ export default {
   },
   data: function () {
     return {
+      updatedcontent: this.review.content,
       newComment: null,
       newCommentSpoil: false,
       comments: "",
+      isLiked: null,
+      isDisliked: null,
+      likeCnt: null,
+      dislikeCnt: null,
+      commentCnt: null,
     };
   },
   props: {
     review: Object,
   },
   methods: {
+    like: function() {
+      axios({
+        method:"post",
+        url: `${process.env.VUE_APP_SERVER_URL}/api/v1/reviews/${this.review.id}/likes/`,
+        headers: this.$store.getters.config,
+        
+      }).then((res)=> {
+        this.isLiked=res.data.isLiked
+        this.likeCnt=res.data.likeCnt
+        
+      })
+    },
+    dislike: function() {
+      axios({
+        method:"post",
+        url: `${process.env.VUE_APP_SERVER_URL}/api/v1/reviews/${this.review.id}/dislikes/`,
+        headers: this.$store.getters.config,
+        
+      }).then((res)=> {
+        this.isDisliked=res.data.isDisliked
+        this.dislikeCnt=res.data.dislikeCnt
+      })
+    },
+
+
+    updateReview: function () {
+      axios({
+        method:"put",
+        url: `${process.env.VUE_APP_SERVER_URL}/api/v1/reviews/${this.review.id}/`,
+        headers: this.$store.getters.config,
+        data: {
+          content:this.updatedcontent
+        }
+      }).then(() => {
+        const updatedreview = {
+          ...this.review,
+          content: this.updatedcontent
+        }
+        this.$emit("update-review", updatedreview, this.review)
+        
+      })
+    },
     deleteReview: function () {
       const delReview = this.review;
       axios({
@@ -88,6 +159,20 @@ export default {
           console.log(err);
         });
     },
+    updateComment: function (updatedcomment, beforecomment) {
+      this.comments = this.comments.map(comment => {
+        if (comment===updatedcomment){
+          return updatedcomment
+          }else{
+            return comment
+          }
+        }
+      )
+      const idx = this.comments.indexOf(beforecomment)
+      this.comments[idx] = updatedcomment
+    },
+
+
     deleteComment: function (delComment) {
       const idx = this.comments.indexOf(delComment);
       this.comments.splice(idx, 1);
@@ -100,7 +185,12 @@ export default {
       headers: this.$store.getters.config,
     })
       .then((res) => {
-        console.log(res);
+        console.log(this.isLogin)
+        this.isLiked = res.data.isLiked
+        this.isDisliked = res.data.isDisliked
+        this.likeCnt = res.data.likeCnt
+        this.dislikeCnt = res.data.dislikeCnt
+        this.commentCnt = res.data.commentCnt
       })
       .catch((err) => {
         console.log(err);
@@ -112,15 +202,17 @@ export default {
       headers: this.$store.getters.config,
     })
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         this.comments = res.data;
       })
       .catch((err) => {
         console.log(err);
       });
   },
+  
   computed: {
     ...mapState(["username"]),
+    ...mapGetters(["isLogin", "config"])
   },
 };
 </script>

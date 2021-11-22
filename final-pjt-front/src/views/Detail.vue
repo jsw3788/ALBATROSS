@@ -80,6 +80,7 @@
               :key="review.id"
               :review="review"
               :movieId="movie.id"
+              @update-review="updateReview"
               @delete-review="deleteReview"
             ></review-list>
           </div>
@@ -148,6 +149,18 @@ export default {
     addReview: function (review) {
       this.reviews.push(review);
     },
+    updateReview: function (updatedreview, beforereview) {
+      this.reviews = this.reviews.map(review => {
+        if (review===updatedreview){
+          return updatedreview
+          }else{
+            return review
+          }
+        }
+      )
+      const idx = this.reviews.indexOf(beforereview)
+      this.reviews[idx] = updatedreview
+    },
     deleteReview: function (delReview) {
       const idx = this.reviews.indexOf(delReview);
       this.reviews.splice(idx, 1);
@@ -177,7 +190,7 @@ export default {
             this.currentRating = "평가함 ☆: " + tempscore;
           }
           this.score = tempscore;
-          console.log(this.score);
+          // console.log(this.score);
         })
         .catch((err) => {
           console.log(err);

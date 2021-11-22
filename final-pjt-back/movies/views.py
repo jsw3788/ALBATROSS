@@ -368,9 +368,27 @@ def review_list(request, movie_pk):
 @permission_classes([IsAuthenticated])
 def review_detail(request, review_pk):
     review = get_object_or_404(Review, pk=review_pk)
+
+    # 리뷰에 대한 좋아요, 싫어요 정보 조회
     if request.method == 'GET':
-        serializer = ReviewSerializer(review)
-        return Response(serializer.data)
+        if review.like_users.filter(pk=request.user.pk).exists():
+            isLiked = True
+        else:
+            isLiked = False
+        
+        if review.dislike_users.filter(pk=request.user.pk).exists():
+            isDisiked = True
+        else:
+            isDisiked = False
+
+        context={
+            'isLiked': isLiked,
+            'isDisliked': isDisiked,
+            'likeCnt' : review.like_users.count(),
+            'dislikeCnt' : review.dislike_users.count(),
+            'commentCnt' : review.comments.count(),
+        }
+        return JsonResponse(context)
 
     elif request.user == review.user:
         # 리뷰 수정
@@ -397,14 +415,14 @@ def likes(request, review_pk):
         return Response({'error': '이미 싫어요를 눌렀습니다.'}, status=status.HTTP_400_BAD_REQUEST)
 
     if review.like_users.filter(pk=request.user.pk).exists():
-        liked = False
+        isLiked = False
         review.like_users.remove(request.user)
     else:
-        liked = True
+        isLiked = True
         review.like_users.add(request.user)
 
     context = {
-        'liked': liked,
+        'isLiked': isLiked,
         'likeCnt': review.like_users.count()
     }
     return JsonResponse(context)
@@ -415,18 +433,18 @@ def likes(request, review_pk):
 def dislikes(request, review_pk):
     review = get_object_or_404(Review, pk=review_pk)
     # 좋아요를 눌렀으면 싫어요를 누를 수 없음
-    if review.dislike_users.filter(pk=request.user.pk).exists():
+    if review.like_users.filter(pk=request.user.pk).exists():
         return Response({'error': '이미 좋아요를 눌렀습니다.'}, status=status.HTTP_400_BAD_REQUEST)
 
     if review.dislike_users.filter(pk=request.user.pk).exists():
-        disliked = False
+        isDisliked = False
         review.dislike_users.remove(request.user)
     else:
-        disliked = True
+        isDisliked = True
         review.dislike_users.add(request.user)
 
     context = {
-        'disliked': disliked,
+        'isDisliked': isDisliked,
         'dislikeCnt': review.dislike_users.count()
     }
     return JsonResponse(context)
@@ -442,9 +460,7 @@ def comment_list(request, review_pk):
         return Response(serializer.data)
     elif request.method == 'POST':
         serializer = CommentSerializer(data=request.data)
-        print(serializer)
         if serializer.is_valid(raise_exception=True):
-            print(13451235)
             serializer.save(user=request.user, review=review)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
