@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Genre, Movie, Record, Comment, Movie, Review, Director, Actor
+from .models import Genre, Movie, Comment, Movie, Review, Director, Actor
 from accounts.serializers import UserProfileUpdateSerializer
 
 
@@ -20,6 +20,39 @@ class MovieListSerializer(serializers.ModelSerializer):
             'poster_path',
         )
 
+class AllMovieListSerializer(serializers.ModelSerializer):
+    
+    class DirectorListSerializer(serializers.ModelSerializer):
+
+        class Meta:
+            model = Director
+            fields = ('name',)
+
+    class ActorListSerializer(serializers.ModelSerializer):
+
+        class Meta:
+            model = Actor
+            fields = ('name',)
+    
+    class GenreSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = Genre
+            fields = ('name',)
+    
+    directors = DirectorListSerializer(many=True, read_only=True)
+    actors = ActorListSerializer(many=True, read_only=True)
+    genres = GenreSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = Movie
+        fields = (
+            'id',
+            'title',
+            'poster_path',
+            'genres',
+            'actors',
+            'directors',
+        )
 
 class MovieSerializer(serializers.ModelSerializer):
     class GenreSerializer(serializers.ModelSerializer):

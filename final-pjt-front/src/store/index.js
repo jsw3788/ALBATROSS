@@ -15,6 +15,7 @@ export default new Vuex.Store({
     directors: [],
     jwtToken: localStorage.getItem("jwt"),
     username: localStorage.getItem("username"),
+    allmovies: [],
   },
   mutations: {
     SET_TOKEN: function (state, token) {
@@ -24,6 +25,9 @@ export default new Vuex.Store({
     EXP_TOKEN: function (state) {
       localStorage.removeItem("jwt")
       state.jwtToken = null
+    },
+    GET_ALL_MOVIE_LIST: function(state, allMovieList) {
+      state.allmovies = allMovieList
     },
     GET_POPULAR_MOVIE_LIST: function (state, popularMovieList) {
       state.popularMovies = popularMovieList
@@ -86,7 +90,9 @@ export default new Vuex.Store({
     setUsername: function ({ commit }, username) {
       commit('SET_USERNAME', username)
     },
-
+    getAllMovies: function ({ commit }, allMovieList) {
+      commit('GET_ALL_MOVIE_LIST', allMovieList)
+    },
     getPopularMovies: function ({ commit }, popularMovieList) {
       commit('GET_POPULAR_MOVIE_LIST', popularMovieList)
     },

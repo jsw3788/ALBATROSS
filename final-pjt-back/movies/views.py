@@ -5,7 +5,7 @@ from rest_framework.response import Response
 import requests
 from django.shortcuts import get_list_or_404, get_object_or_404
 from decouple import config
-from .serializers import ActorListSerializer, ActorSerializer, CommentSerializer, DirectorListSerializer, DirectorSerializer, MovieListSerializer, ReviewListSerializer, ReviewSerializer, MovieSerializer
+from .serializers import AllMovieListSerializer, ActorListSerializer, ActorSerializer, CommentSerializer, DirectorListSerializer, DirectorSerializer, MovieListSerializer, ReviewListSerializer, ReviewSerializer, MovieSerializer
 from .models import Genre, Movie, Actor, Director, Recommend, Review, Comment, Record
 from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -17,7 +17,6 @@ from random import choice
 
 # 영화 상세 조회
 
-
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def read_movie_detail(request, movie_pk):
@@ -25,7 +24,18 @@ def read_movie_detail(request, movie_pk):
     return Response(MovieSerializer(movie).data)
 
 
+
 # 영화리스트 데이터 조회
+
+# 전체
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def read_all_movies(request):
+    movies = Movie.objects.all()
+    return Response(AllMovieListSerializer(movies, many=True).data)
+
+
+
 # 인기순
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -34,7 +44,6 @@ def read_movies_by_popularity(request):
     return Response(MovieListSerializer(movies, many=True).data)
 
 # 평점순
-
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -51,13 +60,11 @@ def read_movies_by_score(request):
 def read_movies_by_release(request):
     now = datetime.today().strftime("%Y-%m-%d")
     # release_date 데이터의 정확성에 문제가 있음
-    # movies = Movie.objects.order_by('-release_date').filter(release_status="Released")
     movies = Movie.objects.filter(
         release_date__lte=now).order_by('-release_date')
     return Response(MovieListSerializer(movies, many=True).data)
 
 # 추천 알고리즘
-
 
 @api_view(['GET'])
 @authentication_classes([JSONWebTokenAuthentication])
@@ -146,15 +153,11 @@ def read_update_score(request, movie_pk):
             my_movie.save()
             # 이거는 내가 담아놓은 모든 장르 가져오는 필터
             my_recommends = Recommend.objects.filter(user=request.user.pk)
-            # print(my_recommends)
             # 이거는 고른 영화의 모든 장르 가져오는 것
             movie_genres = movie.genres.all()
-            # print(movie_genres)
             for movie_genre in movie_genres:
                 for recommend in my_recommends:
-                    # print(movie_genre, movie_genre.pk)
                     if movie_genre.pk == recommend.genre_id:  # 이거 값들은 나중에 찍어보면서 확인
-                        # print(after_score - before_score)
                         recommend.score += (after_score - before_score)
                         recommend.save()
             context={
@@ -174,8 +177,6 @@ def read_update_score(request, movie_pk):
                     is_recommend = Recommend.objects.filter(genre=genre).exists()
                     if is_recommend:
                         my_recommends = Recommend.objects.filter(user=request.user.pk)
-                        # movie_genres = movie.genres.all()
-                        # for movie_genre in movie_genres:
                         for recommend in my_recommends:
                             if genre.pk == recommend.genre_id:
                                 recommend.score += after_score
@@ -205,8 +206,6 @@ def read_update_score(request, movie_pk):
                     if is_recommend:
                         # 새로 만들고나면 
                         my_recommends = Recommend.objects.filter(user=request.user.pk)
-                        # movie_genres = movie.genres.all()
-                        # for movie_genre in movie_genres:
                         for recommend in my_recommends:
                             if genre.pk == recommend.genre_id:
                                 recommend.score += after_score
@@ -322,8 +321,6 @@ def read_popular_reviews_by_user(request, username):
 @permission_classes([AllowAny])
 def read_recent_movies_by_user(request, username):
     person = get_object_or_404(get_user_model(), username=username)
-    # if Record.objects.filter(user__pk=person.pk).exists():
-    # person = get_user_model().objects.get(username=username)
     recent_movies = []
     for review in person.reviews.order_by('-updated_at')[:10]:
         recent_movies.append(review.movie)
@@ -523,9 +520,7 @@ def get_movies(request):
                 # movie.release_status = tmdb_data.get('release_status')
                 movie.save()
             else:
-                # detail_URL = f'https://api.themoviedb.org/3/movie/{tmdb_movie_id}?api_key={API_KEY}&language=ko-KR'
-                # detail_status = requests.get(detail_URL).json().get('status')
-
+               
                 movie = Movie.objects.create(
                     tmdb_id=tmdb_movie_id,
                     title=tmdb_data.get('title'),
