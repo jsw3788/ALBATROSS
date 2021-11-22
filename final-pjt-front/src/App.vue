@@ -43,9 +43,13 @@
             </div>
             <div v-else>
               <b-button v-b-modal.signup-modal>Signup</b-button>
-              <b-modal id="signup-modal" hide-footer><signup-form></signup-form></b-modal>
+              <b-modal id="signup-modal" hide-footer hide-header
+                ><signup-form></signup-form
+              ></b-modal>
               <b-button v-b-modal.login-modal>Login</b-button>
-              <b-modal id="login-modal" hide-footer><login-form></login-form></b-modal>
+              <b-modal id="login-modal" hide-footer hide-header
+                ><login-form></login-form
+              ></b-modal>
             </div>
           </b-navbar-nav>
         </b-collapse>

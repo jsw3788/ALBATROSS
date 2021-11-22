@@ -125,7 +125,6 @@ export default {
         headers: this.config,
       })
         .then((res) => {
-          console.log(res);
           this.wanted = res.data.wanted;
         })
         .catch((err) => {
@@ -147,19 +146,21 @@ export default {
     },
 
     addReview: function (review) {
+      console.log("이거 나올까");
+
+      console.log(review);
       this.reviews.push(review);
     },
     updateReview: function (updatedreview, beforereview) {
-      this.reviews = this.reviews.map(review => {
-        if (review===updatedreview){
-          return updatedreview
-          }else{
-            return review
-          }
+      this.reviews = this.reviews.map((review) => {
+        if (review === updatedreview) {
+          return updatedreview;
+        } else {
+          return review;
         }
-      )
-      const idx = this.reviews.indexOf(beforereview)
-      this.reviews[idx] = updatedreview
+      });
+      const idx = this.reviews.indexOf(beforereview);
+      this.reviews[idx] = updatedreview;
     },
     deleteReview: function (delReview) {
       const idx = this.reviews.indexOf(delReview);
