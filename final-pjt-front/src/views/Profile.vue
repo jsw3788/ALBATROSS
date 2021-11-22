@@ -2,7 +2,7 @@
   <div>
     <span>
       <img :src="image" alt="no profile" />
-      <p>{{ username }}</p>
+      <p>{{ person }}</p>
     </span>
     <div>
       films | {{ films }} follower | {{ follower }} following | {{ following }}
@@ -11,38 +11,75 @@
       <button v-if="isfollowing" @click="follow">언팔로우</button>
       <button v-else @click="follow">팔로우</button>
     </div>
-    <profile-movie :person="username"></profile-movie>
-    <profile-review :person="username"></profile-review>
+    <!-- <profile-movie :person="person"></profile-movie> -->
+    <!-- <profile-review :person="person"></profile-review> -->
+    <h4>가장 좋아하는 영화</h4>
+    <profile-movie-item
+      v-for="(movie, index) in favorite_movies"
+      :key="index + 'favorite'"
+      :movie="movie"
+    ></profile-movie-item>
+    <h4>최근 감상 영화</h4>
+    <profile-movie-item
+      v-for="(movie, index) in recent_movies"
+      :key="index + 'mrecent'"
+      :movie="movie"
+    >
+    </profile-movie-item>
+    <h4>리뷰 좋아요순</h4>
+    <profile-review-item
+      v-for="(review, index) in popular_reviews"
+      :key="index + 'popular'"
+      :review="review"
+    >
+    </profile-review-item>
+    <h4>리뷰 작성일순</h4>
+    <profile-review-item
+      v-for="(review, index) in recent_reviews"
+      :key="index + 'rrecent'"
+      :review="review"
+    >
+    </profile-review-item>
   </div>
 </template>
 
 <script>
 import axios from "axios";
-import ProfileMovie from "@/components/profile/ProfileMovie.vue";
-import ProfileReview from "@/components/profile/ProfileReview.vue";
+// import ProfileMovie from "@/components/profile/ProfileMovie.vue";
+// import ProfileReview from "@/components/profile/ProfileReview.vue";
+import ProfileMovieItem from "@/components/profile/ProfileMovieItem";
+import ProfileReviewItem from "@/components/profile/ProfileReviewItem";
+
 import { mapGetters } from "vuex";
 
 export default {
   name: "Profile",
   components: {
-    ProfileMovie,
-    ProfileReview,
+    // ProfileMovie,
+    // ProfileReview,
+    ProfileMovieItem,
+    ProfileReviewItem,
   },
   data: function () {
     return {
-      username: null,
+      person: null,
       follower: null,
       following: null,
       isfollowing: null,
       image: null,
       films: null,
+
+      favorite_movies: null,
+      recent_movies: null,
+      popular_reviews: null,
+      recent_reviews: null,
     };
   },
   methods: {
     follow: function () {
       axios({
         method: "post",
-        url: `http://127.0.0.1:8000/api/v2/${this.username}/follow/`,
+        url: `http://127.0.0.1:8000/api/v2/${this.person}/follow/`,
         headers: this.config,
       }).then((res) => {
         this.isfollowing = res.data.following;
@@ -58,7 +95,7 @@ export default {
       headers: this.config,
     })
       .then((res) => {
-        this.username = res.data.username;
+        this.person = res.data.username;
         this.isfollowing = res.data.following;
         this.following = res.data.followingCnt;
         this.follower = res.data.followerCnt;
@@ -68,10 +105,63 @@ export default {
       .catch((err) => {
         console.log(err);
       });
+    axios({
+      method: "get",
+      url: `http://127.0.0.1:8000/api/v1/${this.$route.params.username}/movies/favorite/`,
+      // headers: this.setToken(),
+    })
+      .then((res) => {
+        this.favorite_movies = res.data;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    axios({
+      method: "get",
+      url: `http://127.0.0.1:8000/api/v1/${this.$route.params.username}/movies/recent/`,
+      // headers: this.setToken(),
+    })
+      .then((res) => {
+        // console.log('recent_movies')
+        // console.log(res)
+        this.recent_movies = res.data;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    axios({
+      method: "get",
+
+      url: `http://127.0.0.1:8000/api/v1/${this.$route.params.username}/reviews/popular/`,
+      // headers: this.setToken(),
+    })
+      .then((res) => {
+        console.log("popular_reviews");
+        console.log(res);
+        this.popular_reviews = res.data;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    axios({
+      method: "get",
+
+      url: `http://127.0.0.1:8000/api/v1/${this.$route.params.username}/reviews/recent/`,
+      // headers: this.setToken(),
+    })
+      .then((res) => {
+        console.log("recent_reviews");
+        console.log(res);
+        this.recent_reviews = res.data;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   },
   computed: {
     isMySelf: function () {
-      if (this.username != localStorage.getItem("username")) {
+      if (this.person != localStorage.getItem("username")) {
         return false;
       } else {
         return true;

@@ -1,20 +1,29 @@
 <template>
   <div>
-    <h1>Login</h1>
-    <div>
-      <label for="username">ID : </label>
-      <input type="text" id="username" v-model="credentials.username" />
+    <h3>Login</h3>
+    <hr />
+    <div class="mb-3">
+      <label for="username">아이디</label>
+      <input
+        type="text"
+        id="username"
+        class="form-control"
+        v-model="credentials.username"
+      />
     </div>
-    <div>
-      <label for="password">PW : </label>
+    <div class="mb-3">
+      <label for="password">비밀번호</label>
       <input
         type="password"
         id="password"
+        class="form-control"
         v-model="credentials.password"
         @keyup.enter="login"
       />
     </div>
-    <b-button @click="login">로그인</b-button>
+    <div class="d-flex justify-content-end">
+      <b-button @click="login">로그인</b-button>
+    </div>
   </div>
 </template>
 
@@ -35,7 +44,7 @@ export default {
   methods: {
     // ...mapActions(["login"]),
     login: function () {
-      this.$store.dispatch("setUsername", this.credentials.username)
+      this.$store.dispatch("setUsername", this.credentials.username);
       this.$store.dispatch("login", this.credentials);
     },
     // login: function () {
