@@ -31,6 +31,9 @@ export default {
   components: {
     ProfileReviewItem,
   },
+  props: {
+    person: String,
+  },
   data: function () {
     return {
       // 이 두 리스트는 형태가 같아야함
@@ -42,7 +45,7 @@ export default {
     axios({
       method: "get",
 
-      url: `http://127.0.0.1:8000/api/v1/${this.username}/reviews/popular/`,
+      url: `http://127.0.0.1:8000/api/v1/${this.person}/reviews/popular/`,
       // headers: this.setToken(),
     })
       .then((res) => {
@@ -57,7 +60,7 @@ export default {
     axios({
       method: "get",
 
-      url: `http://127.0.0.1:8000/api/v1/${this.username}/reviews/recent/`,
+      url: `http://127.0.0.1:8000/api/v1/${this.person}/reviews/recent/`,
       // headers: this.setToken(),
     })
       .then((res) => {

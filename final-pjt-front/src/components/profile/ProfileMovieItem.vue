@@ -1,27 +1,26 @@
 <template>
   <div @click="goToDetail">
-    {{ movie.poster_path }}
+    <img :src="movie.poster_path" alt="" />
     {{ movie.title }}
-
   </div>
 </template>
 
 <script>
 export default {
-  name: 'ProfileMovieItem',
+  name: "ProfileMovieItem",
   props: {
     movie: Object,
   },
   methods: {
-    goToDetail: function() {
-      this.$router.push({ name: 'Detail' , params: { movie_id: this.movie.id } })
-    }
-
-  }
-
-}
+    goToDetail: function () {
+      this.$router.push({
+        name: "Detail",
+        params: { movie_id: this.movie.id },
+      });
+    },
+  },
+};
 </script>
 
 <style>
-
 </style>
