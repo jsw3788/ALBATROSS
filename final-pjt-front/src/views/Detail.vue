@@ -26,10 +26,18 @@
                   <p v-if="movie.tmdb_vote_cnt">평점 : {{ movieRate }}</p>
                   <p v-else>등록된 평점이 없습니다.</p>
                   <div v-if="isLogin">
-                    <button v-if="wanted" @click="updatedWanted">
-                      보고싶어요 취소
-                    </button>
-                    <button v-else @click="updatedWanted">보고싶어요</button>
+                    <i
+                      class="fas fa-heart"
+                      v-if="wanted"
+                      @click="updatedWanted"
+                      style="color: rgb(237, 73, 86)"
+                    ></i>
+                    <i
+                      class="far fa-heart"
+                      v-else
+                      @click="updatedWanted"
+                      style="color: rgb(237, 73, 86)"
+                    ></i>
                   </div>
                   <div v-if="isLogin" class="mt-2">
                     <div
@@ -93,10 +101,12 @@
 </template>
 
 <script>
+import Vue from "vue";
 import axios from "axios";
 import ReviewForm from "@/components/review/ReviewForm";
 import ReviewList from "@/components/review/ReviewList";
 import { mapGetters } from "vuex";
+
 export default {
   name: "Detail",
   components: {
@@ -127,8 +137,13 @@ export default {
         .then((res) => {
           this.wanted = res.data.wanted;
         })
-        .catch((err) => {
-          console.log(err);
+        .catch(() => {
+          Vue.notify({
+            group: "movie_notify",
+            title: "앗!",
+            text: "이미 시청한 영화입니다! 시청하지 않았다면, 평점을 취소해주세요!",
+            type: "warn",
+          });
         });
     },
     checkWanted: function () {
@@ -146,8 +161,6 @@ export default {
     },
 
     addReview: function (review) {
-      console.log("이거 나올까");
-
       console.log(review);
       this.reviews.push(review);
     },
@@ -188,7 +201,7 @@ export default {
             this.currentRating = "별점을 매겨주세요";
           } else {
             this.showCurrentRating(0);
-            this.currentRating = "평가함 ☆: " + tempscore;
+            this.currentRating = "평가함 ★ " + tempscore;
           }
           this.score = tempscore;
           // console.log(this.score);

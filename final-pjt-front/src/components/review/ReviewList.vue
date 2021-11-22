@@ -13,14 +13,38 @@
         <p>{{ review.created_at }}</p>
         <p>{{ review.updated_at }}</p>
         <p>{{ commentCnt }}개의 댓글이 있습니다</p>
-        <p>{{ likeCnt }} 명이 이 리뷰를 좋아해요</p>
-        <p>{{ dislikeCnt }} 명이 이 리뷰를 싫어해요</p>
       </div>
       <div v-if="isLogin">
-        <b-button v-if="!isLiked" @click="like">좋아요</b-button>
-        <b-button v-else @click="like">좋아요 취소</b-button>
-        <b-button v-if="!isDisliked" @click="dislike">싫어요</b-button>
-        <b-button v-else @click="dislike">싫어요 취소</b-button>
+        <p>
+          <span>{{ likeCnt }}</span>
+          <i
+            class="far fa-thumbs-up mx-2"
+            style="color: rgb(0, 149, 246)"
+            v-if="!isLiked"
+            @click="like"
+          >
+          </i>
+          <i
+            class="fas fa-thumbs-up mx-2"
+            style="color: rgb(0, 149, 246)"
+            v-else
+            @click="like"
+          >
+          </i>
+          <span>{{ dislikeCnt }}</span>
+          <i
+            class="far fa-thumbs-down mx-2"
+            style="color: rgb(0, 149, 246)"
+            v-if="!isDisliked"
+            @click="dislike"
+          ></i>
+          <i
+            class="fas fa-thumbs-down mx-2"
+            style="color: rgb(0, 149, 246)"
+            v-else
+            @click="dislike"
+          ></i>
+        </p>
       </div>
 
       <div v-if="review.user.username === this.username">
@@ -68,6 +92,7 @@
 </template>
 
 <script>
+import Vue from "vue";
 import axios from "axios";
 import ReviewComment from "@/components/review/ReviewComment";
 import { mapState } from "vuex";
@@ -100,20 +125,38 @@ export default {
         method: "post",
         url: `${process.env.VUE_APP_SERVER_URL}/api/v1/reviews/${this.review.id}/likes/`,
         headers: this.$store.getters.config,
-      }).then((res) => {
-        this.isLiked = res.data.isLiked;
-        this.likeCnt = res.data.likeCnt;
-      });
+      })
+        .then((res) => {
+          this.isLiked = res.data.isLiked;
+          this.likeCnt = res.data.likeCnt;
+        })
+        .catch(() => {
+          Vue.notify({
+            group: "review_notify",
+            title: "앗!",
+            text: "이미 비공감을 눌렀어요!",
+            type: "warn",
+          });
+        });
     },
     dislike: function () {
       axios({
         method: "post",
         url: `${process.env.VUE_APP_SERVER_URL}/api/v1/reviews/${this.review.id}/dislikes/`,
         headers: this.$store.getters.config,
-      }).then((res) => {
-        this.isDisliked = res.data.isDisliked;
-        this.dislikeCnt = res.data.dislikeCnt;
-      });
+      })
+        .then((res) => {
+          this.isDisliked = res.data.isDisliked;
+          this.dislikeCnt = res.data.dislikeCnt;
+        })
+        .catch(() => {
+          Vue.notify({
+            group: "review_notify",
+            title: "앗!",
+            text: "이미 공감을 눌렀어요!",
+            type: "warn",
+          });
+        });
     },
     goProfile: function () {
       this.$router.push({

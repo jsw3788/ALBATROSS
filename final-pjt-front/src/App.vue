@@ -1,7 +1,10 @@
 <template>
   <div id="app">
+    <notifications group="auth_notify" />
+    <notifications group="movie_notify" />
+    <notifications group="review_notify" />
     <div>
-      <b-navbar toggleable="lg" type="dark" variant="dark">
+      <b-navbar toggleable="lg" type="dark" variant="dark" class="sticky-top">
         <b-navbar-brand href="#">NavBar</b-navbar-brand>
 
         <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
@@ -35,6 +38,9 @@
             </b-nav-form> -->
 
             <div v-if="this.isLogin" class="d-flex">
+              <div>
+                <p>hi! {{ username }}</p>
+              </div>
               <div>
                 <router-link @click.native="logout" to="#"
                   ><b-button>Logout</b-button>

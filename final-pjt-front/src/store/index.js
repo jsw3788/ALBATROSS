@@ -50,18 +50,17 @@ export default new Vuex.Store({
       state.directors = res.data
       // console.log(state.directors)
     },
-    SET_USERNAME: function(state, username) {
+    SET_USERNAME: function (state, username) {
       localStorage.setItem("username", username);
       state.username = username
     },
-    EXP_USERNAME: function(state) {
+    EXP_USERNAME: function (state) {
       localStorage.removeItem("username")
       state.username = null
     }
   },
   actions: {
     login: function ({ commit }, credentials) {
-      console.log(credentials)
       axios({
         method: "post",
         url: `${process.env.VUE_APP_SERVER_URL}/api/v2/api-token-auth/`,
@@ -72,6 +71,12 @@ export default new Vuex.Store({
           router.go()
         })
         .catch(err => {
+          Vue.notify({
+            group: 'auth_notify',
+            title: '유효하지 않는 계정',
+            text: '아이디 또는 비밀번호를 확인하세요!',
+            type: 'error'
+          });
           console.log(err)
           // swal("아이디와 비밀번호를 확인하쇼", {
           //   dangerMode: true,
