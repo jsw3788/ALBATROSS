@@ -12,8 +12,18 @@
         <p>{{ review.updated_at }}</p>
       </div>
       <div v-if="review.user.username === this.username">
-        <button @click="updateReview">수정</button>
-        <button @click="deleteReview">삭제</button>
+        <b-button v-b-modal="'update'+review.id">수정</b-button>
+        <b-modal title="리뷰 수정" :id="'update'+review.id" ok-only hide-footer>
+        <template #default="{ close }">
+          <input
+            type="text"
+            v-model.trim="updatedcontent"
+            @keyup.enter="updateReview"  
+          >
+          <b-button @click="[updateReview(), close()]">수정</b-button>
+        </template>
+        </b-modal>
+        <b-button @click="deleteReview">삭제</b-button>
       </div>
     </div>
     <!-- comment -->
@@ -52,6 +62,7 @@ export default {
   },
   data: function () {
     return {
+      updatedcontent: this.review.content,
       newComment: null,
       newCommentSpoil: false,
       comments: "",
@@ -62,7 +73,21 @@ export default {
   },
   methods: {
     updateReview: function () {
-
+      axios({
+        method:"put",
+        url: `${process.env.VUE_APP_SERVER_URL}/api/v1/reviews/${this.review.id}/`,
+        headers: this.$store.getters.config,
+        data: {
+          content:this.updatedcontent
+        }
+      }).then(() => {
+        const updatedreview = {
+          ...this.review,
+          content: this.updatedcontent
+        }
+        this.$emit("update-review", updatedreview, this.review)
+        
+      })
     },
     deleteReview: function () {
       const delReview = this.review;

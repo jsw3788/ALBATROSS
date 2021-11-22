@@ -9,7 +9,7 @@
         <template #default="{ close }">
           <input
             type="text"
-            v-model="updatedcontent"
+            v-model.trim="updatedcontent"
             @keyup.enter="updateComment"  
           >
           <b-button @click="[updateComment(), close()]">수정</b-button>
