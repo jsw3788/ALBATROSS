@@ -520,7 +520,7 @@ def get_movies(request):
                     updated_vote_cnt=0,
                     overview=tmdb_data.get('overview'),
                     poster_path=f'https://image.tmdb.org/t/p/w500{tmdb_data.get("poster_path")}',
-                    backdrop_path=f'https://image.tmdb.org/t/p/w500{tmdb_data.get("backdrop_path")}',
+                    backdrop_path=f'https://image.tmdb.org/t/p/original{tmdb_data.get("backdrop_path")}',
                     # release_status=detail_status
                 )
                 for genre_id in tmdb_data.get('genre_ids'):

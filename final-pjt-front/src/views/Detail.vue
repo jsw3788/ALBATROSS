@@ -1,7 +1,12 @@
 <template>
   <div id="detail">
-    <div>
-      <b-img :src="movie.backdrop_path" fluid :alt="movie.poster_path"></b-img>
+    <div class="backdrop-box">
+      <b-img
+        :src="movie.backdrop_path"
+        fluid
+        :alt="movie.poster_path"
+        class="backdrop"
+      ></b-img>
     </div>
     <b-container class="bv-example-row">
       <b-row class="text-center">
@@ -18,9 +23,7 @@
               >
                 <b-card-text>
                   <p>{{ movie.release_date }}</p>
-                  <p v-if="movie.tmdb_vote_cnt">
-                    평점: {{ movie.tmdb_vote_sum / movie.tmdb_vote_cnt / 2 }}
-                  </p>
+                  <p v-if="movie.tmdb_vote_cnt">평점 : {{ movieRate }}</p>
                   <p v-else>등록된 평점이 없습니다.</p>
                   <div v-if="isLogin">
                     <button v-if="wanted" @click="updatedWanted">
@@ -28,13 +31,14 @@
                     </button>
                     <button v-else @click="updatedWanted">보고싶어요</button>
                   </div>
-                  <div v-if="isLogin">
+                  <div v-if="isLogin" class="mt-2">
                     <div
                       @click="showCurrentRating(0)"
                       @mouseleave="showCurrentRating(0)"
                       style="display: inline-block"
                     >
                       <star-rating
+                        :star-size="30"
                         :rating="score"
                         :rounded-corners="true"
                         :show-rating="false"
@@ -104,6 +108,7 @@ export default {
       reviews: "",
       wanted: null,
       score: null,
+      movieRate: null,
 
       rating: "No Rating Selected",
       currentRating: "별점을 매겨주세요",
@@ -248,6 +253,14 @@ export default {
       .then((res) => {
         // console.log(res);
         this.movie = res.data;
+        console.log(this.movie);
+        if (this.movie.updated_vote_cnt + this.movie.tmdb_vote_cnt) {
+          this.movieRate =
+            (this.movie.tmdb_vote_sum + this.movie.updated_vote_sum) /
+            (this.movie.tmdb_vote_cnt + this.movie.updated_vote_cnt) /
+            2;
+          this.movieRate = this.movieRate.toFixed(2);
+        }
       })
       .then({})
       .catch((err) => {
@@ -284,5 +297,13 @@ export default {
 }
 .review {
   background-color: black;
+}
+.backdrop-box {
+  max-height: 15rem;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+.backdrop {
+  max-height: initial;
 }
 </style>
