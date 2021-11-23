@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="!comment.is_spoiled">
     <p>
       댓글 // {{ comment.user.username }} : {{ comment.content }} |
       {{ humanize(new Date(), comment.created_at) }} |
@@ -25,6 +25,15 @@
         <b-button @click="deleteComment">삭제</b-button>
       </span>
     </p>
+  </div>
+  <div v-else>
+    <div>
+      <p>이 댓글은 스포일러를 담고 있습니다.</p>
+      <p>
+        내용을 보시려면 <b-button @click="lookspoiler">여기</b-button>를
+        클릭해주세요.
+      </p>
+    </div>
   </div>
 </template>
 
@@ -85,6 +94,9 @@ export default {
         temp = "지금";
       }
       return temp;
+    },
+    lookspoiler: function () {
+      this.comment.is_spoiled = false;
     },
   },
   computed: {

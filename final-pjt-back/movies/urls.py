@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('movies/all/', views.read_all_movies),
     path('movies/popularity/', views.read_movies_by_popularity),
     path('movies/score/', views.read_movies_by_score),
     path('movies/release_date/', views.read_movies_by_release),
