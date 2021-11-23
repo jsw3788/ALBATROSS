@@ -1,9 +1,11 @@
 <template>
-  <div @click="goToActorDetail">
-    <img :src="actor.profile_path" style="width: 10%" />
-    <p>{{ actor.name }}</p>
-    <p>{{ actor.popularity }}</p>
-  </div>
+  <b-col cols="2">
+    <div @click="goToActorDetail">
+      <img :src="actor.profile_path" style="width: 100%" />
+      <p>{{ actor.name }}</p>
+      <p>{{ actor.popularity }}</p>
+    </div>
+  </b-col>
 </template>
 
 <script>

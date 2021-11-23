@@ -11,65 +11,63 @@
     <b-container class="bv-example-row">
       <b-row class="text-center">
         <b-col cols="3">
-          <div>
-            <div>
-              <b-card
-                :title="movie.title"
-                :img-src="movie.poster_path"
-                img-alt="Poster"
-                img-top
-                tag="article"
-                class="mb-2 side-card"
-              >
-                <b-card-text>
-                  <p>{{ movie.release_date }}</p>
-                  <p v-if="movie.tmdb_vote_cnt">평점 : {{ movieRate }}</p>
-                  <p v-else>등록된 평점이 없습니다.</p>
-                  <div v-if="isLogin">
-                    <i
-                      class="fas fa-heart"
-                      v-if="wanted"
-                      @click="updatedWanted"
-                      style="color: rgb(237, 73, 86)"
-                    ></i>
-                    <i
-                      class="far fa-heart"
-                      v-else
-                      @click="updatedWanted"
-                      style="color: rgb(237, 73, 86)"
-                    ></i>
+          <div class="card-box">
+            <b-card
+              :title="movie.title"
+              :img-src="movie.poster_path"
+              img-alt="Poster"
+              img-top
+              tag="article"
+              class="mb-2 side-card"
+            >
+              <b-card-text>
+                <p>{{ movie.release_date }}</p>
+                <p v-if="movie.tmdb_vote_cnt">평점 : {{ movieRate }}</p>
+                <p v-else>등록된 평점이 없습니다.</p>
+                <div v-if="isLogin">
+                  <i
+                    class="fas fa-heart"
+                    v-if="wanted"
+                    @click="updatedWanted"
+                    style="color: rgb(237, 73, 86)"
+                  ></i>
+                  <i
+                    class="far fa-heart"
+                    v-else
+                    @click="updatedWanted"
+                    style="color: rgb(237, 73, 86)"
+                  ></i>
+                </div>
+                <div v-if="isLogin" class="mt-2">
+                  <div
+                    @click="showCurrentRating(0)"
+                    @mouseleave="showCurrentRating(0)"
+                    style="display: inline-block"
+                  >
+                    <star-rating
+                      :star-size="30"
+                      :rating="score"
+                      :rounded-corners="true"
+                      :show-rating="false"
+                      @current-rating="showCurrentRating(score)"
+                      @rating-selected="setCurrentSelectedRating"
+                      :increment="0.5"
+                    ></star-rating>
                   </div>
-                  <div v-if="isLogin" class="mt-2">
-                    <div
-                      @click="showCurrentRating(0)"
-                      @mouseleave="showCurrentRating(0)"
-                      style="display: inline-block"
-                    >
-                      <star-rating
-                        :star-size="30"
-                        :rating="score"
-                        :rounded-corners="true"
-                        :show-rating="false"
-                        @current-rating="showCurrentRating(score)"
-                        @rating-selected="setCurrentSelectedRating"
-                        :increment="0.5"
-                      ></star-rating>
-                    </div>
-                    <div style="margin-top: 10px; font-weight: bold">
-                      {{ currentRating }}
-                    </div>
-                    <div v-if="isScored">
-                      <button @click="deleteScore">평가 지우기</button>
-                    </div>
+                  <div style="margin-top: 10px; font-weight: bold">
+                    {{ currentRating }}
                   </div>
-                  <p>
-                    <span v-for="genre in movie.genres" :key="genre.id"
-                      >{{ genre.name }}
-                    </span>
-                  </p>
-                </b-card-text>
-              </b-card>
-            </div>
+                  <div v-if="isScored">
+                    <button @click="deleteScore">평가 지우기</button>
+                  </div>
+                </div>
+                <p>
+                  <span v-for="genre in movie.genres" :key="genre.id"
+                    >{{ genre.name }}
+                  </span>
+                </p>
+              </b-card-text>
+            </b-card>
           </div>
         </b-col>
         <b-col cols="9">

@@ -10,8 +10,8 @@
       </div>
       <div>
         <p>{{ review.content }}</p>
-        <p>{{ review.created_at }}</p>
-        <p>{{ review.updated_at }}</p>
+        <p>{{ humanize(new Date(), review.created_at) }}</p>
+        <p>{{ humanize(new Date(), review.updated_at) }}</p>
         <p>{{ commentCnt }}개의 댓글이 있습니다</p>
       </div>
       <div v-if="isLogin">
@@ -219,10 +219,26 @@ export default {
       const idx = this.comments.indexOf(beforecomment);
       this.comments[idx] = updatedcomment;
     },
-
     deleteComment: function (delComment) {
       const idx = this.comments.indexOf(delComment);
       this.comments.splice(idx, 1);
+    },
+    humanize: function (now, date) {
+      const moment = require("moment");
+      const getTime = new Date(date);
+      let temp = parseInt(now - getTime); // ms단위로, 3일-24시간-60분-지금
+      if (259200000 < temp) {
+        temp = moment(getTime).format(""); // 3일보다 오래 지났으면 날짜로 반환
+      } else if (86400000 < temp) {
+        temp = parseInt(temp / 86400000).toString() + "일 전";
+      } else if (3600000 < temp) {
+        temp = parseInt(temp / 3600000).toString() + "시간 전";
+      } else if (60000 < temp) {
+        temp = parseInt(temp / 60000).toString() + "분 전";
+      } else {
+        temp = "지금";
+      }
+      return temp;
     },
   },
   created: function () {

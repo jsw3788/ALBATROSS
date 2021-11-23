@@ -1,22 +1,20 @@
 <template>
-  <div>
-    <div @click="goDetailInfo">
-      <b-card
-        :img-src="movie.poster_path"
-        img-alt="Image"
-        img-top
-        style="max-width: 20rem; font-size: 5px"
-        class="mb-2 movie-card"
-      >
-        <p class="hover-title">{{ movie.title }}</p>
-      </b-card>
+  <SplideSlide class="movie-item">
+    <div @click="goDetailInfo" class="movie-card">
+      <img :src="movie.poster_path" style="width: 100%" />
     </div>
-  </div>
+  </SplideSlide>
 </template>
 
 <script>
+import { SplideSlide } from "@splidejs/vue-splide";
+import "@splidejs/splide/dist/css/splide.min.css";
+
 export default {
   name: "MovieItem",
+  components: {
+    SplideSlide,
+  },
   props: {
     movie: Object,
   },
@@ -37,6 +35,12 @@ export default {
 
 
 <style scoped>
+.movie-item {
+  color: black;
+}
+.movie-card {
+  object-fit: cover;
+}
 .movie-card:hover {
   filter: brightness(50%);
 }

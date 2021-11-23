@@ -1,46 +1,64 @@
 <template>
-  <div>
-    <span>
-      <img :src="image" alt="no profile" />
-      <p>{{ person }}</p>
-    </span>
-    <div>
-      films | {{ films }} follower | {{ follower }} following | {{ following }}
-    </div>
-    <div v-if="!isMySelf">
-      <button v-if="isfollowing" @click="follow">언팔로우</button>
-      <button v-else @click="follow">팔로우</button>
-    </div>
-    <!-- <profile-movie :person="person"></profile-movie> -->
-    <!-- <profile-review :person="person"></profile-review> -->
-    <h4>가장 좋아하는 영화</h4>
-    <profile-movie-item
-      v-for="(movie, index) in favorite_movies"
-      :key="index + 'favorite'"
-      :movie="movie"
-    ></profile-movie-item>
-    <h4>최근 감상 영화</h4>
-    <profile-movie-item
-      v-for="(movie, index) in recent_movies"
-      :key="index + 'mrecent'"
-      :movie="movie"
-    >
-    </profile-movie-item>
-    <h4>리뷰 좋아요순</h4>
-    <profile-review-item
-      v-for="(review, index) in popular_reviews"
-      :key="index + 'popular'"
-      :review="review"
-    >
-    </profile-review-item>
-    <h4>리뷰 작성일순</h4>
-    <profile-review-item
-      v-for="(review, index) in recent_reviews"
-      :key="index + 'rrecent'"
-      :review="review"
-    >
-    </profile-review-item>
-  </div>
+  <b-container class="bv-example-row">
+    <b-row>
+      <b-col cols="4">
+        <span>
+          <img :src="image" alt="no profile" />
+          <p>{{ person }}</p>
+        </span>
+        <div>
+          films | {{ films }} follower | {{ follower }} following |
+          {{ following }}
+        </div>
+        <div v-if="!isMySelf">
+          <button v-if="isfollowing" @click="follow">언팔로우</button>
+          <button v-else @click="follow">팔로우</button>
+        </div>
+      </b-col>
+      <b-col cols="8">
+        <b-container class="bv-example-row">
+          <h4>가장 좋아하는 영화</h4>
+          <b-row>
+            <profile-movie-item
+              v-for="(movie, index) in favorite_movies"
+              :key="index + 'favorite'"
+              :movie="movie"
+            ></profile-movie-item>
+          </b-row>
+
+          <h4>최근 리뷰 영화</h4>
+          <b-row>
+            <profile-movie-item
+              v-for="(movie, index) in recent_movies"
+              :key="index + 'mrecent'"
+              :movie="movie"
+            >
+            </profile-movie-item>
+          </b-row>
+
+          <h4>좋아요를 받이받은 리뷰</h4>
+          <b-row>
+            <profile-review-item
+              v-for="(review, index) in popular_reviews"
+              :key="index + 'popular'"
+              :review="review"
+            >
+            </profile-review-item>
+          </b-row>
+
+          <h4>최근 작성한 리뷰</h4>
+          <b-row>
+            <profile-review-item
+              v-for="(review, index) in recent_reviews"
+              :key="index + 'rrecent'"
+              :review="review"
+            >
+            </profile-review-item>
+          </b-row>
+        </b-container>
+      </b-col>
+    </b-row>
+  </b-container>
 </template>
 
 <script>

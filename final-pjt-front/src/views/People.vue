@@ -1,10 +1,14 @@
 <template>
   <div>
     <h1>인기 배우</h1>
-    <people-actor-list></people-actor-list>
+    <div>
+      <people-actor-list></people-actor-list>
+    </div>
 
     <h1>인기 감독</h1>
-    <people-director-list></people-director-list>
+    <div>
+      <people-director-list></people-director-list>
+    </div>
   </div>
 </template>
 

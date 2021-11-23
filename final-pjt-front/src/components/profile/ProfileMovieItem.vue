@@ -1,8 +1,10 @@
 <template>
-  <div @click="goToDetail">
-    <img :src="movie.poster_path" alt="" />
-    {{ movie.title }}
-  </div>
+  <b-col cols="3">
+    <div @click="goToDetail">
+      <img :src="movie.poster_path" style="width: 100%" />
+      {{ movie.title }}
+    </div>
+  </b-col>
 </template>
 
 <script>
