@@ -1,6 +1,6 @@
-from django.http.response import JsonResponse
+# from django.http.response import JsonResponse
 from rest_framework.decorators import api_view, authentication_classes
-from rest_framework import serializers, status
+from rest_framework import status
 from rest_framework.response import Response
 import requests
 from django.shortcuts import get_list_or_404, get_object_or_404
@@ -11,12 +11,14 @@ from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from django.contrib.auth import get_user_model
-from django.db.models import Max, F
+from django.db.models import F
 from datetime import datetime
 from random import choice
 
-# 영화 상세 조회
 
+
+
+# 영화 상세 조회
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def read_movie_detail(request, movie_pk):
@@ -43,8 +45,8 @@ def read_movies_by_popularity(request):
     movies = Movie.objects.order_by('-popularity')
     return Response(MovieListSerializer(movies, many=True).data)
 
-# 평점순
 
+# 평점순
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def read_movies_by_score(request):
@@ -64,8 +66,9 @@ def read_movies_by_release(request):
         release_date__lte=now).order_by('-release_date')
     return Response(MovieListSerializer(movies, many=True).data)
 
-# 추천 알고리즘
 
+
+# 추천 알고리즘
 @api_view(['GET'])
 @authentication_classes([JSONWebTokenAuthentication])
 @permission_classes([IsAuthenticated])
@@ -105,9 +108,9 @@ def actor_list(request):
     actors = Actor.objects.order_by('-popularity')[:20]
     return Response(ActorListSerializer(actors, many=True).data)
 
+
+
 # 감독 상세
-
-
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def director_detail(request, director_pk):
@@ -125,6 +128,8 @@ def actor_detail(request, actor_pk):
 
 # 영화의 평점을 매기면 scroe를 작성하고, wanted를 false로 뒤집기
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
+@authentication_classes([JSONWebTokenAuthentication])
+@permission_classes([IsAuthenticated])
 def read_update_score(request, movie_pk):
     # 평점을 매기면, 사용자의 Recommend 테이블과 Record 테이블을 갱신해야함
     # POST 요청은 사용자가 평점을 매긴적이 없는 경우
@@ -139,7 +144,8 @@ def read_update_score(request, movie_pk):
         context = {
             'score': score,
         }
-        return JsonResponse(context)
+        # return JsonResponse(context)
+        return Response(context,status=status.HTTP_200_OK)
     else:
         # 선택한 영화
         movie = get_object_or_404(Movie, pk=movie_pk)
@@ -163,7 +169,8 @@ def read_update_score(request, movie_pk):
             context={
                 'wanted': my_movie.wanted
             }
-            return JsonResponse(context)
+            # return JsonResponse(context)
+            return Response(context)
 
         elif request.method == "POST":
             # 보고싶어요가 체크되어 있는 상태라면
@@ -222,7 +229,9 @@ def read_update_score(request, movie_pk):
             context={
                 'wanted': my_movie.wanted
             }
-            return JsonResponse(context)
+            # return JsonResponse(context)
+            return Response(context)
+
 
         elif request.method == "DELETE":  # 0점을 줬어! 삭제할거야!
             my_movie = Record.objects.get(user=request.user.pk, movie=movie.pk)
@@ -243,11 +252,15 @@ def read_update_score(request, movie_pk):
             context={
                 'deleted': '평점데이터가 삭제되었습니다.'
             }
-            return JsonResponse(context) 
+            # return JsonResponse(context)
+            return Response(context)
+
 
 
 # 영화를 보고싶어하면 wanted를 true로 Record에 넣기
 @api_view(['GET', 'POST'])
+@authentication_classes([JSONWebTokenAuthentication])
+@permission_classes([IsAuthenticated])
 def read_update_wanted(request, movie_pk):
     # 선택한 영화
     if request.method == "GET":
@@ -259,7 +272,9 @@ def read_update_wanted(request, movie_pk):
         context = {
             'wanted': wanted,
         }
-        return JsonResponse(context)
+        # return JsonResponse(context)
+        return Response(context)
+
 
     elif request.method == "POST":
         movie = Movie.objects.get(pk=movie_pk)
@@ -283,7 +298,8 @@ def read_update_wanted(request, movie_pk):
         context = {
             'wanted': wanted,
         }
-        return JsonResponse(context)
+        # return JsonResponse(context)
+        return Response(context)
 
 
 # 유저의 최신순 리뷰
@@ -385,7 +401,9 @@ def review_detail(request, review_pk):
             'dislikeCnt' : review.dislike_users.count(),
             'commentCnt' : review.comments.count(),
         }
-        return JsonResponse(context)
+        # return JsonResponse(context)
+        return Response(context)
+
 
     elif request.user == review.user:
         # 리뷰 수정
@@ -405,6 +423,8 @@ def review_detail(request, review_pk):
 
 # 리뷰 좋아요
 @api_view(['POST'])
+@authentication_classes([JSONWebTokenAuthentication])
+@permission_classes([IsAuthenticated])
 def likes(request, review_pk):
     review = get_object_or_404(Review, pk=review_pk)
     # 싫어요를 눌렀으면 좋아요를 누를 수 없음
@@ -422,11 +442,14 @@ def likes(request, review_pk):
         'isLiked': isLiked,
         'likeCnt': review.like_users.count()
     }
-    return JsonResponse(context)
+    # return JsonResponse(context)
+    return Response(context)
 
 
 # 리뷰 싫어요
 @api_view(['POST'])
+@authentication_classes([JSONWebTokenAuthentication])
+@permission_classes([IsAuthenticated])
 def dislikes(request, review_pk):
     review = get_object_or_404(Review, pk=review_pk)
     # 좋아요를 눌렀으면 싫어요를 누를 수 없음
@@ -444,11 +467,15 @@ def dislikes(request, review_pk):
         'isDisliked': isDisliked,
         'dislikeCnt': review.dislike_users.count()
     }
-    return JsonResponse(context)
+    # return JsonResponse(context)
+    return Response(context)
+
 
 
 # 전체 댓글 조회, 생성
 @api_view(['GET', 'POST'])
+@authentication_classes([JSONWebTokenAuthentication])
+@permission_classes([IsAuthenticated])
 def comment_list(request, review_pk):
     review = get_object_or_404(Review, pk=review_pk)
     if request.method == 'GET':
@@ -466,6 +493,8 @@ def comment_list(request, review_pk):
 
 # 댓글 삭제, 수정
 @api_view(['PUT', 'DELETE'])
+@authentication_classes([JSONWebTokenAuthentication])
+@permission_classes([IsAuthenticated])
 def comment_detail(request, comment_pk):
     comment = get_object_or_404(Comment, pk=comment_pk)
     if request.user == comment.user:
@@ -488,99 +517,107 @@ def comment_detail(request, comment_pk):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_genre(request):
-    API_KEY = config('API_KEY')
-    URL = f'https://api.themoviedb.org/3/genre/movie/list?api_key={API_KEY}&language=ko-KR'
-    request = requests.get(URL).json()
-    for tmdb_data in request.get('genres'):
-        if Genre.objects.filter(tmdb_id=tmdb_data.get('id')).exists():
-            continue
-        Genre.objects.create(
-            tmdb_id=tmdb_data.get('id'),
-            name=tmdb_data.get('name'),
-        )
-    return Response({'database': '성공'}, status=status.HTTP_201_CREATED)
+    if request.data.get('username') == 'admin':
+        API_KEY = config('API_KEY')
+        URL = f'https://api.themoviedb.org/3/genre/movie/list?api_key={API_KEY}&language=ko-KR'
+        request = requests.get(URL).json()
+        for tmdb_data in request.get('genres'):
+            if Genre.objects.filter(tmdb_id=tmdb_data.get('id')).exists():
+                continue
+            Genre.objects.create(
+                tmdb_id=tmdb_data.get('id'),
+                name=tmdb_data.get('name'),
+            )
+        return Response({'database': '성공'}, status=status.HTTP_201_CREATED)
+    return Response({'Unauthorized':'권한이 없습니다.'},status=status.HTTP_401_UNAUTHORIZED)
+
 
 # db 영화 데이터 불러오기
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_movies(request):
-    API_KEY = config('API_KEY')
-    for page in range(1, 2):
-        URL = f'https://api.themoviedb.org/3/movie/popular?api_key={API_KEY}&language=ko-KR&page={page}&region=KR'
-        request = requests.get(URL).json()
-        # print(request)
-        for tmdb_data in request.get('results'):
-            tmdb_movie_id = tmdb_data.get('id')
-            if Movie.objects.filter(tmdb_id=tmdb_movie_id).exists():
-                movie = Movie.objects.get(tmdb_id=tmdb_movie_id)
-                movie.popularity = tmdb_data.get('popularity')
-                movie.tmdb_vote_sum = tmdb_data.get(
-                    'vote_average') * tmdb_data.get('vote_count')
-                movie.tmdb_vote_cnt = tmdb_data.get('vote_count')
-                # movie.release_status = tmdb_data.get('release_status')
-                movie.save()
-            else:
-               
-                movie = Movie.objects.create(
-                    tmdb_id=tmdb_movie_id,
-                    title=tmdb_data.get('title'),
-                    release_date=tmdb_data.get('release_date'),
-                    popularity=tmdb_data.get('popularity'),
-                    tmdb_vote_sum=tmdb_data.get(
-                        'vote_average') * tmdb_data.get('vote_count'),
-                    tmdb_vote_cnt=tmdb_data.get('vote_count'),
-                    updated_vote_sum=0,
-                    updated_vote_cnt=0,
-                    overview=tmdb_data.get('overview'),
-                    poster_path=f'https://image.tmdb.org/t/p/w500{tmdb_data.get("poster_path")}',
-                    backdrop_path=f'https://image.tmdb.org/t/p/original{tmdb_data.get("backdrop_path")}',
-                    # release_status=detail_status
-                )
-                for genre_id in tmdb_data.get('genre_ids'):
-                    genre = Genre.objects.get(tmdb_id=genre_id)
-                    movie.genres.add(genre)
-    return Response({'database': '성공'}, status=status.HTTP_201_CREATED)
+    if request.data.get('username') == 'admin':
+        API_KEY = config('API_KEY')
+        for page in range(1, 2):
+            URL = f'https://api.themoviedb.org/3/movie/popular?api_key={API_KEY}&language=ko-KR&page={page}&region=KR'
+            request = requests.get(URL).json()
+            # print(request)
+            for tmdb_data in request.get('results'):
+                tmdb_movie_id = tmdb_data.get('id')
+                if Movie.objects.filter(tmdb_id=tmdb_movie_id).exists():
+                    movie = Movie.objects.get(tmdb_id=tmdb_movie_id)
+                    movie.popularity = tmdb_data.get('popularity')
+                    movie.tmdb_vote_sum = tmdb_data.get(
+                        'vote_average') * tmdb_data.get('vote_count')
+                    movie.tmdb_vote_cnt = tmdb_data.get('vote_count')
+                    # movie.release_status = tmdb_data.get('release_status')
+                    movie.save()
+                else:
+                
+                    movie = Movie.objects.create(
+                        tmdb_id=tmdb_movie_id,
+                        title=tmdb_data.get('title'),
+                        release_date=tmdb_data.get('release_date'),
+                        popularity=tmdb_data.get('popularity'),
+                        tmdb_vote_sum=tmdb_data.get(
+                            'vote_average') * tmdb_data.get('vote_count'),
+                        tmdb_vote_cnt=tmdb_data.get('vote_count'),
+                        updated_vote_sum=0,
+                        updated_vote_cnt=0,
+                        overview=tmdb_data.get('overview'),
+                        poster_path=f'https://image.tmdb.org/t/p/w500{tmdb_data.get("poster_path")}',
+                        backdrop_path=f'https://image.tmdb.org/t/p/original{tmdb_data.get("backdrop_path")}',
+                        # release_status=detail_status
+                    )
+                    for genre_id in tmdb_data.get('genre_ids'):
+                        genre = Genre.objects.get(tmdb_id=genre_id)
+                        movie.genres.add(genre)
+        return Response({'database': '성공'}, status=status.HTTP_201_CREATED)
+    return Response({'Unauthorized':'권한이 없습니다.'},status=status.HTTP_401_UNAUTHORIZED)
+
 
 # db 영화인 데이터 불러오기
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_credits(request):
-    API_KEY = config('API_KEY')
-    movie_data = get_list_or_404(Movie)
-    for movie in movie_data:
-        URL = f'https://api.themoviedb.org/3/movie/{movie.tmdb_id}/credits?api_key={API_KEY}&language=ko-KR'
-        actors = requests.get(URL).json().get('cast')
-        for actor in actors:
-            tmdb_id = actor.get("id")
-            if not actor.get("profile_path"):
-                continue
-            if Actor.objects.filter(actor_id=tmdb_id).exists():
-                continue
-            ppl_URL = f'https://api.themoviedb.org/3/person/{tmdb_id}?api_key={API_KEY}&language=ko-KR'
-            actor_popularity = requests.get(ppl_URL).json().get('popularity')
-            new_actor = Actor.objects.create(
-                actor_id=tmdb_id,
-                name=actor.get("name"),
-                profile_path=f'https://image.tmdb.org/t/p/w500{actor.get("profile_path")}',
-                popularity=actor_popularity,
-            )
-            new_actor.movies.add(movie)
+    if request.data.get('username') == 'admin':
+        API_KEY = config('API_KEY')
+        movie_data = get_list_or_404(Movie)
+        for movie in movie_data:
+            URL = f'https://api.themoviedb.org/3/movie/{movie.tmdb_id}/credits?api_key={API_KEY}&language=ko-KR'
+            actors = requests.get(URL).json().get('cast')
+            for actor in actors:
+                tmdb_id = actor.get("id")
+                if not actor.get("profile_path"):
+                    continue
+                if Actor.objects.filter(actor_id=tmdb_id).exists():
+                    continue
+                ppl_URL = f'https://api.themoviedb.org/3/person/{tmdb_id}?api_key={API_KEY}&language=ko-KR'
+                actor_popularity = requests.get(ppl_URL).json().get('popularity')
+                new_actor = Actor.objects.create(
+                    actor_id=tmdb_id,
+                    name=actor.get("name"),
+                    profile_path=f'https://image.tmdb.org/t/p/w500{actor.get("profile_path")}',
+                    popularity=actor_popularity,
+                )
+                new_actor.movies.add(movie)
 
-        crews = requests.get(URL).json().get('crew')
-        for crew in crews:
-            tmdb_id = crew.get("id")
-            if crew.get("job") != "Director" or not crew.get("profile_path"):
-                continue
-            if Director.objects.filter(director_id=tmdb_id).exists():
-                continue
-            ppl_URL = f'https://api.themoviedb.org/3/person/{tmdb_id}?api_key={API_KEY}&language=ko-KR'
-            director_popularity = requests.get(
-                ppl_URL).json().get('popularity')
-            new_director = Director.objects.create(
-                director_id=tmdb_id,
-                name=crew.get("name"),
-                profile_path=f'https://image.tmdb.org/t/p/w500{crew.get("profile_path")}',
-                popularity=director_popularity,
-            )
-            new_director.movies.add(movie)
-    return Response({'database': '성공!'}, status=status.HTTP_201_CREATED)
+            crews = requests.get(URL).json().get('crew')
+            for crew in crews:
+                tmdb_id = crew.get("id")
+                if crew.get("job") != "Director" or not crew.get("profile_path"):
+                    continue
+                if Director.objects.filter(director_id=tmdb_id).exists():
+                    continue
+                ppl_URL = f'https://api.themoviedb.org/3/person/{tmdb_id}?api_key={API_KEY}&language=ko-KR'
+                director_popularity = requests.get(
+                    ppl_URL).json().get('popularity')
+                new_director = Director.objects.create(
+                    director_id=tmdb_id,
+                    name=crew.get("name"),
+                    profile_path=f'https://image.tmdb.org/t/p/w500{crew.get("profile_path")}',
+                    popularity=director_popularity,
+                )
+                new_director.movies.add(movie)
+        return Response({'database': '성공!'}, status=status.HTTP_201_CREATED)
+    return Response({'Unauthorized':'권한이 없습니다.'},status=status.HTTP_401_UNAUTHORIZED)
