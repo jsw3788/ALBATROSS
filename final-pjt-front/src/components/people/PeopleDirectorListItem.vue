@@ -1,9 +1,11 @@
 <template>
-  <div @click="goToDirectorDetail">
-    <img :src="director.profile_path" style="width: 10%" />
-    <p>{{ director.name }}</p>
-    <p>{{ director.popularity }}</p>
-  </div>
+  <b-col cols="2">
+    <div @click="goToDirectorDetail">
+      <img :src="director.profile_path" style="width: 100%" />
+      <p>{{ director.name }}</p>
+      <p>{{ director.popularity }}</p>
+    </div>
+  </b-col>
 </template>
 
 <script>

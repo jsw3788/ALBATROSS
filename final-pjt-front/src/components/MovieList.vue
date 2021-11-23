@@ -1,36 +1,68 @@
 <template>
   <div>
-    <slick ref="slick" :options="slickOptions">
-      <movie-item
-        v-for="movie in popularMovies"
-        :key="movie.tmdb_id"
-        :movie="movie"
-      ></movie-item>
-    </slick>
-    <hr />
-    <div class="d-flex recommend-movie-list">
+    <Splide
+      :options="{
+        perPage: 5,
+        heightRatio: 0.3,
+        gap: 20,
+        cover: true,
+        isNavigation: true,
+      }"
+    >
       <movie-item
         v-for="movie in recommendMovies"
         :key="movie.tmdb_id"
         :movie="movie"
       ></movie-item>
-    </div>
+    </Splide>
     <hr />
-    <div class="d-flex released-movie-list">
+    <Splide
+      :options="{
+        perPage: 5,
+        heightRatio: 0.3,
+        gap: 20,
+        cover: true,
+        isNavigation: true,
+      }"
+    >
       <movie-item
-        v-for="movie in releasedMovies"
+        v-for="movie in popularMovies"
         :key="movie.tmdb_id"
         :movie="movie"
       ></movie-item>
-    </div>
+    </Splide>
     <hr />
-    <div class="d-flex score-movie-list">
+    <Splide
+      :options="{
+        perPage: 5,
+        heightRatio: 0.3,
+        gap: 20,
+        cover: true,
+        isNavigation: true,
+      }"
+    >
       <movie-item
         v-for="movie in scoreMovies"
         :key="movie.tmdb_id"
         :movie="movie"
       ></movie-item>
-    </div>
+    </Splide>
+    <hr />
+    <Splide
+      :options="{
+        perPage: 5,
+        heightRatio: 0.3,
+        gap: 20,
+        cover: true,
+        isNavigation: true,
+      }"
+    >
+      <movie-item
+        v-for="movie in releasedMovies"
+        :key="movie.tmdb_id"
+        :movie="movie"
+      ></movie-item>
+    </Splide>
   </div>
 </template>
 
@@ -38,22 +70,17 @@
 import MovieItem from "@/components/MovieItem";
 import axios from "axios";
 import { mapState } from "vuex";
-import Slick from "vue-slick";
-import "slick-carousel/slick/slick.css";
+import { Splide } from "@splidejs/vue-splide";
+import "@splidejs/splide/dist/css/splide.min.css";
 
 export default {
   name: "MovieList",
   components: {
     MovieItem,
-    Slick,
+    Splide,
   },
   data: function () {
-    return {
-      slickOptions: {
-        slidesToShow: 5,
-        shileToScroll: 5,
-      },
-    };
+    return {};
   },
   // methods: {
   //   next() {

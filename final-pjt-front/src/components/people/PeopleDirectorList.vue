@@ -1,14 +1,14 @@
 <template>
-  <div>
-    <ul>
+  <b-container class="bv-example-row">
+    <b-row>
       <people-director-list-item
         v-for="director in directors"
         :key="director.director_id"
         :director="director"
       >
       </people-director-list-item>
-    </ul>
-  </div>
+    </b-row>
+  </b-container>
 </template>
 
 <script>

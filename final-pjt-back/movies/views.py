@@ -87,7 +87,7 @@ def read_movies_by_recommend(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def director_list(request):
-    directors = Director.objects.order_by('-popularity')[:20]
+    directors = Director.objects.order_by('-popularity')[:18]
     return Response(DirectorListSerializer(directors, many=True).data)
 
 
@@ -95,12 +95,10 @@ def director_list(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def actor_list(request):
-    actors = Actor.objects.order_by('-popularity')[:20]
+    actors = Actor.objects.order_by('-popularity')[:18]
     return Response(ActorListSerializer(actors, many=True).data)
 
 # 감독 상세
-
-
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def director_detail(request, director_pk):
@@ -142,6 +140,8 @@ def read_update_score(request, movie_pk):
             # 원래 평점이 있잔아
             my_movie = Record.objects.get(user=request.user.pk, movie=movie.pk)
             before_score = my_movie.score
+            movie.updated_vote_sum += (after_score - before_score)
+            movie.save()
             my_movie.score = after_score
             my_movie.save()
             # 이거는 내가 담아놓은 모든 장르 가져오는 필터
@@ -163,6 +163,9 @@ def read_update_score(request, movie_pk):
             return JsonResponse(context)
 
         elif request.method == "POST":
+            movie.updated_vote_cnt += 1
+            movie.updated_vote_sum += after_score
+            movie.save()
             # 보고싶어요가 체크되어 있는 상태라면
             if Record.objects.filter(user=request.user.pk, movie=movie_pk).exists():
                 my_movie = Record.objects.get(
@@ -226,6 +229,9 @@ def read_update_score(request, movie_pk):
             return JsonResponse(context)
 
         elif request.method == "DELETE":  # 0점을 줬어! 삭제할거야!
+            movie.updated_vote_sum -= after_score
+            movie.updated_vote_cnt -= 1
+            movie.save()
             my_movie = Record.objects.get(user=request.user.pk, movie=movie.pk)
             before_score = my_movie.score
             my_recommends = Recommend.objects.filter(user=request.user.pk)
@@ -517,8 +523,7 @@ def get_movies(request):
             if Movie.objects.filter(tmdb_id=tmdb_movie_id).exists():
                 movie = Movie.objects.get(tmdb_id=tmdb_movie_id)
                 movie.popularity = tmdb_data.get('popularity')
-                movie.tmdb_vote_sum = tmdb_data.get(
-                    'vote_average') * tmdb_data.get('vote_count')
+                movie.tmdb_vote_sum = tmdb_data.get('vote_average') * tmdb_data.get('vote_count')
                 movie.tmdb_vote_cnt = tmdb_data.get('vote_count')
                 # movie.release_status = tmdb_data.get('release_status')
                 movie.save()

@@ -1,14 +1,14 @@
 <template>
-  <div>
-    <ul>
+  <b-container class="bv-example-row">
+    <b-row>
       <people-actor-list-item
         v-for="actor in actors"
         :key="actor.actor_id"
         :actor="actor"
       >
       </people-actor-list-item>
-    </ul>
-  </div>
+    </b-row>
+  </b-container>
 </template>
 
 <script>
