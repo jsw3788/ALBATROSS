@@ -207,7 +207,6 @@ def read_update_score(request, movie_pk):
                 )
                 # 영화의 장르를 돌면서, Recommend에 장르가 있는지 확인하자
                 for genre in movie.genres.all():
-                    # print(genre)
                     is_recommend = Recommend.objects.filter(genre=genre).exists()
                     # 이미 좋아하는 장르에 있는 데이터면, 수정해줘야하고
                     if is_recommend:
@@ -484,9 +483,7 @@ def comment_list(request, review_pk):
         return Response(serializer.data)
     elif request.method == 'POST':
         serializer = CommentSerializer(data=request.data)
-        print(serializer)
         if serializer.is_valid(raise_exception=True):
-            print(13451235)
             serializer.save(user=request.user, review=review)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -541,7 +538,6 @@ def get_movies(request):
         for page in range(1, 2):
             URL = f'https://api.themoviedb.org/3/movie/popular?api_key={API_KEY}&language=ko-KR&page={page}&region=KR'
             request = requests.get(URL).json()
-            # print(request)
             for tmdb_data in request.get('results'):
                 tmdb_movie_id = tmdb_data.get('id')
                 if Movie.objects.filter(tmdb_id=tmdb_movie_id).exists():
