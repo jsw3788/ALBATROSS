@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="!comment.is_spoiled">
     <p>
       댓글 // {{ comment.user.username }} : {{ comment.content }}
       <span v-if="comment.user.username === this.username">
@@ -19,6 +19,14 @@
       </span>
     </p>
   </div>
+  <div v-else>
+      <div>
+        <p> 이 댓글은 스포일러를 담고 있습니다.</p>
+        <p>
+          내용을 보시려면 <b-button @click="lookspoiler">여기</b-button>를 클릭해주세요.
+        </p>
+      </div>
+    </div>
 </template>
 
 <script>
@@ -62,6 +70,9 @@ export default {
         this.$emit("delete-comment", delComment);
       });
     },
+    lookspoiler: function () {
+        this.comment.is_spoiled=false
+      },
   },
   computed: {
     ...mapState(["username"]),

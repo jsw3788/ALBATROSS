@@ -2,7 +2,7 @@
   <div id="review-list">
     <!-- 리뷰 하나당 대댓글이 다 달려야함 -->
     <!-- 댓글 -->
-    <div>
+    <div v-if="!review.is_spoiled">
       <div>
         <p>
           작성자 : <span @click="goProfile">{{ review.user.username }}</span>
@@ -65,6 +65,14 @@
           </template>
         </b-modal>
         <b-button @click="deleteReview">삭제</b-button>
+      </div>
+    </div>
+    <div v-else>
+      <div>
+        <p> 이 글은 스포일러를 담고 있습니다.</p>
+        <p>
+          내용을 보시려면 <b-button @click="lookspoiler">여기</b-button>를 클릭해주세요.
+        </p>
       </div>
     </div>
     <!-- comment -->
@@ -224,6 +232,10 @@ export default {
       const idx = this.comments.indexOf(delComment);
       this.comments.splice(idx, 1);
     },
+    lookspoiler: function () {
+        this.review.is_spoiled=false
+      }
+    
   },
   created: function () {
     axios({
@@ -232,7 +244,7 @@ export default {
       headers: this.$store.getters.config,
     })
       .then((res) => {
-        console.log(this.isLogin);
+        // console.log(this.isLogin);
         this.isLiked = res.data.isLiked;
         this.isDisliked = res.data.isDisliked;
         this.likeCnt = res.data.likeCnt;
