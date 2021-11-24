@@ -396,7 +396,7 @@ def read_favorite_movies_by_user(request, username):
         ret.append(favorite_movie.movie)
     return Response(MovieListSerializer(ret, many=True).data)
 
-
+from django.core.paginator import Paginator
 # 리뷰 전체 조회, 생성
 @api_view(['GET', 'POST'])
 @permission_classes([AllowAny])
@@ -407,8 +407,17 @@ def review_list(request, movie_pk):
         
         # 최적화
         reviews = Review.objects.select_related('user').prefetch_related('like_users').prefetch_related('dislike_users').filter(movie__pk=movie_pk)
-        serializer = ReviewListSerializer(reviews, many=True)
-        return Response(serializer.data)
+        # paginator
+        paginator = Paginator(reviews, 5)
+
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        
+        serializer = ReviewListSerializer(page_obj, many=True)
+        data = serializer.data
+        data.append({'last_page': paginator.num_pages})
+        return Response(data)
+        # serializer = ReviewListSerializer(reviews, many=True)
 
     elif request.method == 'POST':
         movie = get_object_or_404(Movie, pk=movie_pk)
@@ -426,7 +435,8 @@ def review_detail(request, review_pk):
     # review = get_object_or_404(Review, pk=review_pk)
 
     # 최적화
-    review = Review.objects.annotate(like_count=Count('like_users'), dislike_count=Count('dislike_users')).select_related('user').prefetch_related('like_users').prefetch_related('dislike_users').get(pk=review_pk)
+    review = Review.objects.annotate(like_count=Count('like_users'), dislike_count=Count('dislike_users')).select_related('user').get(pk=review_pk)
+    
     # 리뷰에 대한 좋아요, 싫어요 정보 조회
     if request.method == 'GET':
         if review.like_users.filter(pk=request.user.pk).exists():
