@@ -62,17 +62,12 @@ def profile(request, username):
 
     # 회원 정보 수정 (프로필 이미지)
     def update_profile(request):
-        print('크크크')
-        print(request.data)
         profile_image = request.data.get('profileImg')
-        print('zmzmzm2')
-        print(profile_image, type(profile_image))
         if request.user.username != request.data.get('username') and get_user_model().objects.filter(username=request.data.get('username')).exists():
             return Response({'error':'이미 존재하는 사용자 이름 입니다.'},status=status.HTTP_400_BAD_REQUEST)
         serializer = UserProfileUpdateSerializer(request.user, data=request.data)
-        print('이건될까')
+        print('체크')
         if serializer.is_valid(raise_exception=True):
-            print(1)
             serializer.save(profile_image=profile_image)
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 

@@ -119,10 +119,10 @@
               />
               <input
                 type="checkbox"
-                id="comment-spoil"
+                :id="'comment-spoil'+ review.id"
                 v-model="newCommentSpoil"
               />
-              <label for="comment-spoil" class="mx-1">spoiler</label>
+              <label :for="'comment-spoil'+ review.id" class="mx-1">spoiler</label>
               <b-icon-pencil-square
                 @click="writeComment"
               ></b-icon-pencil-square>
@@ -234,6 +234,7 @@ export default {
       });
     },
     deleteReview: function () {
+      console.log(this.username)
       const delReview = this.review;
       axios({
         method: "delete",
@@ -256,6 +257,7 @@ export default {
         .then((res) => {
           this.comments.push(res.data);
           this.newComment = null;
+          this.commentCnt +=1
         })
         .catch((err) => {
           console.log(err);
@@ -275,6 +277,8 @@ export default {
     deleteComment: function (delComment) {
       const idx = this.comments.indexOf(delComment);
       this.comments.splice(idx, 1);
+      this.commentCnt -=1
+
     },
     humanize: function (now, date) {
       const moment = require("moment");

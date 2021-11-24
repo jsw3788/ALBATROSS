@@ -126,14 +126,42 @@ export default {
       wanted: null,
       score: null,
       movieRate: null,
+      pageNum: 2,
+      possiblePageNum:2,
 
       rating: "No Rating Selected",
       currentRating: "평점을 매겨주세요",
       currentSelectedRating: "",
-      // boundRating: 3,
     };
   },
   methods: {
+    // 인피니티 스크롤
+    getMoreReviews: function() {
+      axios({
+            method: 'get',
+            url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/${this.movie.id}/reviews/`,
+            headers: this.$store.getters.config,
+            params: {
+              page: this.pageNum,
+            },
+          })
+          .then((res) =>{
+            
+            const newreviews = res.data
+            this.reviews.push(...newreviews)
+            
+            this.pageNum += 1
+          })
+
+    },
+    scrollDown: function () {
+        const { scrollHeight, scrollTop, clientHeight} = document.documentElement
+        if (scrollHeight - Math.round(scrollTop) <= clientHeight) {
+          if (this.pageNum <= this.possiblePageNum) {
+            this.getMoreReviews()
+          } 
+        }
+    },
     updatedWanted: function () {
       axios({
         method: "post",
@@ -167,7 +195,7 @@ export default {
     },
 
     addReview: function (review) {
-      console.log(review);
+      // console.log(review);
       this.reviews.push(review);
     },
     updateReview: function (updatedreview, beforereview) {
@@ -273,6 +301,7 @@ export default {
         });
     },
   },
+  
   computed: {
     isScored: function () {
       return this.score;
@@ -289,7 +318,7 @@ export default {
       .then((res) => {
         // console.log(res);
         this.movie = res.data;
-        console.log(this.movie);
+        // console.log(this.movie);
         if (this.movie.updated_vote_cnt + this.movie.tmdb_vote_cnt) {
           this.movieRate =
             (this.movie.tmdb_vote_sum + this.movie.updated_vote_sum) /
@@ -320,7 +349,11 @@ export default {
       this.checkWanted();
       this.checkScore();
     }
+    document.addEventListener('scroll', this.scrollDown)
   },
+  destroyed: function () {
+    document.removeEventListener('scroll',this.scrollDown)
+  }
 };
 </script>
 

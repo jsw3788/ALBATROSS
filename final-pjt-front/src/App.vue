@@ -3,14 +3,16 @@
     <notifications group="auth_notify" />
     <notifications group="movie_notify" />
     <notifications group="review_notify" />
-    <div>
+    <div v-if="!isIndex">
       <b-navbar
         toggleable="lg"
         type="dark"
         variant="dark"
         class="d-flex justify-content-end"
       >
-        <b-navbar-brand href="#">NavBar</b-navbar-brand>
+        <b-navbar-brand href="#">
+          <img src="@/assets/ALBATROSS.png" alt="albatross" />
+        </b-navbar-brand>
 
         <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 

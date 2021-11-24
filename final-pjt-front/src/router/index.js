@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import Index from '@/views/Index.vue'
 import Home from '@/views/Home.vue'
 import People from '@/views/People.vue'
 import Detail from '@/views/Detail.vue'
@@ -8,10 +9,14 @@ import SearchResult from '@/views/SearchResult.vue'
 import PeopleDirectorDetail from '@/views/detail/PeopleDirectorDetail'
 import PeopleActorDetail from '@/views/detail/PeopleActorDetail'
 
-
 Vue.use(VueRouter)
 
 const routes = [
+  {
+    path: '',
+    name: 'Index',
+    component: Index
+  },
   {
     path: '/home',
     name: 'Home',

@@ -26,6 +26,9 @@ import VueCarousel from 'vue-carousel';
 Vue.use(VueCarousel);
 
 
+import anime from 'animejs/lib/anime.es.js'
+Vue.prototype.$anime = anime;
+
 
 Vue.config.productionTip = false
 
