@@ -231,7 +231,7 @@ export default {
           content: this.updatedcontent,
         };
         this.$emit("update-review", updatedreview, this.review);
-      });
+      }).catch((err)=> console.log(err));
     },
     deleteReview: function () {
       console.log(this.username)
@@ -242,7 +242,7 @@ export default {
         headers: this.$store.getters.config,
       }).then(() => {
         this.$emit("delete-review", delReview);
-      });
+      }).catch((err)=> console.log(err));
     },
     writeComment: function () {
       axios({

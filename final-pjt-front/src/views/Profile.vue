@@ -4,7 +4,7 @@
       <b-col cols="4">
         <span>
           <img
-            src="@/assets/profile_basic_g.png"
+            :src="image"
             alt="profile_image"
             style="width: 50%; border-radius: 50%"
             class="my-3"
@@ -125,7 +125,7 @@ export default {
         this.isfollowing = res.data.following;
         this.following = res.data.followingCnt;
         this.follower = res.data.followerCnt;
-        this.image = res.data.profile_image;
+        this.image = `${process.env.VUE_APP_SERVER_URL}/media/`+ res.data.profile_image;
         this.films = res.data.movieCnt;
       })
       .catch((err) => {
@@ -162,8 +162,7 @@ export default {
       // headers: this.setToken(),
     })
       .then((res) => {
-        console.log("popular_reviews");
-        console.log(res);
+        
         this.popular_reviews = res.data;
       })
       .catch((err) => {
@@ -177,8 +176,7 @@ export default {
       // headers: this.setToken(),
     })
       .then((res) => {
-        console.log("recent_reviews");
-        console.log(res);
+        
         this.recent_reviews = res.data;
       })
       .catch((err) => {

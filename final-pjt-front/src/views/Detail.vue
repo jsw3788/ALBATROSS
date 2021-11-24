@@ -128,6 +128,7 @@ export default {
       movieRate: null,
       pageNum: 2,
       possiblePageNum:2,
+      loading: 2,
 
       rating: "No Rating Selected",
       currentRating: "평점을 매겨주세요",
@@ -147,6 +148,7 @@ export default {
           })
           .then((res) =>{
             
+            this.possiblePageNum = res.data.pop()['last_page']
             const newreviews = res.data
             this.reviews.push(...newreviews)
             
@@ -159,7 +161,10 @@ export default {
         const { scrollHeight, scrollTop, clientHeight} = document.documentElement
         if (scrollHeight - Math.round(scrollTop) <= clientHeight) {
           if (this.pageNum <= this.possiblePageNum) {
-            this.getMoreReviews()
+            if(this.loading == this.pageNum){
+              this.getMoreReviews()
+              this.loading+=1
+            }
           } 
         }
     },
@@ -350,7 +355,9 @@ export default {
       this.checkWanted();
       this.checkScore();
     }
-    document.addEventListener('scroll', this.scrollDown)
+    setTimeout(() =>{
+      document.addEventListener('scroll', this.scrollDown)
+    }, 2000)
   },
   destroyed: function () {
     document.removeEventListener('scroll',this.scrollDown)
