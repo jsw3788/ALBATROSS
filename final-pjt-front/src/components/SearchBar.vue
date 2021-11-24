@@ -61,7 +61,6 @@ export default {
     axios({
       method: "get",
       url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/all/`,
-      headers: this.$store.getters.config,
     }).then(res => {
       this.$store.dispatch('getAllMovies',res.data)
     })

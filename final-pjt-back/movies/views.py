@@ -11,7 +11,7 @@ from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from django.contrib.auth import get_user_model
-from django.db.models import F
+from django.db.models import Count, F, Prefetch
 from datetime import datetime
 from random import choice
 
@@ -33,7 +33,8 @@ def read_movie_detail(request, movie_pk):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def read_all_movies(request):
-    movies = Movie.objects.all()
+    # movies = Movie.objects.all()
+    movies = Movie.objects.prefetch_related('genres').prefetch_related('actors').prefetch_related('directors')
     return Response(AllMovieListSerializer(movies, many=True).data)
 
 
@@ -72,6 +73,7 @@ def read_movies_by_release(request):
 @api_view(['GET'])
 @authentication_classes([JSONWebTokenAuthentication])
 @permission_classes([IsAuthenticated])
+# @permission_classes([AllowAny])
 def read_movies_by_recommend(request):
     my_genre = Recommend.objects.filter(user__pk=request.user.pk)
     most_prefer_point = 0
@@ -127,8 +129,9 @@ def actor_detail(request, actor_pk):
 
 # 영화의 평점을 매기면 scroe를 작성하고, wanted를 false로 뒤집기
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
-@authentication_classes([JSONWebTokenAuthentication])
-@permission_classes([IsAuthenticated])
+# @authentication_classes([JSONWebTokenAuthentication])
+# @permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def read_update_score(request, movie_pk):
     # 평점을 매기면, 사용자의 Recommend 테이블과 Record 테이블을 갱신해야함
     # POST 요청은 사용자가 평점을 매긴적이 없는 경우
@@ -162,6 +165,8 @@ def read_update_score(request, movie_pk):
             my_recommends = Recommend.objects.filter(user=request.user.pk)
             # 이거는 고른 영화의 모든 장르 가져오는 것
             movie_genres = movie.genres.all()
+            # movie_genres = Movie.objects.prefetch_related('genres')
+            # movie_genres = Genre.objects.prefetch_related('movies')
             for movie_genre in movie_genres:
                 for recommend in my_recommends:
                     if movie_genre.pk == recommend.genre_id:  # 이거 값들은 나중에 찍어보면서 확인
@@ -314,6 +319,7 @@ def read_update_wanted(request, movie_pk):
 def read_recent_reviews_by_user(request, username):
     person = get_object_or_404(get_user_model(), username=username)
     recent_reviews = person.reviews.order_by('-updated_at')[:3]
+    
     return Response(ReviewSerializer(recent_reviews, many=True).data)
 
 
@@ -325,9 +331,11 @@ def read_popular_reviews_by_user(request, username):
     person = get_user_model().objects.get(username=username)
     if person:
         reviews = []
-        my_reviews = person.reviews.all()
+        # my_reviews = person.reviews.all()
+        my_reviews = Review.objects.annotate(like_count=Count('like_users')).select_related('user').prefetch_related('like_users').prefetch_related('dislike_users').filter(user=person)
         for review in my_reviews:
-            reviews.append((review.like_users.count(), review))
+            # reviews.append((review.like_users.count(), review))
+            reviews.append((review.like_count, review))
         # 좋아요 순 정렬
         sorted_reviews = sorted(reviews, key=lambda x: x[0])[:3]
         popular_reviews = []
@@ -343,33 +351,40 @@ def read_popular_reviews_by_user(request, username):
 @permission_classes([AllowAny])
 def read_recent_movies_by_user(request, username):
     person = get_object_or_404(get_user_model(), username=username)
-    recent_movies = []
-    for review in person.reviews.order_by('-updated_at')[:10]:
-        recent_movies.append(review.movie)
+    recent_reviews = Review.objects.select_related('user').filter(user=person).prefetch_related('movie').order_by('-updated_at')[:10]
+    
+    recent_movies = {}
+    for review in recent_reviews:
+        recent_movies.add(review.movie)
+    # for review in person.reviews.order_by('-updated_at')[:10]:
+    #     recent_movies.add(review.movie)
     return Response(MovieListSerializer(recent_movies, many=True).data)
     # else:
     #     return Response({'error': '본 영화가 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
 
-
-# 유저의 최고 리뷰 영화
+# ------------------------------------------------------------------------- 여기 최적화
+# 유저의 최고 평점 리뷰 영화(바뀜)
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def read_favorite_movies_by_user(request, username):
     person = get_object_or_404(get_user_model(), username=username)
     favorite_movies = person.movies.order_by('-score')[:10]
+    # favorite_movies = Movie.objects.prefetch_related('users').filter(user=person)
     ret = []
     for favorite_movie in favorite_movies:
         ret.append(favorite_movie.movie)
-    return Response(MovieListSerializer(ret, many=True).data)
+    return Response(MovieListSerializer(favorite_movies, many=True).data)
 
 
 # 리뷰 전체 조회, 생성
 @api_view(['GET', 'POST'])
 @authentication_classes([JSONWebTokenAuthentication])
 @permission_classes([IsAuthenticated])
+# @permission_classes([AllowAny])
 def review_list(request, movie_pk):
     if request.method == 'GET':
-        reviews = Review.objects.filter(movie__pk=movie_pk)
+        # reviews = Review.objects.filter(movie__pk=movie_pk)
+        reviews = Review.objects.select_related('user').prefetch_related('like_users').prefetch_related('dislike_users').filter(movie__pk=movie_pk)
         serializer = ReviewListSerializer(reviews, many=True)
         return Response(serializer.data)
 
@@ -383,11 +398,13 @@ def review_list(request, movie_pk):
 
 # 리뷰 상세 조회, 삭제, 수정
 @api_view(['GET', 'PUT', 'DELETE'])
-@authentication_classes([JSONWebTokenAuthentication])
-@permission_classes([IsAuthenticated])
+# @authentication_classes([JSONWebTokenAuthentication])
+# @permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def review_detail(request, review_pk):
-    review = get_object_or_404(Review, pk=review_pk)
-
+    # 최적화 된것인가??????????
+    review = Review.objects.annotate(like_count=Count('like_users'), dislike_count=Count('dislike_users')).select_related('user').prefetch_related('like_users').prefetch_related('dislike_users').get(pk=review_pk)
+    # review = get_object_or_404(Review, pk=review_pk)
     # 리뷰에 대한 좋아요, 싫어요 정보 조회
     if request.method == 'GET':
         if review.like_users.filter(pk=request.user.pk).exists():
@@ -403,8 +420,10 @@ def review_detail(request, review_pk):
         context={
             'isLiked': isLiked,
             'isDisliked': isDisiked,
-            'likeCnt' : review.like_users.count(),
-            'dislikeCnt' : review.dislike_users.count(),
+            # 'likeCnt' : review.like_users.count(),
+            'likeCnt' : review.like_count,
+            # 'dislikeCnt' : review.dislike_users.count(),
+            'dislikeCnt' : review.dislike_count,
             'commentCnt' : review.comments.count(),
         }
         # return JsonResponse(context)
@@ -480,12 +499,14 @@ def dislikes(request, review_pk):
 
 # 전체 댓글 조회, 생성
 @api_view(['GET', 'POST'])
-@authentication_classes([JSONWebTokenAuthentication])
-@permission_classes([IsAuthenticated])
+# @authentication_classes([JSONWebTokenAuthentication])
+# @permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def comment_list(request, review_pk):
     review = get_object_or_404(Review, pk=review_pk)
     if request.method == 'GET':
-        comments = Comment.objects.filter(review__pk=review_pk)
+        # comments = Comment.objects.filter(review__pk=review_pk)
+        comments = Comment.objects.select_related('user').filter(review__pk=review_pk)
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
     elif request.method == 'POST':
@@ -519,7 +540,6 @@ def comment_detail(request, comment_pk):
 
 # db 장르 데이터 불러오기
 @api_view(['POST'])
-@permission_classes([AllowAny])
 def get_genre(request):
     if request.data.get('username') == 'admin':
         API_KEY = config('API_KEY')
@@ -538,7 +558,6 @@ def get_genre(request):
 
 # db 영화 데이터 불러오기
 @api_view(['POST'])
-@permission_classes([AllowAny])
 def get_movies(request):
     if request.data.get('username') == 'admin':
         API_KEY = config('API_KEY')
@@ -581,7 +600,6 @@ def get_movies(request):
 
 # db 영화인 데이터 불러오기
 @api_view(['POST'])
-@permission_classes([AllowAny])
 def get_credits(request):
     if request.data.get('username') == 'admin':
         API_KEY = config('API_KEY')

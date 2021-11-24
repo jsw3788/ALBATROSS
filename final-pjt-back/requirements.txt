@@ -5,6 +5,8 @@ charset-normalizer==2.0.7
 Django==3.2.6
 django-appconf==1.0.5
 django-cors-headers==3.10.0
+django-debug-toolbar==3.2.2
+django-extensions==3.1.5
 django-imagekit==4.1.0
 djangorestframework==3.12.4
 djangorestframework-jwt==1.11.0
@@ -19,5 +21,5 @@ requests==2.26.0
 six==1.16.0
 sqlparse==0.4.1
 toml==0.10.2
-typing-extensions==4.0.0
+typing_extensions==4.0.0
 urllib3==1.26.7
