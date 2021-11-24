@@ -21,7 +21,9 @@ Vue.component('star-rating', StarRating);
 import Notifications from 'vue-notification'
 Vue.use(Notifications)
 
-
+import anime from 'animejs/lib/anime.es.js'
+    
+Vue.prototype.$anime = anime;
 
 
 Vue.config.productionTip = false

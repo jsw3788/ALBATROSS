@@ -68,9 +68,7 @@ def profile(request, username):
         if request.user.username != request.data.get('username') and get_user_model().objects.filter(username=request.data.get('username')).exists():
             return Response({'error':'이미 존재하는 사용자 이름 입니다.'},status=status.HTTP_400_BAD_REQUEST)
         serializer = UserProfileUpdateSerializer(data=request.data)
-        print('이건될까')
         if serializer.is_valid(raise_exception=True):
-            print(1)
             serializer.save(profile_image=profile_image)
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 

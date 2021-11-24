@@ -23,17 +23,17 @@ export default {
     searchPattern() {
       if (this.pattern.length) {
         const options = {
-          // isCaseSensitive: false,
-          // includeScore: false,
+          // isCaseSensitive: true,
+          // includeScore: true,
           // shouldSort: true,
-          // includeMatches: false,
-          // findAllMatches: false,
-          // minMatchCharLength: 1,
+          // includeMatches: true,
+          // findAllMatches: true,
+          minMatchCharLength: 2,
           // location: 0,
-          // threshold: 0.6,
+          threshold: 0.3,
           // distance: 100,
           // useExtendedSearch: false,
-          // ignoreLocation: false,
+          // ignoreLocation: true,
           // ignoreFieldNorm: false,
           keys: [
             "title",
@@ -74,7 +74,6 @@ export default {
 };
 
   
-}
 </script>
 
 <style>

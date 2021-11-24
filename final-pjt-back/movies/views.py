@@ -33,7 +33,10 @@ def read_movie_detail(request, movie_pk):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def read_all_movies(request):
+    # 구버전
     # movies = Movie.objects.all()
+    
+    # 최적화
     movies = Movie.objects.prefetch_related('genres').prefetch_related('actors').prefetch_related('directors')
     return Response(AllMovieListSerializer(movies, many=True).data)
 
@@ -51,6 +54,7 @@ def read_movies_by_popularity(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def read_movies_by_score(request):
+    # 최적화
     # DB의 정보들을 바탕으로 F를 사용하여 DB 내에서 평균평점을 처리하여 annotate를 사용해 새로운 column을 추가한 후 정렬
     movies = Movie.objects.annotate(vote_average=(F('tmdb_vote_sum') + F('updated_vote_sum')) / (
         F('tmdb_vote_cnt') + F('updated_vote_cnt'))).order_by('-vote_average')
@@ -75,21 +79,31 @@ def read_movies_by_release(request):
 @permission_classes([IsAuthenticated])
 # @permission_classes([AllowAny])
 def read_movies_by_recommend(request):
-    my_genre = Recommend.objects.filter(user__pk=request.user.pk)
+    # 구버전
+    # my_genre = Recommend.objects.filter(user__pk=request.user.pk)
+
+    # 최적화
+    my_genre = Recommend.objects.select_related('genre').select_related('user').filter(user__pk=request.user.pk)
     most_prefer_point = 0
     most_prefer_genre = 0
     for genre in my_genre:
         if most_prefer_point < genre.score:
             most_prefer_point = genre.score
             most_prefer_genre = Genre.objects.get(pk=genre.genre_id).tmdb_id
+    
+    # 가장 좋아하는 장르를 못찾으면 랜덤 
     if most_prefer_genre == 0:
         most_prefer_genre = choice(
             [28, 12, 16, 35, 80, 99, 18, 10751, 14, 36, 27, 10402, 9648, 10749, 878, 10770, 53, 10752, 37])
-    movies = Movie.objects.filter(genres__tmdb_id=most_prefer_genre)
+    # 최적화
+    movies = Movie.objects.prefetch_related('genres').filter(genres__tmdb_id=most_prefer_genre)
+    
+    # 해당하는 장르의 영화가 하나도 없으면 다시 뽑기
     while not movies:
         most_prefer_genre = choice(
             [28, 12, 16, 35, 80, 99, 18, 10751, 14, 36, 27, 10402, 9648, 10749, 878, 10770, 53, 10752, 37])
-        movies = Movie.objects.filter(genres__tmdb_id=most_prefer_genre)
+        # 최적화
+        movies = Movie.objects.prefetch_related('genres').filter(genres__tmdb_id=most_prefer_genre)
     return Response(MovieListSerializer(movies, many=True).data)
 
 
@@ -366,31 +380,44 @@ def read_recent_movies_by_user(request, username):
         recent_movies.add(review.movie)
     return Response(MovieListSerializer(recent_movies, many=True).data)
 
-# ------------------------------------------------------------------------- 여기 최적화
-# 유저의 최고 평점 리뷰 영화(바뀜)
+# 유저의 최고 평점 영화
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def read_favorite_movies_by_user(request, username):
+    
     person = get_object_or_404(get_user_model(), username=username)
-    favorite_movies = person.movies.order_by('-score').distinct()[:4]
-    # favorite_movies = Movie.objects.prefetch_related('users').filter(user=person)
+    # 구버전
+    # favorite_movies = person.movies.order_by('-score').distinct()[:4]
+    
+    # 최적화
+    favorite_movies = Record.objects.select_related('user').prefetch_related('movie').filter(user=person).order_by('-score').distinct()[:4]
     ret = []
     for favorite_movie in favorite_movies:
         ret.append(favorite_movie.movie)
-    return Response(MovieListSerializer(favorite_movies, many=True).data)
+    return Response(MovieListSerializer(ret, many=True).data)
 
-
+from django.core.paginator import Paginator
 # 리뷰 전체 조회, 생성
 @api_view(['GET', 'POST'])
-@authentication_classes([JSONWebTokenAuthentication])
-@permission_classes([IsAuthenticated])
-# @permission_classes([AllowAny])
+@permission_classes([AllowAny])
 def review_list(request, movie_pk):
     if request.method == 'GET':
+        # 구버전
         # reviews = Review.objects.filter(movie__pk=movie_pk)
+        
+        # 최적화
         reviews = Review.objects.select_related('user').prefetch_related('like_users').prefetch_related('dislike_users').filter(movie__pk=movie_pk)
-        serializer = ReviewListSerializer(reviews, many=True)
-        return Response(serializer.data)
+        # paginator
+        paginator = Paginator(reviews, 5)
+
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        
+        serializer = ReviewListSerializer(page_obj, many=True)
+        data = serializer.data
+        data.append({'last_page': paginator.num_pages})
+        return Response(data)
+        # serializer = ReviewListSerializer(reviews, many=True)
 
     elif request.method == 'POST':
         movie = get_object_or_404(Movie, pk=movie_pk)
@@ -402,13 +429,14 @@ def review_list(request, movie_pk):
 
 # 리뷰 상세 조회, 삭제, 수정
 @api_view(['GET', 'PUT', 'DELETE'])
-# @authentication_classes([JSONWebTokenAuthentication])
-# @permission_classes([IsAuthenticated])
 @permission_classes([AllowAny])
 def review_detail(request, review_pk):
-    # 최적화 된것인가??????????
-    review = Review.objects.annotate(like_count=Count('like_users'), dislike_count=Count('dislike_users')).select_related('user').prefetch_related('like_users').prefetch_related('dislike_users').get(pk=review_pk)
+    # 구버전
     # review = get_object_or_404(Review, pk=review_pk)
+
+    # 최적화
+    review = Review.objects.annotate(like_count=Count('like_users'), dislike_count=Count('dislike_users')).select_related('user').get(pk=review_pk)
+    
     # 리뷰에 대한 좋아요, 싫어요 정보 조회
     if request.method == 'GET':
         if review.like_users.filter(pk=request.user.pk).exists():
@@ -503,13 +531,15 @@ def dislikes(request, review_pk):
 
 # 전체 댓글 조회, 생성
 @api_view(['GET', 'POST'])
-# @authentication_classes([JSONWebTokenAuthentication])
-# @permission_classes([IsAuthenticated])
 @permission_classes([AllowAny])
 def comment_list(request, review_pk):
     review = get_object_or_404(Review, pk=review_pk)
     if request.method == 'GET':
+
+        # 구버전
         # comments = Comment.objects.filter(review__pk=review_pk)
+
+        # 최적화
         comments = Comment.objects.select_related('user').filter(review__pk=review_pk)
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
@@ -545,10 +575,7 @@ def comment_detail(request, comment_pk):
 # db 장르 데이터 불러오기
 @api_view(['POST'])
 @permission_classes([AllowAny])
-# @authentication_classes([JSONWebTokenAuthentication])
-# @permission_classes([IsAuthenticated])
 def get_genre(request):
-    print(request.data)
     API_KEY = config('API_KEY')
     URL = f'https://api.themoviedb.org/3/genre/movie/list?api_key={API_KEY}&language=ko-KR'
     request = requests.get(URL).json()
@@ -566,6 +593,7 @@ def get_genre(request):
 
 # db 영화 데이터 불러오기
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def get_movies(request):
     API_KEY = config('API_KEY')
     for page in range(1, 4):
@@ -607,7 +635,9 @@ def get_movies(request):
 
 
 # db 영화인 데이터 불러오기
+
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def get_credits(request):
     API_KEY = config('API_KEY')
     movie_data = get_list_or_404(Movie)
@@ -619,6 +649,8 @@ def get_credits(request):
             if not actor.get("profile_path"):
                 continue
             if Actor.objects.filter(actor_id=tmdb_id).exists():
+                actor = get_object_or_404(Actor, actor_id=tmdb_id)
+                actor.movies.add(movie)
                 continue
             ppl_URL = f'https://api.themoviedb.org/3/person/{tmdb_id}?api_key={API_KEY}&language=ko-KR'
             actor_popularity = requests.get(ppl_URL).json().get('popularity')
@@ -636,6 +668,8 @@ def get_credits(request):
             if crew.get("job") != "Director" or not crew.get("profile_path"):
                 continue
             if Director.objects.filter(director_id=tmdb_id).exists():
+                director = get_object_or_404(Director, director_id=tmdb_id)
+                director.movies.add(movie)
                 continue
             ppl_URL = f'https://api.themoviedb.org/3/person/{tmdb_id}?api_key={API_KEY}&language=ko-KR'
             director_popularity = requests.get(
