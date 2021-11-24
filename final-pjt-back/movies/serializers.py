@@ -160,10 +160,9 @@ class ActorListSerializer(serializers.ModelSerializer):
         )
 
 
-# nested serializer로 변경해야함 : movies
 class DirectorSerializer(serializers.ModelSerializer):
 
-    class MovieSerializer(serializers.ModelSerializer):
+    class MovieListSerializer(serializers.ModelSerializer):
         class Meta:
             model = Movie
             fields = (
@@ -171,7 +170,7 @@ class DirectorSerializer(serializers.ModelSerializer):
                 'poster_path',
             )
 
-    movies = MovieSerializer(many=True, read_only=True)
+    movies = MovieListSerializer(many=True, read_only=True)
 
     class Meta:
         model = Director
@@ -186,7 +185,7 @@ class DirectorSerializer(serializers.ModelSerializer):
 
 class ActorSerializer(serializers.ModelSerializer):
 
-    class MovieSerializer(serializers.ModelSerializer):
+    class MovieListSerializer(serializers.ModelSerializer):
         class Meta:
             model = Movie
             fields = (
@@ -194,7 +193,7 @@ class ActorSerializer(serializers.ModelSerializer):
                 'poster_path',
             )
 
-    movies = MovieSerializer(many=True, read_only=True)
+    movies = MovieListSerializer(many=True, read_only=True)
 
     class Meta:
         model = Actor

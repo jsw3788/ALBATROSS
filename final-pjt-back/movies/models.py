@@ -2,8 +2,6 @@ from django.db import models
 from django.conf import settings
 
 # 장르
-
-
 class Genre(models.Model):
     tmdb_id = models.IntegerField()
     name = models.CharField(max_length=20)
