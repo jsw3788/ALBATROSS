@@ -130,7 +130,7 @@ export default {
       possiblePageNum:2,
 
       rating: "No Rating Selected",
-      currentRating: "별점을 매겨주세요",
+      currentRating: "평점을 매겨주세요",
       currentSelectedRating: "",
     };
   },
@@ -233,7 +233,7 @@ export default {
           const tempscore = res.data.score;
 
           if (tempscore === 0) {
-            this.currentRating = "별점을 매겨주세요";
+            this.currentRating = "평점을 매겨주세요";
           } else {
             this.showCurrentRating(0);
             this.currentRating = "평가함 ★ " + tempscore;
@@ -372,7 +372,6 @@ export default {
   max-height: 15rem;
   overflow: hidden;
   margin-bottom: 1rem;
-  background-image: -webkit-linear-gradient(left, white, black);
 }
 .backdrop {
   /* max-height: initial;

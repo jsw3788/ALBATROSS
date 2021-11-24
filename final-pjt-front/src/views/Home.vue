@@ -1,5 +1,5 @@
 <template>
-  <div class="home">
+  <div>
     <movie-list></movie-list>
   </div>
 </template>

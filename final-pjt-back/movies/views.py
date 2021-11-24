@@ -14,7 +14,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Count, F, Prefetch
 from datetime import datetime
 from random import choice
-
+from django.core.paginator import Paginator
 
 
 
@@ -396,7 +396,7 @@ def read_favorite_movies_by_user(request, username):
         ret.append(favorite_movie.movie)
     return Response(MovieListSerializer(ret, many=True).data)
 
-from django.core.paginator import Paginator
+
 # 리뷰 전체 조회, 생성
 @api_view(['GET', 'POST'])
 @permission_classes([AllowAny])

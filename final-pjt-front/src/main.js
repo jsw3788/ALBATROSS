@@ -21,8 +21,12 @@ Vue.component('star-rating', StarRating);
 import Notifications from 'vue-notification'
 Vue.use(Notifications)
 
+
+import VueCarousel from 'vue-carousel';
+Vue.use(VueCarousel);
+
+
 import anime from 'animejs/lib/anime.es.js'
-    
 Vue.prototype.$anime = anime;
 
 
