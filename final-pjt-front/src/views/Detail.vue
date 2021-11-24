@@ -151,7 +151,8 @@ export default {
             this.reviews.push(...newreviews)
             
             this.pageNum += 1
-          })
+          }).catch((err)=>
+          console.log(err))
 
     },
     scrollDown: function () {
