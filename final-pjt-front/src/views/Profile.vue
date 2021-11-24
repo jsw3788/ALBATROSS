@@ -1,6 +1,6 @@
 <template>
   <b-container class="bv-example-row">
-    <b-row>
+    <b-row class="mt-5">
       <b-col cols="4">
         <span>
           <img
@@ -36,7 +36,7 @@
               :movie="movie"
             ></profile-movie-item>
           </b-row>
-
+          <hr />
           <h4>최근 리뷰 영화</h4>
           <b-row>
             <profile-movie-item
@@ -46,7 +46,7 @@
             >
             </profile-movie-item>
           </b-row>
-
+          <hr />
           <h4>좋아요를 받이받은 리뷰</h4>
           <b-row>
             <profile-review-item
@@ -56,7 +56,7 @@
             >
             </profile-review-item>
           </b-row>
-
+          <hr />
           <h4>최근 작성한 리뷰</h4>
           <b-row>
             <profile-review-item
@@ -74,8 +74,6 @@
 
 <script>
 import axios from "axios";
-// import ProfileMovie from "@/components/profile/ProfileMovie.vue";
-// import ProfileReview from "@/components/profile/ProfileReview.vue";
 import ProfileMovieItem from "@/components/profile/ProfileMovieItem";
 import ProfileReviewItem from "@/components/profile/ProfileReviewItem";
 import UpdateForm from "@/components/authform/UpdateForm";

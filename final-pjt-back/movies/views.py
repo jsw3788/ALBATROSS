@@ -372,12 +372,14 @@ def read_recent_movies_by_user(request, username):
 @permission_classes([AllowAny])
 def read_favorite_movies_by_user(request, username):
     person = get_object_or_404(get_user_model(), username=username)
-    favorite_movies = person.movies.order_by('-score').distinct()[:4]
+    # favorite_movies = person.movies.order_by('-score').distinct()[:4]
+    print('debug')
+    favorite_movies = person.movies.order_by('-score')[:4]
     # favorite_movies = Movie.objects.prefetch_related('users').filter(user=person)
     ret = []
     for favorite_movie in favorite_movies:
         ret.append(favorite_movie.movie)
-    return Response(MovieListSerializer(favorite_movies, many=True).data)
+    return Response(MovieListSerializer(ret, many=True).data)
 
 
 # 리뷰 전체 조회, 생성

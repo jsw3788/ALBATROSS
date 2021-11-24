@@ -8,7 +8,7 @@
         type="text"
         id="update-username"
         class="form-control"
-        v-model="credentials.updateUsername"
+        v-model="updateUsername"
       />
     </div>
     <div class="mb-3">
@@ -17,7 +17,7 @@
         type="password"
         id="update-password"
         class="form-control"
-        v-model="credentials.password"
+        v-model="password"
       />
     </div>
     <div class="mb-3">
@@ -26,7 +26,7 @@
         type="password"
         id="update-password-confirmation"
         class="form-control"
-        v-model="credentials.passwordConfirmation"
+        v-model="passwordConfirmation"
         @keyup.enter="signup"
       />
     </div>
@@ -48,8 +48,8 @@
 </template>
 
 <script>
-import Vue from "vue";
-import axios from "axios";
+// import Vue from "vue";
+// import axios from "axios";
 import { mapState } from "vuex";
 import { mapGetters } from "vuex";
 
@@ -57,46 +57,34 @@ export default {
   name: "UpdateForm",
   data: function () {
     return {
-      credentials: {
-        updateUsername: this.username,
-        password: null,
-        passwordConfirmation: null,
-        profilePath: this.profileImg,
-      },
+      updateUsername: this.username,
+      password: null,
+      passwordConfirmation: null,
+      profileImg: null,
     };
   },
   methods: {
     changeFile: function (event) {
       let file = event.target.files[0];
-      this.credentials.profilePath = file;
+      this.profileImg = file;
     },
     deleteFile: function () {
-      this.credentials.profilePath = "";
+      this.profileImg = "";
     },
     updateProfile: function () {
-      console.log(this.username);
-      axios({
-        method: "put",
-        url: `http://127.0.0.1:8000/api/v2/${this.username}/profile/`,
-        data: this.credentials,
-        headers: this.config,
-      })
-        .then(() => {
-          this.$router.go();
-        })
-        .catch((err) => {
-          Vue.notify({
-            group: "auth_notify",
-            title: "정보 수정 실패",
-            text: "이미 존재하는 아이디거나, 비밀번호가 일치하지 않습니다!",
-            type: "error",
-          });
-          console.log(err);
-        });
+      console.log(this.updateUsername);
+      console.log(this.passwordConfirmation);
+      console.log(this.password);
+      let profileData = new FormData();
+      profileData.append("profileImg", this.profileImg);
+      profileData.append("username", this.updateUsername);
+      profileData.append("password", this.password);
+      profileData.append("passwordConfirmation", this.passwordConfirmation);
+      this.$store.dispatch("setProfileImg", profileData);
     },
   },
   computed: {
-    ...mapState(["username", "profileImg"]),
+    ...mapState(["username"]),
     ...mapGetters(["config"]),
   },
 };
