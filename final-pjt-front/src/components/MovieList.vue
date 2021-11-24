@@ -1,97 +1,122 @@
 <template>
   <div>
-    <Splide
-      :options="{
-        perPage: 5,
-        heightRatio: 0.3,
-        gap: 20,
-        cover: true,
-        isNavigation: true,
-      }"
+    <h4 class="mt-5">인기영화</h4>
+    <carousel
+      :loop="true"
+      :navigationClickTargetSize="25"
+      :paginationSize="5"
+      :navigationEnabled="true"
+      :perPageCustom="[
+        [576, 2],
+        [768, 3],
+        [992, 4],
+        [1200, 5],
+      ]"
+      :paginationActiveColor="'#ff0000'"
+      :paginationColor="'#ffffff'"
     >
-      <movie-item
-        v-for="movie in popularMovies"
-        :key="movie.tmdb_id"
-        :movie="movie"
-      ></movie-item>
-    </Splide>
-    <hr />
-    <h4>추천영화</h4>
-    <Splide
-      :options="{
-        perPage: 5,
-        heightRatio: 0.3,
-        gap: 20,
-        cover: true,
-        isNavigation: true,
-      }"
+      <slide v-for="movie in popularMovies" :key="movie.tmdb_id">
+        <div @click="goDetailInfo(movie)" class="poster p-2">
+          <img
+            :src="movie.poster_path"
+            class="poster-img"
+            style="width: 100%"
+          />
+          <p class="poster-text">{{ movie.title }}</p>
+        </div>
+      </slide>
+    </carousel>
+    <h4 class="mt-5">추천영화</h4>
+    <carousel
+      :loop="true"
+      :navigationClickTargetSize="25"
+      :paginationSize="5"
+      :navigationEnabled="true"
+      :perPageCustom="[
+        [576, 2],
+        [768, 3],
+        [992, 4],
+        [1200, 5],
+      ]"
+      :paginationActiveColor="'#ff0000'"
+      :paginationColor="'#ffffff'"
     >
-      <movie-item
-        v-for="movie in recommendMovies"
-        :key="movie.tmdb_id"
-        :movie="movie"
-      ></movie-item>
-    </Splide>
-    <hr />
-    <Splide
-      :options="{
-        perPage: 5,
-        heightRatio: 0.3,
-        gap: 20,
-        cover: true,
-        isNavigation: true,
-      }"
+      <slide v-for="movie in recommendMovies" :key="movie.tmdb_id">
+        <div @click="goDetailInfo(movie)" class="poster p-2">
+          <img
+            :src="movie.poster_path"
+            class="poster-img"
+            style="width: 100%"
+          />
+          <p class="poster-text">{{ movie.title }}</p>
+        </div>
+      </slide>
+    </carousel>
+    <h4 class="mt-5">평점이 높은 영화</h4>
+    <carousel
+      :loop="true"
+      :navigationClickTargetSize="25"
+      :paginationSize="5"
+      :navigationEnabled="true"
+      :perPageCustom="[
+        [576, 2],
+        [768, 3],
+        [992, 4],
+        [1200, 5],
+      ]"
+      :paginationActiveColor="'#ff0000'"
+      :paginationColor="'#ffffff'"
     >
-      <movie-item
-        v-for="movie in scoreMovies"
-        :key="movie.tmdb_id"
-        :movie="movie"
-      ></movie-item>
-    </Splide>
-    <hr />
-    <Splide
-      :options="{
-        perPage: 5,
-        heightRatio: 0.3,
-        gap: 20,
-        cover: true,
-        isNavigation: true,
-      }"
+      <slide v-for="movie in scoreMovies" :key="movie.tmdb_id">
+        <div @click="goDetailInfo(movie)" class="poster p-2">
+          <img
+            :src="movie.poster_path"
+            class="poster-img"
+            style="width: 100%"
+          />
+          <p class="poster-text">{{ movie.title }}</p>
+        </div>
+      </slide>
+    </carousel>
+    <h4 class="mt-5">최신영화</h4>
+    <carousel
+      :loop="true"
+      :navigationClickTargetSize="25"
+      :paginationSize="5"
+      :navigationEnabled="true"
+      :perPageCustom="[
+        [576, 2],
+        [768, 3],
+        [992, 4],
+        [1200, 5],
+      ]"
+      :paginationActiveColor="'#ff0000'"
+      :paginationColor="'#ffffff'"
     >
-      <movie-item
-        v-for="movie in releasedMovies"
-        :key="movie.tmdb_id"
-        :movie="movie"
-      ></movie-item>
-    </Splide>
+      <slide v-for="movie in releasedMovies" :key="movie.tmdb_id">
+        <div @click="goDetailInfo(movie)" class="poster p-2">
+          <img
+            :src="movie.poster_path"
+            class="poster-img"
+            style="width: 100%"
+          />
+          <p class="poster-text">{{ movie.title }}</p>
+        </div>
+      </slide>
+    </carousel>
   </div>
 </template>
 
 <script>
-import MovieItem from "@/components/MovieItem";
-import axios from "axios";
 import { mapState } from "vuex";
-import { Splide } from "@splidejs/vue-splide";
-import "@splidejs/splide/dist/css/splide.min.css";
+import { Carousel, Slide } from "vue-carousel";
 
 export default {
   name: "MovieList",
   components: {
-    MovieItem,
-    Splide,
+    Carousel,
+    Slide,
   },
-  data: function () {
-    return {};
-  },
-  // methods: {
-  //   next() {
-  //     this.$refs.slick.next();
-  //   },
-
-  //   prev() {
-  //     this.$refs.slick.prev();
-  //   },
-  // },
   computed: {
     ...mapState([
       "popularMovies",
@@ -100,49 +125,66 @@ export default {
       "scoreMovies",
     ]),
   },
-  created: function () {
-    axios({
-      method: "get",
-      url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/score/`,
-    })
-      .then((res) => {
-        this.$store.dispatch("getScoreMovies", res.data);
-      })
-      .catch((err) => {
-        console.log(err);
+  methods: {
+    goDetailInfo: function (movie) {
+      this.$router.push({
+        name: "Detail",
+        params: {
+          movie_id: movie.id,
+        },
       });
-    axios({
-      method: "get",
-      url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/release_date/`,
-    })
-      .then((res) => {
-        this.$store.dispatch("getReleasedMovies", res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    axios({
-      method: "get",
-      url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/popularity/`,
-    })
-      .then((res) => {
-        this.$store.dispatch("getPopularMovies", res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    axios({
-      method: "get",
-      url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/recommend/`,
-      headers: this.$store.getters.config,
-    })
-      .then((res) => {
-        this.$store.dispatch("getRecommendMovies", res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    },
   },
 };
 </script>
+
+<style scoped>
+/* poster img hover_text */
+/* 부모태그 poster 사진 poster-img 글 poster-text*/
+.poster-img {
+  vertical-align: top;
+}
+.poster {
+  display: inline-block;
+  position: relative;
+}
+.poster:hover:after,
+.poster:hover > .poster-text {
+  display: block;
+}
+.poster:after,
+.poster-text {
+  display: none;
+}
+
+.poster:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
+.poster {
+  overflow: hidden;
+}
+.poster .poster-img {
+  height: 340px;
+}
+.poster:hover .poster-img {
+  transform: scale(1.2);
+  transition: 1s;
+}
+.poster-text {
+  position: absolute;
+  margin-left: auto;
+  margin-right: auto;
+  top: 5%;
+  color: #fff;
+  z-index: 20;
+  font-weight: 600;
+  font-size: 20px;
+}
+</style>

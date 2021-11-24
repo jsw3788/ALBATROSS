@@ -96,8 +96,23 @@ export default new Vuex.Store({
     setUsername: function ({ commit }, username) {
       commit('SET_USERNAME', username)
     },
-    setProfileImg: function ({ commit }, profileImg) {
-      commit('SET_PROFILE_IMG', profileImg)
+    setProfileImg: function ({ commit, state }, credit) {
+      console.log(credit)
+      axios({
+        method: "put",
+        url: `http://127.0.0.1:8000/api/v2/${state.username}/profile/`,
+        data: credit,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `JWT ${state.jwtToken}`
+        }
+      })
+        .then((res) => {
+          commit('SET_PROFILE_IMG', res.data)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
     },
     getAllMovies: function ({ commit }, allMovieList) {
       commit('GET_ALL_MOVIE_LIST', allMovieList)
