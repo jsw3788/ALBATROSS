@@ -72,6 +72,9 @@ export default {
     ...mapState(["allmovies"]),
   },
 };
+
+  
+}
 </script>
 
 <style>
