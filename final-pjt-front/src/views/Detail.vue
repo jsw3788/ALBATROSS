@@ -21,28 +21,38 @@
               class="mb-2 side-card"
             >
               <b-card-text>
-                <p>{{ movie.release_date }}</p>
-                <p v-if="movie.tmdb_vote_cnt">평점 : {{ movieRate }}</p>
-                <p v-else>등록된 평점이 없습니다.</p>
-                <div v-if="isLogin">
-                  <i
-                    class="fas fa-heart"
-                    v-if="wanted"
-                    @click="updatedWanted"
-                    style="color: rgb(237, 73, 86)"
-                  ></i>
-                  <i
-                    class="far fa-heart"
-                    v-else
-                    @click="updatedWanted"
-                    style="color: rgb(237, 73, 86)"
-                  ></i>
+                <div>
+                  <p>{{ movie.release_date }}</p>
+                  <p v-if="movie.tmdb_vote_cnt">평점 : {{ movieRate }}</p>
+                  <p v-else>등록된 평점이 없습니다.</p>
                 </div>
-                <div v-if="isLogin" class="mt-2">
+                <div v-if="isLogin">
+                  <div class="d-flex justify-content-evenly">
+                    <div></div>
+                    <div>
+                      <i
+                        class="fas fa-heart"
+                        v-if="wanted"
+                        @click="updatedWanted"
+                        style="color: rgb(237, 73, 86)"
+                      ></i>
+                      <i
+                        class="far fa-heart"
+                        v-else
+                        @click="updatedWanted"
+                        style="color: rgb(237, 73, 86)"
+                      ></i>
+                    </div>
+                    <div v-if="isScored" @click="deleteScore">
+                      <b-icon-eye-slash-fill></b-icon-eye-slash-fill>
+                    </div>
+                    <div></div>
+                  </div>
                   <div
                     @click="showCurrentRating(0)"
                     @mouseleave="showCurrentRating(0)"
                     style="display: inline-block"
+                    class="my-2"
                   >
                     <star-rating
                       :star-size="30"
@@ -57,9 +67,6 @@
                   <div style="margin-top: 10px; font-weight: bold">
                     {{ currentRating }}
                   </div>
-                  <div v-if="isScored">
-                    <button @click="deleteScore">평가 지우기</button>
-                  </div>
                 </div>
                 <p>
                   <span v-for="genre in movie.genres" :key="genre.id"
@@ -71,9 +78,9 @@
           </div>
         </b-col>
         <b-col cols="9">
-          <div>
-            <p>줄거리</p>
-            <p>{{ movie.overview }}</p>
+          <div class="text-start">
+            <p class="m-3">줄거리</p>
+            <p class="m-3">{{ movie.overview }}</p>
           </div>
           <!-- 이하 리뷰칸 -->
           <div class="review">
@@ -81,6 +88,7 @@
               :movieId="movie.id"
               @add-review="addReview"
             ></review-form>
+            <hr />
             <review-list
               v-for="review in reviews"
               :key="review.id"
@@ -251,6 +259,9 @@ export default {
         method: "delete",
         url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/score/${this.$route.params.movie_id}/`,
         headers: this.$store.getters.config,
+        data: {
+          delScore: this.score,
+        },
       })
         .then(() => {
           this.score = 0;
@@ -327,8 +338,14 @@ export default {
   max-height: 15rem;
   overflow: hidden;
   margin-bottom: 1rem;
+  background-image: -webkit-linear-gradient(left, white, black);
 }
 .backdrop {
-  max-height: initial;
+  /* max-height: initial;
+  filter: blur(5px);
+  -webkit-filter: blur(5px);
+  -moz-filter: blur(5px);
+  -o-filter: blur(5px);
+  -ms-filter: blur(5px); */
 }
 </style>

@@ -1,30 +1,52 @@
 <template>
   <div v-if="!comment.is_spoiled">
-    <p>
-      댓글 // {{ comment.user.username }} : {{ comment.content }} |
-      {{ humanize(new Date(), comment.created_at) }} |
-      {{ humanize(new Date(), comment.updated_at) }}
-      <span v-if="comment.user.username === this.username">
-        <b-button v-b-modal="'update' + comment.id">수정</b-button>
+    <div class="d-flex align-items-center">
+      <div class="my-2 mx-2">
+        <b-icon-arrow-return-right></b-icon-arrow-return-right>
+        {{ comment.user.username }} : {{ comment.content }} |
 
-        <b-modal
-          title="댓글 수정"
-          :id="'update' + comment.id"
-          ok-only
-          hide-footer
-        >
-          <template #default="{ close }">
-            <input
-              type="text"
-              v-model.trim="updatedcontent"
-              @keyup.enter="updateComment"
-            />
-            <b-button @click="[updateComment(), close()]">수정</b-button>
-          </template>
-        </b-modal>
-        <b-button @click="deleteComment">삭제</b-button>
-      </span>
-    </p>
+        <span>
+          {{ humanize(new Date(), comment.updated_at) }}
+          <span
+            v-if="
+              humanize(new Date(), comment.created_at) !== '지금' &&
+              comment.created_at !== comment.updated_at
+            "
+            >(수정됨)</span
+          >
+        </span>
+      </div>
+      <div>
+        <span v-if="comment.user.username === this.username">
+          <b-icon-pencil-fill
+            v-b-modal="'update' + comment.id"
+            size="sm"
+            class="mx-1"
+          ></b-icon-pencil-fill>
+
+          <b-modal
+            title="댓글 수정"
+            :id="'update' + comment.id"
+            ok-only
+            hide-footer
+          >
+            <template #default="{ close }">
+              <input
+                type="text"
+                v-model.trim="updatedcontent"
+                @keyup.enter="updateComment"
+              />
+              <b-button @click="[updateComment(), close()]">수정</b-button>
+            </template>
+          </b-modal>
+          <b-icon-trash
+            @click="deleteComment"
+            size="sm"
+            class="mx-1"
+          ></b-icon-trash>
+        </span>
+      </div>
+    </div>
   </div>
   <div v-else>
     <div>

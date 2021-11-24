@@ -38,9 +38,9 @@ export default {
 .movie-item {
   color: black;
 }
-.movie-card {
+/* .movie-card {
   object-fit: cover;
-}
+} */
 .movie-card:hover {
   filter: brightness(50%);
 }
