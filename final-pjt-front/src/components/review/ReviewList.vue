@@ -3,69 +3,133 @@
     <!-- 리뷰 하나당 대댓글이 다 달려야함 -->
     <!-- 댓글 -->
     <div v-if="!review.is_spoiled">
-      <div>
-        <p>
-          작성자 : <span @click="goProfile">{{ review.user.username }}</span>
-        </p>
+      <div class="p-3">
+        <div class="d-flex justify-content-between mb-2">
+          <div>
+            <span> 작성자 : </span>
+            <span @click="goProfile">{{ review.user.username }}</span>
+          </div>
+          <div class="d-flex">
+            <div class="me-3">
+              <span>
+                {{ humanize(new Date(), review.updated_at) }}
+              </span>
+              <span
+                v-if="
+                  humanize(new Date(), review.created_at) !== '지금' &&
+                  review.created_at !== review.updated_at
+                "
+                >(수정됨)</span
+              >
+            </div>
+            <!-- 수정, 삭제 -->
+            <div v-if="review.user.username === this.username">
+              <b-icon-pencil-fill
+                v-b-modal="'update' + review.id"
+                size="sm"
+                class="me-2"
+              ></b-icon-pencil-fill>
+              <b-modal
+                title="리뷰 수정"
+                :id="'update' + review.id"
+                ok-only
+                hide-footer
+              >
+                <template #default="{ close }">
+                  <input
+                    type="text"
+                    v-model.trim="updatedcontent"
+                    @keyup.enter="updateReview"
+                  />
+                  <b-button @click="[updateReview(), close()]">수정</b-button>
+                </template>
+              </b-modal>
+              <b-icon-trash
+                @click="deleteReview"
+                size="sm"
+                class="me-2"
+              ></b-icon-trash>
+            </div>
+          </div>
+        </div>
+        <div>
+          <p class="text-start">{{ review.content }}</p>
+        </div>
       </div>
-      <div>
-        <p>{{ review.content }}</p>
-        <p>{{ humanize(new Date(), review.created_at) }}</p>
-        <p>{{ humanize(new Date(), review.updated_at) }}</p>
-        <p>{{ commentCnt }}개의 댓글이 있습니다</p>
+      <div class="d-flex justify-content-between">
+        <div class="text-start ms-3">{{ commentCnt }}개의 댓글이 있습니다</div>
+        <div class="d-flex align-items-start justify-content-end me-3">
+          <!-- 공감, 비공감 -->
+          <div v-if="isLogin">
+            <p>
+              <span>{{ likeCnt }}</span>
+              <i
+                class="far fa-thumbs-up mx-2"
+                style="color: rgb(0, 149, 246)"
+                v-if="!isLiked"
+                @click="like"
+              >
+              </i>
+              <i
+                class="fas fa-thumbs-up mx-2"
+                style="color: rgb(0, 149, 246)"
+                v-else
+                @click="like"
+              >
+              </i>
+              <span>{{ dislikeCnt }}</span>
+              <i
+                class="far fa-thumbs-down mx-2"
+                style="color: rgb(0, 149, 246)"
+                v-if="!isDisliked"
+                @click="dislike"
+              ></i>
+              <i
+                class="fas fa-thumbs-down mx-2"
+                style="color: rgb(0, 149, 246)"
+                v-else
+                @click="dislike"
+              ></i>
+            </p>
+          </div>
+        </div>
       </div>
-      <div v-if="isLogin">
-        <p>
-          <span>{{ likeCnt }}</span>
-          <i
-            class="far fa-thumbs-up mx-2"
-            style="color: rgb(0, 149, 246)"
-            v-if="!isLiked"
-            @click="like"
-          >
-          </i>
-          <i
-            class="fas fa-thumbs-up mx-2"
-            style="color: rgb(0, 149, 246)"
-            v-else
-            @click="like"
-          >
-          </i>
-          <span>{{ dislikeCnt }}</span>
-          <i
-            class="far fa-thumbs-down mx-2"
-            style="color: rgb(0, 149, 246)"
-            v-if="!isDisliked"
-            @click="dislike"
-          ></i>
-          <i
-            class="fas fa-thumbs-down mx-2"
-            style="color: rgb(0, 149, 246)"
-            v-else
-            @click="dislike"
-          ></i>
-        </p>
-      </div>
-
-      <div v-if="review.user.username === this.username">
-        <b-button v-b-modal="'update' + review.id">수정</b-button>
-        <b-modal
-          title="리뷰 수정"
-          :id="'update' + review.id"
-          ok-only
-          hide-footer
-        >
-          <template #default="{ close }">
-            <input
-              type="text"
-              v-model.trim="updatedcontent"
-              @keyup.enter="updateReview"
-            />
-            <b-button @click="[updateReview(), close()]">수정</b-button>
-          </template>
-        </b-modal>
-        <b-button @click="deleteReview">삭제</b-button>
-      </div>
+      <!-- comment -->
+      <b-container class="bv-example-row p-2">
+        <b-row>
+          <b-col cols="1"></b-col>
+          <b-col cols="10 border-start border-3">
+            <!-- comment list -->
+            <div>
+              <review-comment
+                v-for="comment in comments"
+                :key="comment.id"
+                :comment="comment"
+                @update-comment="updateComment"
+                @delete-comment="deleteComment"
+              ></review-comment>
+            </div>
+            <!-- comment form -->
+            <div class="text-start my-2">
+              <input
+                type="text"
+                v-model.trim="newComment"
+                @keyup.enter="writeComment"
+                class="mx-2"
+              />
+              <input
+                type="checkbox"
+                id="comment-spoil"
+                v-model="newCommentSpoil"
+              />
+              <label for="comment-spoil" class="mx-1">spoiler</label>
+              <b-icon-pencil-square
+                @click="writeComment"
+              ></b-icon-pencil-square>
+            </div>
+          </b-col>
+        </b-row>
+      </b-container>
     </div>
     <div v-else>
       <div>
@@ -75,26 +139,6 @@
           클릭해주세요.
         </p>
       </div>
-    </div>
-    <!-- comment -->
-    <div>
-      <!-- comment form -->
-      <input
-        type="text"
-        v-model.trim="newComment"
-        @keyup.enter="writeComment"
-      />
-      <input type="checkbox" id="comment-spoil" v-model="newCommentSpoil" />
-      <label for="comment-spoil">스포일러</label>
-      <button @click="writeComment">댓글쓰기</button>
-      <!-- comment list -->
-      <review-comment
-        v-for="comment in comments"
-        :key="comment.id"
-        :comment="comment"
-        @update-comment="updateComment"
-        @delete-comment="deleteComment"
-      ></review-comment>
     </div>
     <hr />
   </div>

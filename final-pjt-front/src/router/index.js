@@ -4,9 +4,9 @@ import Home from '@/views/Home.vue'
 import People from '@/views/People.vue'
 import Detail from '@/views/Detail.vue'
 import Profile from '@/views/Profile.vue'
-// import Review from '@/views/Review.vue'
-import PeopleDirectorDetail from '@/components/people/PeopleDirectorDetail'
-import PeopleActorDetail from '@/components/people/PeopleActorDetail'
+import SearchResult from '@/views/SearchResult.vue'
+import PeopleDirectorDetail from '@/views/detail/PeopleDirectorDetail'
+import PeopleActorDetail from '@/views/detail/PeopleActorDetail'
 
 
 Vue.use(VueRouter)
@@ -27,11 +27,6 @@ const routes = [
     name: 'Detail',
     component: Detail
   },
-  // {
-  //   path: '/review/:review_id',
-  //   name: 'Review',
-  //   component: Review
-  // },
   {
     path: '/people/director/:director_pk',
     name: 'PeopleDirectorDetail',
@@ -43,10 +38,15 @@ const routes = [
     component: PeopleActorDetail
   },
   {
-    path: '/:username/profile/',
+    path: '/:username/profile',
     name: 'Profile',
     component: Profile
-
+  },
+  {
+    path: '/search/:keyword',
+    name: 'SearchResult',
+    component: SearchResult,
+    props: true,
   }
 ]
 

@@ -36,7 +36,7 @@ def signup(request):
 @permission_classes([IsAuthenticated])
 # @permission_classes([AllowAny])
 def profile(request, username):
-
+    print(1)
     # 회원 정보 조회 -> JsonResponse로 바꾸기
     def profile_detail():
         person=get_object_or_404(get_user_model(), username=username)
@@ -63,12 +63,14 @@ def profile(request, username):
 
     # 회원 정보 수정 (프로필 이미지)
     def update_profile():
-        profile_image = request.data.get('profile_image')
+        profile_image = request.data.get('profilePath')
+        print(profile_image, type(profile_image))
         if request.user.username != request.data.get('username') and get_user_model().objects.filter(username=request.data.get('username')).exists():
             return Response({'error':'이미 존재하는 사용자 이름 입니다.'},status=status.HTTP_400_BAD_REQUEST)
-        
-        serializer = UserProfileUpdateSerializer(request.user, data=request.data)
+        serializer = UserProfileUpdateSerializer(data=request.data)
+        print('이건될까')
         if serializer.is_valid(raise_exception=True):
+            print(1)
             serializer.save(profile_image=profile_image)
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 

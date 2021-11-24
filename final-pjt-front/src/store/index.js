@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
 import router from '../router'
+import createPersistedState from "vuex-persistedstate";
 
 Vue.use(Vuex)
 
@@ -15,18 +16,19 @@ export default new Vuex.Store({
     directors: [],
     jwtToken: localStorage.getItem("jwt"),
     username: localStorage.getItem("username"),
+    profileImg: localStorage.getItem("profile_path"),
     allmovies: [],
   },
   mutations: {
     SET_TOKEN: function (state, token) {
-      localStorage.setItem("jwt", token);
       state.jwtToken = token
+      localStorage.setItem("jwt", token);
     },
     EXP_TOKEN: function (state) {
       localStorage.removeItem("jwt")
       state.jwtToken = null
     },
-    GET_ALL_MOVIE_LIST: function(state, allMovieList) {
+    GET_ALL_MOVIE_LIST: function (state, allMovieList) {
       state.allmovies = allMovieList
     },
     GET_POPULAR_MOVIE_LIST: function (state, popularMovieList) {
@@ -45,7 +47,6 @@ export default new Vuex.Store({
       state.actors = res.data
       // console.log(state.actors)
     },
-
     GET_DIRECTORLIST: function (state, res) {
       state.directors = res.data
       // console.log(state.directors)
@@ -53,6 +54,10 @@ export default new Vuex.Store({
     SET_USERNAME: function (state, username) {
       localStorage.setItem("username", username);
       state.username = username
+    },
+    SET_PROFILE_IMG: function (state, profileImg) {
+      localStorage.setItem("profile_path", profileImg)
+      state.profileImg = profileImg
     },
     EXP_USERNAME: function (state) {
       localStorage.removeItem("username")
@@ -86,9 +91,13 @@ export default new Vuex.Store({
     logout: function ({ commit }) {
       commit("EXP_TOKEN")
       commit("EXP_USERNAME")
+      commit("EXP_PROFILE_IMG")
     },
     setUsername: function ({ commit }, username) {
       commit('SET_USERNAME', username)
+    },
+    setProfileImg: function ({ commit }, profileImg) {
+      commit('SET_PROFILE_IMG', profileImg)
     },
     getAllMovies: function ({ commit }, allMovieList) {
       commit('GET_ALL_MOVIE_LIST', allMovieList)
@@ -138,4 +147,5 @@ export default new Vuex.Store({
   },
   modules: {
   },
+  plugins: [createPersistedState()]
 })

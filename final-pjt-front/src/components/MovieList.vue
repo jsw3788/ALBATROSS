@@ -10,12 +10,13 @@
       }"
     >
       <movie-item
-        v-for="movie in recommendMovies"
+        v-for="movie in popularMovies"
         :key="movie.tmdb_id"
         :movie="movie"
       ></movie-item>
     </Splide>
     <hr />
+    <h4>추천영화</h4>
     <Splide
       :options="{
         perPage: 5,
@@ -26,7 +27,7 @@
       }"
     >
       <movie-item
-        v-for="movie in popularMovies"
+        v-for="movie in recommendMovies"
         :key="movie.tmdb_id"
         :movie="movie"
       ></movie-item>
@@ -102,6 +103,26 @@ export default {
   created: function () {
     axios({
       method: "get",
+      url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/score/`,
+    })
+      .then((res) => {
+        this.$store.dispatch("getScoreMovies", res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    axios({
+      method: "get",
+      url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/release_date/`,
+    })
+      .then((res) => {
+        this.$store.dispatch("getReleasedMovies", res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    axios({
+      method: "get",
       url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/popularity/`,
     })
       .then((res) => {
@@ -118,28 +139,6 @@ export default {
     })
       .then((res) => {
         this.$store.dispatch("getRecommendMovies", res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    axios({
-      method: "get",
-      url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/release_date/`,
-    })
-      .then((res) => {
-        this.$store.dispatch("getReleasedMovies", res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    axios({
-      method: "get",
-      url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/score/`,
-    })
-      .then((res) => {
-        this.$store.dispatch("getScoreMovies", res.data);
       })
       .catch((err) => {
         console.log(err);

@@ -3,8 +3,19 @@
     <b-row>
       <b-col cols="4">
         <span>
-          <img :src="image" alt="no profile" />
+          <img
+            src="@/assets/profile_basic_g.png"
+            alt="profile_image"
+            style="width: 50%; border-radius: 50%"
+            class="my-3"
+          />
           <p>{{ person }}</p>
+          <p v-if="isMySelf">
+            <b-button size="sm" v-b-modal.update-modal>프로필 수정</b-button>
+            <b-modal id="update-modal" hide-footer hide-header>
+              <update-form></update-form>
+            </b-modal>
+          </p>
         </span>
         <div>
           films | {{ films }} follower | {{ follower }} following |
@@ -67,16 +78,15 @@ import axios from "axios";
 // import ProfileReview from "@/components/profile/ProfileReview.vue";
 import ProfileMovieItem from "@/components/profile/ProfileMovieItem";
 import ProfileReviewItem from "@/components/profile/ProfileReviewItem";
-
+import UpdateForm from "@/components/authform/UpdateForm";
 import { mapGetters } from "vuex";
 
 export default {
   name: "Profile",
   components: {
-    // ProfileMovie,
-    // ProfileReview,
     ProfileMovieItem,
     ProfileReviewItem,
+    UpdateForm,
   },
   data: function () {
     return {
