@@ -3,20 +3,19 @@
     <notifications group="auth_notify" />
     <notifications group="movie_notify" />
     <notifications group="review_notify" />
-    <div v-if="!isIndex">
-      <b-navbar
-        toggleable="lg"
-        type="dark"
-        class="d-flex justify-content-end"
-        style="background-color: #151515"
-      >
-        <b-navbar-brand href="#" class="mx-3">
-          <img
+    <b-navbar
+      toggleable="lg"
+      type="dark"
+      class="d-flex justify-content-even"
+      style="background-color: #151515"
+    >
+      <div class="container d-flex justify-content-even">
+        <b-navbar-brand href="#" class="mx-3"
+          ><img
             src="@/assets/ALBATROSS (5).png"
             alt="albatross"
             style="height: 40px"
-          />
-        </b-navbar-brand>
+        /></b-navbar-brand>
 
         <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
@@ -56,6 +55,10 @@
                 </div>
               </div>
             </div>
+          </b-navbar-nav>
+
+          <!-- Right aligned nav items -->
+          <b-navbar-nav class="ms-auto align-items-center">
             <div>
               <b-nav-item>
                 <div>
@@ -64,29 +67,13 @@
                 </div>
               </b-nav-item>
             </div>
-          </b-navbar-nav>
-
-          <!-- Right aligned nav items -->
-          <b-navbar-nav class="ml-auto">
-            <!-- <b-nav-form class="d-flex">
-              <div>
-                <b-form-input
-                  size="sm"
-                  class="mr-sm-2"
-                  placeholder="Search"
-                ></b-form-input>
-              </div>
-              <div>
-                <b-button size="sm" class="my-2 my-sm-0" type="submit"
-                  >Search</b-button
-                >
-              </div>
-            </b-nav-form> -->
 
             <div v-if="this.isLogin" class="d-flex justify-content-center">
               <div>
                 <router-link @click.native="logout" to="#">
-                  <b-button size="sm" class="mx-2">Logout</b-button>
+                  <b-button size="sm" class="mx-2"
+                    ><i class="fas fa-sign-out-alt"></i
+                  ></b-button>
                 </router-link>
               </div>
               <div>
@@ -103,7 +90,9 @@
                 </b-modal>
               </div>
               <div>
-                <b-button size="sm" v-b-modal.login-modal>Login</b-button>
+                <b-button size="sm" v-b-modal.login-modal
+                  ><i class="fas fa-sign-in-alt"></i>
+                </b-button>
                 <b-modal id="login-modal" hide-footer hide-header>
                   <login-form></login-form>
                 </b-modal>
@@ -111,12 +100,12 @@
             </div>
           </b-navbar-nav>
         </b-collapse>
-      </b-navbar>
-    </div>
+      </div>
+    </b-navbar>
 
     <router-view class="container" />
 
-    <div class="container fixed-bottom">
+    <div class="container sticky-bottom">
       <footer
         class="
           d-flex
@@ -262,8 +251,11 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  min-height: 100vh;
+  min-height: 120vh;
   background-color: #3c415c;
   color: #d5d5d5;
+}
+footer {
+  background-color: #3c415c;
 }
 </style>
