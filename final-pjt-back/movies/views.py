@@ -595,7 +595,11 @@ def get_genre(request):
 @permission_classes([AllowAny])
 def get_movies(request):
     API_KEY = config('API_KEY')
-    for page in range(4, 7):
+
+    # 가져오고 싶은 데이터 양을 조절합니다
+    # 한 페이지당 20개의 영화정보가 담깁니다.
+    for page in range(1, 51):
+
         URL = f'https://api.themoviedb.org/3/movie/popular?api_key={API_KEY}&language=ko-KR&page={page}&region=KR'
         request = requests.get(URL).json()
         for tmdb_data in request.get('results'):
@@ -606,7 +610,6 @@ def get_movies(request):
                 movie.tmdb_vote_sum = tmdb_data.get(
                     'vote_average') * tmdb_data.get('vote_count')
                 movie.tmdb_vote_cnt = tmdb_data.get('vote_count')
-                # movie.release_status = tmdb_data.get('release_status')
                 movie.save()
             else:
             
@@ -623,7 +626,6 @@ def get_movies(request):
                     overview=tmdb_data.get('overview'),
                     poster_path=f'https://image.tmdb.org/t/p/w500{tmdb_data.get("poster_path")}',
                     backdrop_path=f'https://image.tmdb.org/t/p/original{tmdb_data.get("backdrop_path")}',
-                    # release_status=detail_status
                 )
                 for genre_id in tmdb_data.get('genre_ids'):
                     genre = Genre.objects.get(tmdb_id=genre_id)

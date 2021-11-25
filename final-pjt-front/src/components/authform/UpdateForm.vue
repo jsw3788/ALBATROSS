@@ -70,12 +70,19 @@ export default {
       this.profileImg = file;
     },
     deleteFile: function () {
-      this.profileImg = "";
+      
+      this.profileImg = `${process.env.VUE_APP_SERVER_URL}/media/`+'default.png';
+      let profileData = new FormData();
+      profileData.append("username", this.profileImg);
+      profileData.append("username", this.updateUsername);
+      profileData.append("password", this.password);
+      profileData.append("passwordConfirmation", this.passwordConfirmation);
+      this.$store.dispatch("setProfileImg", profileData);
     },
     updateProfile: function () {
-      console.log(this.updateUsername);
-      console.log(this.passwordConfirmation);
-      console.log(this.password);
+      // console.log(this.updateUsername);
+      // console.log(this.passwordConfirmation);
+      // console.log(this.password);
       let profileData = new FormData();
       profileData.append("profileImg", this.profileImg);
       profileData.append("username", this.updateUsername);
