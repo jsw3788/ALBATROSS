@@ -57,7 +57,7 @@
             </profile-movie-item>
           </b-row>
           <hr />
-          <h4>좋아요를 받이받은 리뷰</h4>
+          <h4>좋아요를 많이받은 리뷰</h4>
           <b-row>
             <profile-review-item
               v-for="(review, index) in popular_reviews"

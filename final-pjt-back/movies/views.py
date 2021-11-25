@@ -11,7 +11,7 @@ from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from django.contrib.auth import get_user_model
-from django.db.models import Count, F, Prefetch
+from django.db.models import Count, F
 from datetime import datetime
 from random import choice
 from django.core.paginator import Paginator
@@ -56,7 +56,7 @@ def read_movies_by_popularity(request):
 def read_movies_by_score(request):
     # 최적화
     # DB의 정보들을 바탕으로 F를 사용하여 DB 내에서 평균평점을 처리하여 annotate를 사용해 새로운 column을 추가한 후 정렬
-    movies = Movie.objects.annotate(vote_average=(F('tmdb_vote_sum') + F('updated_vote_sum')) / (
+    movies = Movie.objects.annotate(vote_average=(F('tmdb_vote_sum') + 2*F('updated_vote_sum')) / (
         F('tmdb_vote_cnt') + F('updated_vote_cnt'))).order_by('-vote_average')[:30]
     return Response(MovieListSerializer(movies, many=True).data)
 
@@ -405,7 +405,7 @@ def review_list(request, movie_pk):
         # reviews = Review.objects.filter(movie__pk=movie_pk)
         
         # 최적화
-        reviews = Review.objects.select_related('user').prefetch_related('like_users').prefetch_related('dislike_users').filter(movie__pk=movie_pk)
+        reviews = Review.objects.select_related('user').prefetch_related('like_users').prefetch_related('dislike_users').filter(movie__pk=movie_pk).order_by('-created_at')
         # paginator
         paginator = Paginator(reviews, 5)
 

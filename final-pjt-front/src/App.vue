@@ -38,7 +38,7 @@ export default {
     },
   },
   created: function () {
-    // this.$store.dispatch("getAllMovies");
+    this.$store.dispatch("getAllMovies");
     this.$store.dispatch("getScoreMovies");
     this.$store.dispatch("getReleasedMovies");
     this.$store.dispatch("getPopularMovies");
