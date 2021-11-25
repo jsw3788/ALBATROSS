@@ -13,16 +13,15 @@
           <p>{{ person }}</p>
           <p v-if="isMySelf">
             <b-button size="sm" v-b-modal.update-modal>프로필 수정</b-button>
-            <b-modal id="update-modal" hide-footer hide-header>
-              <template #default="{ close }">
-                  <update-form :close="close"></update-form>
-              </template>
+            <b-modal id="update-modal" hide-header ok-only>
+              <update-form></update-form>
             </b-modal>
           </p>
         </span>
         <div>
-          films | {{ films }} follower | {{ follower }} following |
-          {{ following }}
+          <p>films | {{ films }}</p>
+          <p>follower | {{ follower }}</p>
+          <p>following | {{ following }}</p>
         </div>
         <div v-if="!isMySelf">
           <button v-if="isfollowing" @click="follow">언팔로우</button>

@@ -81,8 +81,10 @@ def profile(request, username):
         serializer = UserProfileUpdateSerializer(request.user, data=context)
         
         if serializer.is_valid(raise_exception=True):
-            print('체크2')
-            serializer.save(profile_image=profile_image)
+            user = serializer.save(profile_image=profile_image)
+            
+            user.set_password(password)
+            user.save()
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
     # 회원 탈퇴

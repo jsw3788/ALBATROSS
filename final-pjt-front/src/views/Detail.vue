@@ -127,8 +127,9 @@ export default {
       score: null,
       movieRate: null,
       pageNum: 2,
-      possiblePageNum: 2,
-      loading: 2,
+      possiblePageNum:1,
+      // loading: 2,
+      loadingCheck: true,
 
       rating: "No Rating Selected",
       currentRating: "평점을 매겨주세요",
@@ -150,23 +151,25 @@ export default {
           this.possiblePageNum = res.data.pop()["last_page"];
           const newreviews = res.data;
           this.reviews.push(...newreviews);
-
-          this.pageNum += 1;
-        })
-        .catch((err) => console.log(err));
+  
+            this.pageNum += 1
+            this.loadingCheck=true
+          }).catch((err)=>
+          console.log(err))
     },
     scrollDown: function () {
-      const { scrollHeight, scrollTop, clientHeight } =
-        document.documentElement;
-      if (scrollHeight - Math.round(scrollTop) <= clientHeight) {
-        if (this.pageNum <= this.possiblePageNum) {
-          if (this.loading == this.pageNum) {
-            this.getMoreReviews();
-            this.loading += 1;
-          }
+      const { scrollHeight, scrollTop, clientHeight} = document.documentElement
+        if (scrollHeight - Math.round(scrollTop) <= clientHeight) {
+          if (this.pageNum <= this.possiblePageNum && this.possiblePageNum != 1) {
+            if(this.loadingCheck){
+            // if(this.loading == this.pageNum){
+              this.getMoreReviews()
+              // this.loading+=1
+              this.loadingCheck=false
+            }
+          } 
         }
-      }
-    },
+      },
     updatedWanted: function () {
       axios({
         method: "post",
@@ -343,6 +346,7 @@ export default {
       headers: this.$store.getters.config,
     })
       .then((res) => {
+        this.possiblePageNum=res.data.pop()['last_page']
         this.reviews = res.data;
       })
       .catch((err) => {
