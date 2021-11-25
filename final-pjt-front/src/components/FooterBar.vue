@@ -36,7 +36,9 @@
           "
         >
           <li class="ms-3">
-            <a class="text-muted" href="https://lab.ssafy.com/jsw3788/pjt-final"
+            <a
+              class="text-muted"
+              href="https://lab.ssafy.com/kelvin9149/final-pjt-front"
               ><i class="fab fa-gitlab"></i
             ></a>
           </li>

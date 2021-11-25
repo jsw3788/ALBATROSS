@@ -47,7 +47,7 @@
             ></profile-movie-item>
           </b-row>
           <hr />
-          <h4>최근 리뷰 영화</h4>
+          <h4>최근 평가한 영화</h4>
           <b-row>
             <profile-movie-item
               v-for="(movie, index) in recent_movies"
