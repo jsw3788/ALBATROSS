@@ -595,9 +595,11 @@ def get_genre(request):
 @permission_classes([AllowAny])
 def get_movies(request):
     API_KEY = config('API_KEY')
+
     # 가져오고 싶은 데이터 양을 조절합니다
     # 한 페이지당 20개의 영화정보가 담깁니다.
     for page in range(1, 51):
+
         URL = f'https://api.themoviedb.org/3/movie/popular?api_key={API_KEY}&language=ko-KR&page={page}&region=KR'
         request = requests.get(URL).json()
         for tmdb_data in request.get('results'):
@@ -635,6 +637,8 @@ def get_movies(request):
 
 # db 영화인 데이터 불러오기
 
+# db 영화인 데이터 불러오기
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_credits(request):
@@ -651,7 +655,6 @@ def get_credits(request):
                 actor = get_object_or_404(Actor, actor_id=tmdb_id)
                 actor.movies.add(movie)
                 continue
-            
             # ppl_URL = f'https://api.themoviedb.org/3/person/{tmdb_id}?api_key={API_KEY}&language=ko-KR'
             # actor_popularity = requests.get(ppl_URL).json().get('popularity')
             new_actor = Actor.objects.create(

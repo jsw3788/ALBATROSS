@@ -30,11 +30,6 @@ import anime from 'animejs/lib/anime.es.js'
 Vue.prototype.$anime = anime;
 
 
-import VCalendar from 'v-calendar';
-
-// Use v-calendar & v-date-picker components
-Vue.use(VCalendar);
-
 Vue.config.productionTip = false
 
 new Vue({

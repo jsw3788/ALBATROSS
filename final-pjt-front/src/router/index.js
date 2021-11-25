@@ -6,7 +6,6 @@ import People from '@/views/People.vue'
 import Detail from '@/views/Detail.vue'
 import Profile from '@/views/Profile.vue'
 import SearchResult from '@/views/SearchResult.vue'
-import ReleaseSchedule from '@/views/ReleaseSchedule'
 
 
 Vue.use(VueRouter)
@@ -42,11 +41,6 @@ const routes = [
     name: 'SearchResult',
     component: SearchResult,
     props: true,
-  },
-  {
-    path: '/release',
-    name: 'ReleaseSchedule',
-    component: ReleaseSchedule,
   },
 
 ]

@@ -2,32 +2,38 @@
   <b-container class="bv-example-row">
     <b-row class="mt-5">
       <b-col cols="4">
-      <div style="position: fixed; width: 25%">
-        <span>
-          <img
-            :src="image"
-            alt="profile_image"
-            style="width: 50%; border-radius: 50%"
-            class="my-3"
-          />
-          <p>{{ person }}</p>
-          <p v-if="isMySelf">
-            <b-button size="sm" v-b-modal.update-modal>프로필 수정</b-button>
-            <b-modal id="update-modal" hide-header ok-only>
-              <update-form></update-form>
-            </b-modal>
-          </p>
-        </span>
-        <div>
-          <p>films | {{ films }}</p>
-          <p>follower | {{ follower }}</p>
-          <p>following | {{ following }}</p>
-        </div>
-        <div v-if="!isMySelf">
-          <button v-if="isfollowing" @click="follow">언팔로우</button>
-          <button v-else @click="follow">팔로우</button>
-      </div>
-
+        <div style="position: fixed; width: 25%">
+          <span>
+            <img
+              :src="image"
+              alt="profile_image"
+              style="width: 50%; border-radius: 50%"
+              class="my-3"
+            />
+            <p>
+              <span class="mx-1"> {{ person }}</span>
+              <span v-if="isMySelf" class="mx-1">
+                <b-button
+                  size="sm"
+                  v-b-modal.update-modal
+                  variant="outline-secondary"
+                  ><i class="fas fa-user-edit"></i
+                ></b-button>
+                <b-modal id="update-modal" hide-header ok-only>
+                  <update-form></update-form>
+                </b-modal>
+              </span>
+            </p>
+          </span>
+          <div>
+            <p>films | {{ films }}</p>
+            <p>follower | {{ follower }}</p>
+            <p>following | {{ following }}</p>
+          </div>
+          <div v-if="!isMySelf">
+            <button v-if="isfollowing" @click="follow">언팔로우</button>
+            <button v-else @click="follow">팔로우</button>
+          </div>
         </div>
       </b-col>
       <b-col cols="8">
@@ -129,7 +135,8 @@ export default {
         this.isfollowing = res.data.following;
         this.following = res.data.followingCnt;
         this.follower = res.data.followerCnt;
-        this.image = `${process.env.VUE_APP_SERVER_URL}/media/`+ res.data.profile_image;
+        this.image =
+          `${process.env.VUE_APP_SERVER_URL}/media/` + res.data.profile_image;
         this.films = res.data.movieCnt;
       })
       .catch((err) => {
@@ -166,7 +173,6 @@ export default {
       // headers: this.setToken(),
     })
       .then((res) => {
-        
         this.popular_reviews = res.data;
       })
       .catch((err) => {
@@ -180,7 +186,6 @@ export default {
       // headers: this.setToken(),
     })
       .then((res) => {
-        
         this.recent_reviews = res.data;
       })
       .catch((err) => {
