@@ -1,0 +1,96 @@
+\---movie_community_project
+    |   .gitignore
+    |   README.md
+    |
+    +---final-pjt-back
+    |   |   manage.py
+    |   |   package-lock.json
+    |   |   package.json
+    |   |   requirements.txt
+    |   |
+    |   +---accounts
+    |   |   |   admin.py
+    |   |   |   apps.py
+    |   |   |   models.py
+    |   |   |   serializers.py
+    |   |   |   tests.py
+    |   |   |   urls.py
+    |   |   |   views.py
+    |   |   |   __init__.py
+    |   |   |
+    |   |   \---migrations
+    |   |           0001_initial.py
+    |   |           __init__.py
+    |   |
+    |   +---movies
+    |   |   |   admin.py
+    |   |   |   apps.py
+    |   |   |   models.py
+    |   |   |   serializers.py
+    |   |   |   tests.py
+    |   |   |   urls.py
+    |   |   |   views.py
+    |   |   |   __init__.py
+    |   |   |
+    |   |   \---migrations
+    |   |           0001_initial.py
+    |   |           __init__.py
+    |   |
+    |   \---server
+    |           asgi.py
+    |           settings.py
+    |           urls.py
+    |           wsgi.py
+    |           __init__.py
+    |
+    \---final-pjt-front
+        |   babel.config.js
+        |   package-lock.json
+        |   package.json
+        |
+        +---public
+        |       index.html
+        |
+        \---src
+            |   App.vue
+            |   main.js
+            |
+            +---components
+            |   |   FooterBar.vue
+            |   |   MovieList.vue
+            |   |   NavBar.vue
+            |   |   SearchBar.vue
+            |   |
+            |   +---authform
+            |   |       LoginForm.vue
+            |   |       SignupForm.vue
+            |   |       UpdateForm.vue
+            |   |
+            |   +---people
+            |   |       PeopleActorList.vue
+            |   |       PeopleActorListItem.vue
+            |   |       PeopleDirectorList.vue
+            |   |       PeopleDirectorListItem.vue
+            |   |
+            |   +---profile
+            |   |       ProfileMovieItem.vue
+            |   |       ProfileReviewItem.vue
+            |   |
+            |   \---review
+            |           ReviewComment.vue
+            |           ReviewForm.vue
+            |           ReviewList.vue
+            |
+            +---router
+            |       index.js
+            |
+            +---store
+            |       index.js
+            |
+            \---views
+                    Detail.vue
+                    Home.vue
+                    Index.vue
+                    People.vue
+                    Profile.vue
+                    SearchResult.vue

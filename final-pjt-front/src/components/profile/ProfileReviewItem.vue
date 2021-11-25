@@ -13,7 +13,6 @@
         <b-col cols="9">
           <div>
             {{ nowmovie.title }}
-            {{ review.like_users }}
             <p class="text-start">{{ review.content }}</p>
           </div>
         </b-col>

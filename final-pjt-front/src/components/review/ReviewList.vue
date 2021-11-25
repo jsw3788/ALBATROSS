@@ -4,9 +4,15 @@
     <!-- 댓글 -->
     <div v-if="!review.is_spoiled">
       <div class="py-3 px-5">
-        <div class="d-flex justify-content-between mb-2">
-          <div>
-            <span> 작성자 : </span>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <div class="text-start">
+            <span
+              ><img
+                :src="image"
+                alt="profile"
+                style="width: 20%; border-radius: 50%"
+                class="me-2"
+            /></span>
             <span @click="goProfile">{{ review.user.username }}</span>
           </div>
           <div class="d-flex">
@@ -110,7 +116,10 @@
               ></review-comment>
             </div>
             <!-- comment form -->
-            <div class="text-end my-2">
+            <div class="text-end my-2" v-if="letWrite">
+              <div class="text-start">
+                <button @click="clickWrite">접기</button>
+              </div>
               <input
                 type="text"
                 v-model.trim="newComment"
@@ -129,6 +138,9 @@
               <b-icon-pencil-square
                 @click="writeComment"
               ></b-icon-pencil-square>
+            </div>
+            <div v-else class="text-start">
+              <button @click="clickWrite">댓글 쓰기</button>
             </div>
           </b-col>
         </b-row>
@@ -170,6 +182,9 @@ export default {
       likeCnt: null,
       dislikeCnt: null,
       commentCnt: null,
+      letWrite: false,
+      image:
+        `${process.env.VUE_APP_SERVER_URL}` + this.review.user.profile_image,
     };
   },
   props: {
@@ -264,10 +279,20 @@ export default {
           this.comments.push(res.data);
           this.newComment = null;
           this.commentCnt += 1;
+          this.newCommentSpoil = false;
         })
-        .catch((err) => {
-          console.log(err);
+        .catch(() => {
+          Vue.notify({
+            group: "review_notify",
+            title: "멈춰!",
+            text: "댓글 작성을 위해 로그인이 필요합니다.",
+            type: "warn",
+            closeOnClick: true,
+          });
         });
+    },
+    clickWrite: function () {
+      this.letWrite = !this.letWrite;
     },
     updateComment: function (updatedcomment, beforecomment) {
       this.comments = this.comments.map((comment) => {

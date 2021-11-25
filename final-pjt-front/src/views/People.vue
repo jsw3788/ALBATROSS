@@ -22,9 +22,6 @@ export default {
     PeopleActorList,
     PeopleDirectorList,
   },
-  created: function () {
-    this.$store.dispatch("getPeople");
-  },
 };
 </script>
 

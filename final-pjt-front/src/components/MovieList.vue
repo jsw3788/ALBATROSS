@@ -1,7 +1,7 @@
 <template>
   <div id="MovieList">
     <div>
-      <h4 class="mt-5">인기영화</h4>
+      <p class="text-start mt-5 fw-bold fs-4">인기영화</p>
       <carousel
         :loop="true"
         :navigationClickTargetSize="25"
@@ -23,13 +23,16 @@
               class="poster-img"
               style="width: 100%"
             />
-            <p class="poster-text">{{ movie.title }}</p>
+            <div class="poster-text text-start">
+              <p>{{ movie.title }}</p>
+              <p>{{ movie.popularity }}</p>
+            </div>
           </div>
         </slide>
       </carousel>
     </div>
     <div v-if="isLogin">
-      <h4 class="mt-5">추천영화</h4>
+      <p class="text-start mt-5 fw-bold fs-4">추천영화</p>
       <carousel
         :loop="true"
         :navigationClickTargetSize="25"
@@ -57,7 +60,7 @@
       </carousel>
     </div>
     <div>
-      <h4 class="mt-5">평점이 높은 영화</h4>
+      <p class="text-start mt-5 fw-bold fs-4">명작영화</p>
       <carousel
         :loop="true"
         :navigationClickTargetSize="25"
@@ -79,13 +82,24 @@
               class="poster-img"
               style="width: 100%"
             />
-            <p class="poster-text">{{ movie.title }}</p>
+            <div class="poster-text text-start">
+              <p>{{ movie.title }}</p>
+              <p>
+                {{
+                  (
+                    (movie.tmdb_vote_sum + movie.updated_vote_sum) /
+                    (movie.tmdb_vote_cnt + movie.updated_vote_cnt) /
+                    2
+                  ).toFixed(2)
+                }}
+              </p>
+            </div>
           </div>
         </slide>
       </carousel>
     </div>
     <div>
-      <h4 class="mt-5">최신영화</h4>
+      <p class="text-start mt-5 fw-bold fs-4">최신영화</p>
       <carousel
         :loop="true"
         :navigationClickTargetSize="25"
@@ -107,7 +121,10 @@
               class="poster-img"
               style="width: 100%"
             />
-            <p class="poster-text">{{ movie.title }}</p>
+            <div class="poster-text text-start">
+              <p>{{ movie.title }}</p>
+              <p>{{ movie.release_date }}</p>
+            </div>
           </div>
         </slide>
       </carousel>

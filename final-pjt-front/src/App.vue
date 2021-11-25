@@ -14,6 +14,7 @@ import NavBar from "@/components/NavBar";
 import FooterBar from "@/components/FooterBar";
 import { mapGetters } from "vuex";
 import { mapState } from "vuex";
+import axios from "axios";
 
 export default {
   name: "App",
@@ -35,6 +36,24 @@ export default {
         alert("로그인을 해주세요");
       }
     },
+  },
+  created: function () {
+    // this.$store.dispatch("getAllMovies");
+    this.$store.dispatch("getScoreMovies");
+    this.$store.dispatch("getReleasedMovies");
+    this.$store.dispatch("getPopularMovies");
+    this.$store.dispatch("getPeople");
+    axios({
+      method: "get",
+      url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/recommend/`,
+      headers: this.$store.getters.config,
+    })
+      .then((res) => {
+        this.$store.dispatch("getRecommendMovies", res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   },
   computed: {
     ...mapGetters(["isLogin"]),

@@ -120,20 +120,57 @@ export default new Vuex.Store({
           console.log(err)
         })
     },
-    getAllMovies: function ({ commit }, allMovieList) {
-      commit('GET_ALL_MOVIE_LIST', allMovieList)
+    getAllMovies: function ({ commit }) {
+      axios({
+        method: "get",
+        url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/all/`,
+      })
+        .then((res) => {
+          commit('GET_ALL_MOVIE_LIST', res.data)
+        })
+        .catch((err) => {
+          console.log(err)
+        });
     },
-    getPopularMovies: function ({ commit }, popularMovieList) {
-      commit('GET_POPULAR_MOVIE_LIST', popularMovieList)
+    getPopularMovies: function ({ commit }) {
+      axios({
+        method: "get",
+        url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/popularity/`,
+      })
+        .then((res) => {
+          commit('GET_POPULAR_MOVIE_LIST', res.data)
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
-    getRecommendMovies: function ({ commit }, recommendMovieList) {
-      commit('GET_RECOMMEND_MOVIE_LIST', recommendMovieList)
+    getRecommendMovies: function ({ commit }, data) {
+      commit('GET_RECOMMEND_MOVIE_LIST', data)
     },
-    getReleasedMovies: function ({ commit }, releasedMovieList) {
-      commit('GET_RELEEASED_MOVIE_LIST', releasedMovieList)
+    getReleasedMovies: function ({ commit }) {
+      axios({
+        method: "get",
+        url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/release_date/`,
+      })
+        .then((res) => {
+          commit('GET_RELEEASED_MOVIE_LIST', res.data)
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
-    getScoreMovies: function ({ commit }, scoreMovieList) {
-      commit('GET_SCORE_MOVIE_LIST', scoreMovieList)
+    getScoreMovies: function ({ commit }) {
+      axios({
+        method: "get",
+        url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/score/`,
+      })
+        .then((res) => {
+          commit('GET_SCORE_MOVIE_LIST', res.data)
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+
     },
     getPeople: function ({ commit }) {
 
@@ -143,7 +180,6 @@ export default new Vuex.Store({
         url: 'http://127.0.0.1:8000/api/v1/people/directors/',
       }).then(res => {
         commit('GET_DIRECTORLIST', res)
-
       }).catch(err => { console.log(err) })
 
       // 배우 리스트 가져오기
@@ -152,7 +188,6 @@ export default new Vuex.Store({
         url: 'http://127.0.0.1:8000/api/v1/people/actors/',
       }).then(res => {
         commit('GET_ACTORLIST', res)
-
       }).catch(err => { console.log(err) })
     },
   },

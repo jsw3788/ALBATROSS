@@ -8,12 +8,17 @@
         style="background-color: #151515"
       >
         <div class="container d-flex justify-content-even">
-          <b-navbar-brand href="#" class="mx-3"
-            ><img
-              src="@/assets/ALBATROSS (5).png"
-              alt="albatross"
-              style="height: 40px"
-          /></b-navbar-brand>
+          <b-navbar-brand class="mx-3">
+            <router-link
+              to="/"
+              class="text-decoration-none"
+              style="color: white"
+              ><img
+                src="@/assets/ALBATROSS (5).png"
+                alt="albatross"
+                style="height: 40px"
+            /></router-link>
+          </b-navbar-brand>
 
           <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
@@ -24,7 +29,7 @@
                   <div class="mx-2">
                     <b-nav-item>
                       <router-link
-                        to="#"
+                        to="/home"
                         class="text-decoration-none"
                         style="color: white"
                         ><b-icon-camera-reels></b-icon-camera-reels
