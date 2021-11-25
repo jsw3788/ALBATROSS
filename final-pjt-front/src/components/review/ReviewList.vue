@@ -3,7 +3,7 @@
     <!-- 리뷰 하나당 대댓글이 다 달려야함 -->
     <!-- 댓글 -->
     <div v-if="!review.is_spoiled">
-      <div class="p-3">
+      <div class="py-3 px-5">
         <div class="d-flex justify-content-between mb-2">
           <div>
             <span> 작성자 : </span>
@@ -56,7 +56,7 @@
           <p class="text-start">{{ review.content }}</p>
         </div>
       </div>
-      <div class="d-flex justify-content-between">
+      <div class="d-flex justify-content-between px-5">
         <div class="text-start ms-3">{{ commentCnt }}개의 댓글이 있습니다</div>
         <div class="d-flex align-items-start justify-content-end me-3">
           <!-- 공감, 비공감 -->
@@ -95,10 +95,10 @@
         </div>
       </div>
       <!-- comment -->
-      <b-container class="bv-example-row p-2">
+      <b-container class="bv-example-row px-5">
         <b-row>
           <b-col cols="1"></b-col>
-          <b-col cols="10 border-start border-3">
+          <b-col cols="11 border-start border-3">
             <!-- comment list -->
             <div>
               <review-comment
@@ -110,19 +110,22 @@
               ></review-comment>
             </div>
             <!-- comment form -->
-            <div class="text-start my-2">
+            <div class="text-end my-2">
               <input
                 type="text"
                 v-model.trim="newComment"
                 @keyup.enter="writeComment"
                 class="mx-2"
+                style="width: 100%"
               />
               <input
                 type="checkbox"
-                :id="'comment-spoil'+ review.id"
+                :id="'comment-spoil' + review.id"
                 v-model="newCommentSpoil"
               />
-              <label :for="'comment-spoil'+ review.id" class="mx-1">spoiler</label>
+              <label :for="'comment-spoil' + review.id" class="mx-1"
+                >spoiler</label
+              >
               <b-icon-pencil-square
                 @click="writeComment"
               ></b-icon-pencil-square>
@@ -225,24 +228,28 @@ export default {
         data: {
           content: this.updatedcontent,
         },
-      }).then(() => {
-        const updatedreview = {
-          ...this.review,
-          content: this.updatedcontent,
-        };
-        this.$emit("update-review", updatedreview, this.review);
-      }).catch((err)=> console.log(err));
+      })
+        .then(() => {
+          const updatedreview = {
+            ...this.review,
+            content: this.updatedcontent,
+          };
+          this.$emit("update-review", updatedreview, this.review);
+        })
+        .catch((err) => console.log(err));
     },
     deleteReview: function () {
-      console.log(this.username)
+      console.log(this.username);
       const delReview = this.review;
       axios({
         method: "delete",
         url: `${process.env.VUE_APP_SERVER_URL}/api/v1/reviews/${this.review.id}/`,
         headers: this.$store.getters.config,
-      }).then(() => {
-        this.$emit("delete-review", delReview);
-      }).catch((err)=> console.log(err));
+      })
+        .then(() => {
+          this.$emit("delete-review", delReview);
+        })
+        .catch((err) => console.log(err));
     },
     writeComment: function () {
       axios({
@@ -257,7 +264,7 @@ export default {
         .then((res) => {
           this.comments.push(res.data);
           this.newComment = null;
-          this.commentCnt +=1
+          this.commentCnt += 1;
         })
         .catch((err) => {
           console.log(err);
@@ -277,8 +284,7 @@ export default {
     deleteComment: function (delComment) {
       const idx = this.comments.indexOf(delComment);
       this.comments.splice(idx, 1);
-      this.commentCnt -=1
-
+      this.commentCnt -= 1;
     },
     humanize: function (now, date) {
       const moment = require("moment");

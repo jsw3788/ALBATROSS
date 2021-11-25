@@ -84,19 +84,23 @@
           </div>
           <!-- 이하 리뷰칸 -->
           <div class="review">
-            <review-form
-              :movieId="movie.id"
-              @add-review="addReview"
-            ></review-form>
+            <div class="pt-4 pb-4 px-5">
+              <review-form
+                :movieId="movie.id"
+                @add-review="addReview"
+              ></review-form>
+            </div>
             <hr />
-            <review-list
-              v-for="review in reviews"
-              :key="review.id"
-              :review="review"
-              :movieId="movie.id"
-              @update-review="updateReview"
-              @delete-review="deleteReview"
-            ></review-list>
+            <div>
+              <review-list
+                v-for="review in reviews"
+                :key="review.id"
+                :review="review"
+                :movieId="movie.id"
+                @update-review="updateReview"
+                @delete-review="deleteReview"
+              ></review-list>
+            </div>
           </div>
         </b-col>
       </b-row>
@@ -127,7 +131,7 @@ export default {
       score: null,
       movieRate: null,
       pageNum: 2,
-      possiblePageNum:1,
+      possiblePageNum: 1,
       // loading: 2,
       loadingCheck: true,
 
@@ -151,25 +155,26 @@ export default {
           this.possiblePageNum = res.data.pop()["last_page"];
           const newreviews = res.data;
           this.reviews.push(...newreviews);
-  
-            this.pageNum += 1
-            this.loadingCheck=true
-          }).catch((err)=>
-          console.log(err))
+
+          this.pageNum += 1;
+          this.loadingCheck = true;
+        })
+        .catch((err) => console.log(err));
     },
     scrollDown: function () {
-      const { scrollHeight, scrollTop, clientHeight} = document.documentElement
-        if (scrollHeight - Math.round(scrollTop) <= clientHeight) {
-          if (this.pageNum <= this.possiblePageNum && this.possiblePageNum != 1) {
-            if(this.loadingCheck){
+      const { scrollHeight, scrollTop, clientHeight } =
+        document.documentElement;
+      if (scrollHeight - Math.round(scrollTop) <= clientHeight) {
+        if (this.pageNum <= this.possiblePageNum && this.possiblePageNum != 1) {
+          if (this.loadingCheck) {
             // if(this.loading == this.pageNum){
-              this.getMoreReviews()
-              // this.loading+=1
-              this.loadingCheck=false
-            }
-          } 
+            this.getMoreReviews();
+            // this.loading+=1
+            this.loadingCheck = false;
+          }
         }
-      },
+      }
+    },
     updatedWanted: function () {
       axios({
         method: "post",
@@ -346,7 +351,7 @@ export default {
       headers: this.$store.getters.config,
     })
       .then((res) => {
-        this.possiblePageNum=res.data.pop()['last_page']
+        this.possiblePageNum = res.data.pop()["last_page"];
         this.reviews = res.data;
       })
       .catch((err) => {
@@ -369,11 +374,11 @@ export default {
 </script>
 
 <style scoped>
-.side-card {
-  background-color: #301b3f;
-}
+.side-card,
 .review {
-  background-color: #301b3f;
+  /* background-color: #2c272e; */
+  /* background-color: #181d31; */
+  background-color: #090910;
 }
 .backdrop-box {
   max-height: 15rem;

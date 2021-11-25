@@ -3,9 +3,8 @@
     <h4 class="mt-5">검색결과</h4>
     <b-row>
       <b-col
-        lg="2"
-        md="3"
-        sm="4"
+        xl="3"
+        md="4"
         cols="6"
         class="mt-2"
         v-for="ret in result"
@@ -19,14 +18,6 @@
             class="poster-img"
           />
           <p class="poster-text">{{ ret.item.title }}</p>
-          <p class="poster-text">
-            <span
-              v-for="(genre, index) in ret.item.genres"
-              :key="genre + index"
-            >
-              {{ genre.name }}
-            </span>
-          </p>
         </div>
       </b-col>
     </b-row>
@@ -53,8 +44,6 @@ export default {
 </script>
 
 <style scoped>
-/* poster img hover_text */
-/* 부모태그 poster 사진 poster-img 글 poster-text*/
 .poster-img {
   vertical-align: top;
 }

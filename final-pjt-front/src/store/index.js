@@ -83,9 +83,7 @@ export default new Vuex.Store({
             type: 'error'
           });
           console.log(err)
-          // swal("아이디와 비밀번호를 확인하쇼", {
-          //   dangerMode: true,
-          // })
+
         })
     },
     logout: function ({ commit }) {
@@ -108,9 +106,16 @@ export default new Vuex.Store({
         }
       })
         .then((res) => {
+          commit('SET_USERNAME', res.data)
           commit('SET_PROFILE_IMG', res.data)
         })
         .catch((err) => {
+          Vue.notify({
+            group: 'auth_notify',
+            title: '수정 실패!',
+            text: '형식에 문제가 있습니다',
+            type: 'error'
+          });
           console.log(err)
         })
     },

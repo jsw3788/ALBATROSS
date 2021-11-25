@@ -19,7 +19,7 @@ def signup(request):
     password_confirmation = request.data.get('passwordConfirmation')
 
     if get_user_model().objects.filter(username=request.data.get('username')).exists():
-        return Response({'error':'이미 존재하는 사용자 이름 입니다.'},status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error':'이미 존재하는 계정 입니다.'},status=status.HTTP_400_BAD_REQUEST)
 
     if password != password_confirmation:
         return Response({'error' : '비밀번호가 일치하지 않습니다.'}, status=status.HTTP_400_BAD_REQUEST)
