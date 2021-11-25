@@ -1,19 +1,13 @@
 <template>
-  <div
-    id="review-from"
-    class="d-flex justify-content-between align-items-center"
-  >
-    <div>{{ username }}</div>
-    <div>
-      <textarea
-        v-model.trim="newReview"
-        rows="1"
-        class="form-control"
-        @keyup.enter="writeReview"
-        style="width: 200%"
-      ></textarea>
-    </div>
+  <div id="review-from">
+    <h4 class="text-start mb-4">Review</h4>
     <div class="d-flex align-items-center">
+      <input
+        v-model.trim="newReview"
+        class="mx-3"
+        @keyup.enter="writeReview"
+        style="width: 100%"
+      />
       <input
         type="checkbox"
         id="spoiler"
@@ -66,7 +60,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(["username"]),
+    ...mapState(["username", "profileImg"]),
   },
 };
 </script>

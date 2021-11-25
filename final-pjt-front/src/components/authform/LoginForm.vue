@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h3>Login</h3>
+    <h3>로그인</h3>
     <hr />
     <div class="mb-3">
       <label for="username">아이디</label>

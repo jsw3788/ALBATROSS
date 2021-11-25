@@ -14,12 +14,63 @@
 <script src="anime.min.js"></script>
 <script>
 import anime from "animejs/lib/anime.es.js";
+
 export default {
   name: "Index",
   data: function () {
     return {
       isIndex: true,
     };
+  },
+  created: function () {
+    axios({
+      method: "get",
+      url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/all/`,
+    }).then((res) => {
+      this.$store.dispatch("getAllMovies", res.data);
+    });
+    axios({
+      method: "get",
+      url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/score/`,
+    })
+      .then((res) => {
+        this.$store.dispatch("getScoreMovies", res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    axios({
+      method: "get",
+      url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/release_date/`,
+    })
+      .then((res) => {
+        this.$store.dispatch("getReleasedMovies", res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    axios({
+      method: "get",
+      url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/popularity/`,
+    })
+      .then((res) => {
+        this.$store.dispatch("getPopularMovies", res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    axios({
+      method: "get",
+      url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/recommend/`,
+      headers: this.$store.getters.config,
+    })
+      .then((res) => {
+        this.$store.dispatch("getRecommendMovies", res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   },
   mounted: function () {
     setTimeout(() => {

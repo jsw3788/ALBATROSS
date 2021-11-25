@@ -1,6 +1,6 @@
 <template>
-  <div id="FooterBar">
-    <div class="container">
+  <div id="footer-bar">
+    <div class="container fixed-bottom">
       <footer
         class="
           d-flex
@@ -21,12 +21,24 @@
               <use xlink:href="#bootstrap"></use>
             </svg>
           </a>
-          <span class="text-muted">© 2021 Albatross Company</span>
+          <span class="text-muted">© 2021 Albatross</span>
         </div>
 
-        <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+        <ul
+          class="
+            nav
+            col-md-4
+            justify-content-end
+            list-unstyled
+            d-flex
+            me-4
+            pe-2
+          "
+        >
           <li class="ms-3">
-            <a class="text-muted" href="#"><i class="fab fa-gitlab"></i></a>
+            <a class="text-muted" href="https://lab.ssafy.com/jsw3788/pjt-final"
+              ><i class="fab fa-gitlab"></i
+            ></a>
           </li>
         </ul>
       </footer>
