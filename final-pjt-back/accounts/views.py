@@ -68,6 +68,7 @@ def profile(request, username):
         serializer = UserProfileUpdateSerializer(request.user, data=request.data)
         print('체크')
         if serializer.is_valid(raise_exception=True):
+            print('체크2')
             serializer.save(profile_image=profile_image)
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 

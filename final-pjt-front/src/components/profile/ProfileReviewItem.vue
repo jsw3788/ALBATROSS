@@ -40,7 +40,7 @@ export default {
   computed: {
     ...mapState(["allmovies"]),
     nowmovie: function () {
-      return this.allmovies[this.review.movie];
+      return this.allmovies[this.review.movie - 1];
     },
   },
 };
