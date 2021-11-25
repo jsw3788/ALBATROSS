@@ -18,7 +18,7 @@
               img-alt="Poster"
               img-top
               tag="article"
-              class="mb-2 side-card"
+              class="mt-5 side-card"
             >
               <b-card-text>
                 <div>
@@ -130,6 +130,7 @@ export default {
       possiblePageNum:2,
       loading: 2,
 
+
       rating: "No Rating Selected",
       currentRating: "평점을 매겨주세요",
       currentSelectedRating: "",
@@ -137,8 +138,9 @@ export default {
   },
   methods: {
     // 인피니티 스크롤
-    getMoreReviews: function() {
+    getMoreReviews: function () {
       axios({
+
             method: 'get',
             url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/${this.movie.id}/reviews/`,
             headers: this.$store.getters.config,
@@ -156,6 +158,8 @@ export default {
           }).catch((err)=>
           console.log(err))
 
+        this.pageNum += 1;
+      });
     },
     scrollDown: function () {
         const { scrollHeight, scrollTop, clientHeight} = document.documentElement
@@ -166,7 +170,9 @@ export default {
               this.loading+=1
             }
           } 
+
         }
+      }
     },
     updatedWanted: function () {
       axios({
@@ -307,7 +313,7 @@ export default {
         });
     },
   },
-  
+
   computed: {
     isScored: function () {
       return this.score;
@@ -355,25 +361,23 @@ export default {
       this.checkWanted();
       this.checkScore();
     }
+
     setTimeout(() =>{
       document.addEventListener('scroll', this.scrollDown)
     }, 2000)
   },
   destroyed: function () {
-    document.removeEventListener('scroll',this.scrollDown)
-  }
+    document.removeEventListener("scroll", this.scrollDown);
+  },
 };
 </script>
 
 <style scoped>
-#detail {
-  color: white;
-}
 .side-card {
-  background-color: black;
+  background-color: #301b3f;
 }
 .review {
-  background-color: black;
+  background-color: #301b3f;
 }
 .backdrop-box {
   max-height: 15rem;

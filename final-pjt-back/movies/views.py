@@ -366,14 +366,17 @@ def read_popular_reviews_by_user(request, username):
 def read_recent_movies_by_user(request, username):
     person = get_object_or_404(get_user_model(), username=username)
     # 최적화
-    records = Record.objects.select_related('user').filter(user=person).prefetch_related('movie').order_by('-pk')[:20]
+    records = Record.objects.select_related('user').filter(user=person).prefetch_related('movie').order_by('-pk')
     
     recent_movies = []
     for record in records:
+        if 4 <= len(recent_movies):
+            break
         if record.score:
             recent_movies.append(record.movie)
 
     
+
     return Response(MovieListSerializer(recent_movies, many=True).data)
 
 # 유저의 가장 좋아하는(최고 평점) 영화

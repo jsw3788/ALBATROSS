@@ -1,11 +1,11 @@
 <template>
   <div>
-    <h1>인기 배우</h1>
+    <h1 class="mt-5">HOT ACTORS</h1>
     <div>
       <people-actor-list></people-actor-list>
     </div>
-
-    <h1>인기 감독</h1>
+    <hr />
+    <h1 class="mt-5">HOT DIRECTORS</h1>
     <div>
       <people-director-list></people-director-list>
     </div>

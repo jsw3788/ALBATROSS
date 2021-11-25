@@ -42,7 +42,7 @@
     </div>
     <div><button @click="deleteFile">프로필 이미지 삭제</button></div>
     <div class="d-flex justify-content-end">
-      <b-button @click="updateProfile">수정</b-button>
+      <b-button @click="[updateProfile(), close()]">수정</b-button>
     </div>
   </div>
 </template>

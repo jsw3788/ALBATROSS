@@ -2,6 +2,7 @@
   <b-container class="bv-example-row">
     <b-row class="mt-5">
       <b-col cols="4">
+      <div style="position: fixed; width: 25%">
         <span>
           <img
             :src="image"
@@ -13,7 +14,9 @@
           <p v-if="isMySelf">
             <b-button size="sm" v-b-modal.update-modal>프로필 수정</b-button>
             <b-modal id="update-modal" hide-footer hide-header>
-              <update-form></update-form>
+              <template #default="{ close }">
+                  <update-form :close="close"></update-form>
+              </template>
             </b-modal>
           </p>
         </span>
@@ -24,6 +27,8 @@
         <div v-if="!isMySelf">
           <button v-if="isfollowing" @click="follow">언팔로우</button>
           <button v-else @click="follow">팔로우</button>
+      </div>
+
         </div>
       </b-col>
       <b-col cols="8">

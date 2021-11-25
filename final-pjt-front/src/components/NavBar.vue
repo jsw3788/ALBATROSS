@@ -1,9 +1,6 @@
 <template>
-  <div id="app" style="z-index: 5">
-    <notifications group="auth_notify" />
-    <notifications group="movie_notify" />
-    <notifications group="review_notify" />
-    <div v-if="!isIndex">
+  <div id="NavBar">
+    <div>
       <b-navbar
         toggleable="lg"
         type="dark"
@@ -66,23 +63,7 @@
             </div>
           </b-navbar-nav>
 
-          <!-- Right aligned nav items -->
           <b-navbar-nav class="ml-auto">
-            <!-- <b-nav-form class="d-flex">
-              <div>
-                <b-form-input
-                  size="sm"
-                  class="mr-sm-2"
-                  placeholder="Search"
-                ></b-form-input>
-              </div>
-              <div>
-                <b-button size="sm" class="my-2 my-sm-0" type="submit"
-                  >Search</b-button
-                >
-              </div>
-            </b-nav-form> -->
-
             <div v-if="this.isLogin" class="d-flex justify-content-center">
               <div>
                 <router-link @click.native="logout" to="#">
@@ -113,40 +94,6 @@
         </b-collapse>
       </b-navbar>
     </div>
-
-    <router-view class="container" />
-
-    <div class="container fixed-bottom">
-      <footer
-        class="
-          d-flex
-          flex-wrap
-          justify-content-between
-          align-items-center
-          py-3
-          mt-4
-          border-top
-        "
-      >
-        <div class="col-md-4 d-flex align-items-center">
-          <a
-            href="/"
-            class="mb-3 me-2 mb-md-0 text-muted text-decoration-none lh-1"
-          >
-            <svg class="bi" width="30" height="24">
-              <use xlink:href="#bootstrap"></use>
-            </svg>
-          </a>
-          <span class="text-muted">© 2021 Albatross Company</span>
-        </div>
-
-        <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
-          <li class="ms-3">
-            <a class="text-muted" href="#"><i class="fab fa-gitlab"></i></a>
-          </li>
-        </ul>
-      </footer>
-    </div>
   </div>
 </template>
 
@@ -156,31 +103,18 @@ import SignupForm from "@/components/authform/SignupForm";
 import LoginForm from "@/components/authform/LoginForm";
 import { mapGetters } from "vuex";
 import { mapState } from "vuex";
-import axios from "axios";
-
 export default {
-  name: "App",
+  name: "NavBar",
   components: {
     SearchBar,
     SignupForm,
     LoginForm,
   },
-  // created: function () {
-  //   const token = localStorage.getItem("jwt");
-  //   if (token) {
-  //     this.isLogin = true;
-  //   }
-  // },
   methods: {
     logout: function () {
       this.$store.dispatch("logout");
-
-      // this.isLogin = false;
-      // localStorage.removeItem("jwt");
-      // this.$router.push({ name: "Home" });
     },
     goToMyProfile: function () {
-      // console.log(this.username)
       if (this.username) {
         this.$router.push({
           name: "Profile",
@@ -191,56 +125,6 @@ export default {
       }
     },
   },
-  created: function () {
-    axios({
-      method: "get",
-      url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/all/`,
-    }).then((res) => {
-      this.$store.dispatch("getAllMovies", res.data);
-    });
-    axios({
-      method: "get",
-      url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/score/`,
-    })
-      .then((res) => {
-        this.$store.dispatch("getScoreMovies", res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    axios({
-      method: "get",
-      url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/release_date/`,
-    })
-      .then((res) => {
-        this.$store.dispatch("getReleasedMovies", res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    axios({
-      method: "get",
-      url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/popularity/`,
-    })
-      .then((res) => {
-        this.$store.dispatch("getPopularMovies", res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    axios({
-      method: "get",
-      url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/recommend/`,
-      headers: this.$store.getters.config,
-    })
-      .then((res) => {
-        this.$store.dispatch("getRecommendMovies", res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  },
   computed: {
     ...mapGetters(["isLogin"]),
     ...mapState(["username"]),
@@ -248,22 +132,5 @@ export default {
 };
 </script>
 
-
 <style>
-@font-face {
-  font-family: "GowunDodum-Regular";
-  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2108@1.1/GowunDodum-Regular.woff")
-    format("woff");
-  font-weight: normal;
-  font-style: normal;
-}
-#app {
-  font-family: GowunDodum-Regular, Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  min-height: 100vh;
-  background-color: #3c415c;
-  color: #d5d5d5;
-}
 </style>
