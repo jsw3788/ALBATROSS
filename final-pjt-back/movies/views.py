@@ -46,7 +46,7 @@ def read_all_movies(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def read_movies_by_popularity(request):
-    movies = Movie.objects.order_by('-popularity')
+    movies = Movie.objects.order_by('-popularity')[:30]
     return Response(MovieListSerializer(movies, many=True).data)
 
 
@@ -57,7 +57,7 @@ def read_movies_by_score(request):
     # 최적화
     # DB의 정보들을 바탕으로 F를 사용하여 DB 내에서 평균평점을 처리하여 annotate를 사용해 새로운 column을 추가한 후 정렬
     movies = Movie.objects.annotate(vote_average=(F('tmdb_vote_sum') + F('updated_vote_sum')) / (
-        F('tmdb_vote_cnt') + F('updated_vote_cnt'))).order_by('-vote_average')
+        F('tmdb_vote_cnt') + F('updated_vote_cnt'))).order_by('-vote_average')[:30]
     return Response(MovieListSerializer(movies, many=True).data)
 
 
@@ -68,7 +68,7 @@ def read_movies_by_release(request):
     now = datetime.today().strftime("%Y-%m-%d")
     # release_date 데이터의 정확성에 문제가 있음
     movies = Movie.objects.filter(
-        release_date__lte=now).order_by('-release_date')
+        release_date__lte=now).order_by('-release_date')[:30]
     return Response(MovieListSerializer(movies, many=True).data)
 
 
@@ -104,7 +104,7 @@ def read_movies_by_recommend(request):
             [28, 12, 16, 35, 80, 99, 18, 10751, 14, 36, 27, 10402, 9648, 10749, 878, 10770, 53, 10752, 37])
         # 최적화
         movies = Movie.objects.prefetch_related('genres').filter(genres__tmdb_id=most_prefer_genre)
-    return Response(MovieListSerializer(movies, many=True).data)
+    return Response(MovieListSerializer(movies[:30], many=True).data)
 
 
 # 영화인 데이터 조회
@@ -595,7 +595,9 @@ def get_genre(request):
 @permission_classes([AllowAny])
 def get_movies(request):
     API_KEY = config('API_KEY')
-    for page in range(1, 4):
+    # 가져오고 싶은 데이터 양을 조절합니다
+    # 한 페이지당 20개의 영화정보가 담깁니다.
+    for page in range(1, 51):
         URL = f'https://api.themoviedb.org/3/movie/popular?api_key={API_KEY}&language=ko-KR&page={page}&region=KR'
         request = requests.get(URL).json()
         for tmdb_data in request.get('results'):
@@ -606,7 +608,6 @@ def get_movies(request):
                 movie.tmdb_vote_sum = tmdb_data.get(
                     'vote_average') * tmdb_data.get('vote_count')
                 movie.tmdb_vote_cnt = tmdb_data.get('vote_count')
-                # movie.release_status = tmdb_data.get('release_status')
                 movie.save()
             else:
             
@@ -623,7 +624,6 @@ def get_movies(request):
                     overview=tmdb_data.get('overview'),
                     poster_path=f'https://image.tmdb.org/t/p/w500{tmdb_data.get("poster_path")}',
                     backdrop_path=f'https://image.tmdb.org/t/p/original{tmdb_data.get("backdrop_path")}',
-                    # release_status=detail_status
                 )
                 for genre_id in tmdb_data.get('genre_ids'):
                     genre = Genre.objects.get(tmdb_id=genre_id)
@@ -651,13 +651,14 @@ def get_credits(request):
                 actor = get_object_or_404(Actor, actor_id=tmdb_id)
                 actor.movies.add(movie)
                 continue
-            ppl_URL = f'https://api.themoviedb.org/3/person/{tmdb_id}?api_key={API_KEY}&language=ko-KR'
-            actor_popularity = requests.get(ppl_URL).json().get('popularity')
+            
+            # ppl_URL = f'https://api.themoviedb.org/3/person/{tmdb_id}?api_key={API_KEY}&language=ko-KR'
+            # actor_popularity = requests.get(ppl_URL).json().get('popularity')
             new_actor = Actor.objects.create(
                 actor_id=tmdb_id,
                 name=actor.get("name"),
                 profile_path=f'https://image.tmdb.org/t/p/w500{actor.get("profile_path")}',
-                popularity=actor_popularity,
+                popularity=actor.get("popularity"),
             )
             new_actor.movies.add(movie)
 
@@ -670,14 +671,13 @@ def get_credits(request):
                 director = get_object_or_404(Director, director_id=tmdb_id)
                 director.movies.add(movie)
                 continue
-            ppl_URL = f'https://api.themoviedb.org/3/person/{tmdb_id}?api_key={API_KEY}&language=ko-KR'
-            director_popularity = requests.get(
-                ppl_URL).json().get('popularity')
+            # ppl_URL = f'https://api.themoviedb.org/3/person/{tmdb_id}?api_key={API_KEY}&language=ko-KR'
+            # director_popularity = requests.get(ppl_URL).json().get('popularity')
             new_director = Director.objects.create(
                 director_id=tmdb_id,
                 name=crew.get("name"),
                 profile_path=f'https://image.tmdb.org/t/p/w500{crew.get("profile_path")}',
-                popularity=director_popularity,
+                popularity=director.get("popularity"),
             )
             new_director.movies.add(movie)
     return Response({'database': '성공!'}, status=status.HTTP_201_CREATED)

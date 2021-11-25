@@ -30,6 +30,7 @@ def signup(request):
 
         user.set_password(request.data.get('password'))
         user.save()
+        print(user.profile_image)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
@@ -73,13 +74,21 @@ def profile(request, username):
 
         if request.user.username != request.data.get('username') and get_user_model().objects.filter(username=request.data.get('username')).exists():
             return Response({'error':'이미 존재하는 사용자 이름 입니다.'},status=status.HTTP_400_BAD_REQUEST)
+        
+        # 프로필 이미지 삭제
+        if not profile_image:
+            user=request.user
+            user.profile_image.delete()
+            user.username=username
+            user.profile_image='default.png'
+            user.save()
+            profile_image = user.profile_image
         context={
             'username': username,
             'profile_image': profile_image,
             'password': password,
         }
         serializer = UserProfileUpdateSerializer(request.user, data=context)
-        
         if serializer.is_valid(raise_exception=True):
             user = serializer.save(profile_image=profile_image)
             
