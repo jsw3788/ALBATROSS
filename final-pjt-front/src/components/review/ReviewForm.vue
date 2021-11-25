@@ -7,6 +7,7 @@
         class="mx-3"
         @keyup.enter="writeReview"
         style="width: 100%"
+        :disabled="isLogin == false"
       />
       <input
         type="checkbox"
@@ -24,7 +25,8 @@
 
 <script>
 import axios from "axios";
-import { mapState } from "vuex";
+import { mapGetters, mapState } from "vuex";
+import Vue from "vue";
 
 export default {
   name: "ReviewForm",
@@ -54,13 +56,20 @@ export default {
           this.newReview = null;
           this.newReviewSpoil = false;
         })
-        .catch((err) => {
-          console.log(err);
+        .catch(() => {
+          Vue.notify({
+            group: "review_notify",
+            title: "멈춰!",
+            text: "리뷰 작성을 위해 로그인이 필요합니다.",
+            type: "warn",
+            closeOnClick: true,
+          });
         });
     },
   },
   computed: {
     ...mapState(["username", "profileImg"]),
+    ...mapGetters(["isLogin"]),
   },
 };
 </script>

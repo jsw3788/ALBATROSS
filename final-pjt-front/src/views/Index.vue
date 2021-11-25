@@ -14,6 +14,7 @@
 <script src="anime.min.js"></script>
 <script>
 import anime from "animejs/lib/anime.es.js";
+import { mapActions } from "vuex";
 
 export default {
   name: "Index",
@@ -22,55 +23,15 @@ export default {
       isIndex: true,
     };
   },
-  created: function () {
-    axios({
-      method: "get",
-      url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/all/`,
-    }).then((res) => {
-      this.$store.dispatch("getAllMovies", res.data);
-    });
-    axios({
-      method: "get",
-      url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/score/`,
-    })
-      .then((res) => {
-        this.$store.dispatch("getScoreMovies", res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    axios({
-      method: "get",
-      url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/release_date/`,
-    })
-      .then((res) => {
-        this.$store.dispatch("getReleasedMovies", res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    axios({
-      method: "get",
-      url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/popularity/`,
-    })
-      .then((res) => {
-        this.$store.dispatch("getPopularMovies", res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    axios({
-      method: "get",
-      url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/recommend/`,
-      headers: this.$store.getters.config,
-    })
-      .then((res) => {
-        this.$store.dispatch("getRecommendMovies", res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+  created: {
+    ...mapActions([
+      "getAllMovies",
+      "getScoreMovies",
+      "getReleasedMovies",
+      "getPopularMovies",
+      "getRecommendMovies",
+      "getPeople",
+    ]),
   },
   mounted: function () {
     setTimeout(() => {
@@ -99,11 +60,9 @@ export default {
           delay: 1000,
         });
 
-      setTimeout(() => {
-        this.$router.push({ name: "Home" });
-        this.isIndex = false;
-        this.$emit("goHome", isIndex);
-      }, 3000);
+      // setTimeout(() => {
+      //   this.$router.push({ name: "Home" });
+      // }, 3000);
     }, 1000);
   },
 };

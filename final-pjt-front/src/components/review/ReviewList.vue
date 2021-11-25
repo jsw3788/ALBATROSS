@@ -110,7 +110,10 @@
               ></review-comment>
             </div>
             <!-- comment form -->
-            <div class="text-end my-2">
+            <div class="text-end my-2" v-if="letWrite">
+              <div class="text-start">
+                <button @click="clickWrite">접기</button>
+              </div>
               <input
                 type="text"
                 v-model.trim="newComment"
@@ -129,6 +132,9 @@
               <b-icon-pencil-square
                 @click="writeComment"
               ></b-icon-pencil-square>
+            </div>
+            <div v-else class="text-start">
+              <button @click="clickWrite">댓글 쓰기</button>
             </div>
           </b-col>
         </b-row>
@@ -170,6 +176,7 @@ export default {
       likeCnt: null,
       dislikeCnt: null,
       commentCnt: null,
+      letWrite: false,
     };
   },
   props: {
@@ -265,10 +272,20 @@ export default {
           this.comments.push(res.data);
           this.newComment = null;
           this.commentCnt += 1;
+          this.newCommentSpoil = false;
         })
-        .catch((err) => {
-          console.log(err);
+        .catch(() => {
+          Vue.notify({
+            group: "review_notify",
+            title: "멈춰!",
+            text: "댓글 작성을 위해 로그인이 필요합니다.",
+            type: "warn",
+            closeOnClick: true,
+          });
         });
+    },
+    clickWrite: function () {
+      this.letWrite = !this.letWrite;
     },
     updateComment: function (updatedcomment, beforecomment) {
       this.comments = this.comments.map((comment) => {

@@ -23,7 +23,10 @@
               class="poster-img"
               style="width: 100%"
             />
-            <p class="poster-text">{{ movie.title }}</p>
+            <div class="poster-text text-start">
+              <p>{{ movie.title }}</p>
+              <p>{{ movie.popularity }}</p>
+            </div>
           </div>
         </slide>
       </carousel>
@@ -79,7 +82,18 @@
               class="poster-img"
               style="width: 100%"
             />
-            <p class="poster-text">{{ movie.title }}</p>
+            <div class="poster-text text-start">
+              <p>{{ movie.title }}</p>
+              <p>
+                {{
+                  (
+                    (movie.tmdb_vote_sum + movie.updated_vote_sum) /
+                    (movie.tmdb_vote_cnt + movie.updated_vote_cnt) /
+                    2
+                  ).toFixed(2)
+                }}
+              </p>
+            </div>
           </div>
         </slide>
       </carousel>
@@ -107,7 +121,10 @@
               class="poster-img"
               style="width: 100%"
             />
-            <p class="poster-text">{{ movie.title }}</p>
+            <div class="poster-text text-start">
+              <p>{{ movie.title }}</p>
+              <p>{{ movie.release_date }}</p>
+            </div>
           </div>
         </slide>
       </carousel>
