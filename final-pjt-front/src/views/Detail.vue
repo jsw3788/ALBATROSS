@@ -210,7 +210,7 @@ export default {
 
     addReview: function (review) {
       // console.log(review);
-      this.reviews.push(review);
+      this.reviews.unshift(review);
     },
     updateReview: function (updatedreview, beforereview) {
       this.reviews = this.reviews.map((review) => {
@@ -331,7 +331,7 @@ export default {
         this.movie = res.data;
         if (this.movie.updated_vote_cnt + this.movie.tmdb_vote_cnt) {
           this.movieRate =
-            (this.movie.tmdb_vote_sum + this.movie.updated_vote_sum) /
+            (this.movie.tmdb_vote_sum + 2*this.movie.updated_vote_sum) /
             (this.movie.tmdb_vote_cnt + this.movie.updated_vote_cnt) /
             2;
           this.movieRate = this.movieRate.toFixed(2);
@@ -351,8 +351,10 @@ export default {
       .then((res) => {
         this.possiblePageNum = res.data.pop()["last_page"];
         this.reviews = res.data;
-        let sortedreviews = _.sortBy(this.reviews, function(review) {return review.like_users.length-review.dislike_users.length })
-        console.log(sortedreviews)
+        let sortedreviews = _.sortBy(this.reviews, function (review) {
+          return review.like_users.length - review.dislike_users.length;
+        });
+        console.log(sortedreviews);
       })
       .catch((err) => {
         console.log(err);
@@ -376,7 +378,6 @@ export default {
 <style scoped>
 .side-card,
 .review {
-
   background-color: #090910;
 }
 .backdrop-box {
@@ -384,5 +385,4 @@ export default {
   overflow: hidden;
   margin-bottom: 1rem;
 }
-
 </style>

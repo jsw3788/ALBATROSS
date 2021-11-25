@@ -10,7 +10,7 @@
               ><img
                 :src="image"
                 alt="profile"
-                style="width: 20%; border-radius: 50%"
+                style="width: 40px; border-radius: 50%"
                 class="me-2"
             /></span>
             <span @click="goProfile">{{ review.user.username }}</span>
@@ -118,7 +118,7 @@
             <!-- comment form -->
             <div class="text-end my-2" v-if="letWrite">
               <div class="text-start">
-                <button @click="clickWrite">접기</button>
+                <b-button @click="clickWrite">접기</b-button>
               </div>
               <input
                 type="text"
@@ -140,7 +140,7 @@
               ></b-icon-pencil-square>
             </div>
             <div v-else class="text-start">
-              <button @click="clickWrite">댓글 쓰기</button>
+              <b-button @click="clickWrite">댓글 쓰기</b-button>
             </div>
           </b-col>
         </b-row>

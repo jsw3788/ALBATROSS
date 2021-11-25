@@ -87,7 +87,7 @@
               <p>
                 {{
                   (
-                    (movie.tmdb_vote_sum + movie.updated_vote_sum) /
+                    (movie.tmdb_vote_sum + 2 * movie.updated_vote_sum) /
                     (movie.tmdb_vote_cnt + movie.updated_vote_cnt) /
                     2
                   ).toFixed(2)
