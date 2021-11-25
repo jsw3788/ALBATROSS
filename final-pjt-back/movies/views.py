@@ -405,7 +405,7 @@ def review_list(request, movie_pk):
         # reviews = Review.objects.filter(movie__pk=movie_pk)
         
         # 최적화
-        reviews = Review.objects.select_related('user').prefetch_related('like_users').prefetch_related('dislike_users').filter(movie__pk=movie_pk)
+        reviews = Review.objects.select_related('user').prefetch_related('like_users').prefetch_related('dislike_users').filter(movie__pk=movie_pk).order_by('-created_at')
         # paginator
         paginator = Paginator(reviews, 5)
 

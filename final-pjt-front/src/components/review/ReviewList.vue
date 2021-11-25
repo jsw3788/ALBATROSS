@@ -10,7 +10,7 @@
               ><img
                 :src="image"
                 alt="profile"
-                style="width: 20%; border-radius: 50%"
+                style="width: 40px; border-radius: 50%"
                 class="me-2"
             /></span>
             <span @click="goProfile">{{ review.user.username }}</span>

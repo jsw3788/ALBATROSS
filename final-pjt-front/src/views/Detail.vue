@@ -210,7 +210,7 @@ export default {
 
     addReview: function (review) {
       // console.log(review);
-      this.reviews.push(review);
+      this.reviews.unshift(review);
     },
     updateReview: function (updatedreview, beforereview) {
       this.reviews = this.reviews.map((review) => {
