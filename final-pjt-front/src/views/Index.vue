@@ -17,11 +17,6 @@ import anime from "animejs/lib/anime.es.js";
 
 export default {
   name: "Index",
-  data: function () {
-    return {
-      isIndex: true,
-    };
-  },
   mounted: function () {
     setTimeout(() => {
       // anime
@@ -48,7 +43,7 @@ export default {
           easing: "easeOutExpo",
           delay: 1000,
         });
-
+        
       // setTimeout(() => {
       //   this.$router.push({ name: "Home" });
       // }, 3000);

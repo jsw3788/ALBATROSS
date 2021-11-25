@@ -73,11 +73,13 @@ export default {
       
       this.profileImg = `${process.env.VUE_APP_SERVER_URL}/media/`+'default.png';
       let profileData = new FormData();
-      profileData.append("username", this.profileImg);
+      profileData.append("profileImg", this.profileImg);
       profileData.append("username", this.updateUsername);
       profileData.append("password", this.password);
       profileData.append("passwordConfirmation", this.passwordConfirmation);
       this.$store.dispatch("setProfileImg", profileData);
+      this.$store.dispatch("setUsername", this.username)
+
     },
     updateProfile: function () {
       // console.log(this.updateUsername);
@@ -89,6 +91,7 @@ export default {
       profileData.append("password", this.password);
       profileData.append("passwordConfirmation", this.passwordConfirmation);
       this.$store.dispatch("setProfileImg", profileData);
+      this.$store.dispatch("setUsername", this.username)
     },
   },
   computed: {

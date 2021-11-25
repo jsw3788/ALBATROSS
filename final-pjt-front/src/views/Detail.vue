@@ -116,6 +116,7 @@ import axios from "axios";
 import ReviewForm from "@/components/review/ReviewForm";
 import ReviewList from "@/components/review/ReviewList";
 import { mapGetters } from "vuex";
+import _ from "lodash";
 
 export default {
   name: "Detail",
@@ -325,12 +326,9 @@ export default {
     axios({
       method: "get",
       url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/detail/${this.$route.params.movie_id}`,
-      // headers: this.$store.getters.config,
     })
       .then((res) => {
-        // console.log(res);
         this.movie = res.data;
-        // console.log(this.movie);
         if (this.movie.updated_vote_cnt + this.movie.tmdb_vote_cnt) {
           this.movieRate =
             (this.movie.tmdb_vote_sum + this.movie.updated_vote_sum) /
@@ -348,11 +346,13 @@ export default {
     axios({
       method: "get",
       url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/${this.$route.params.movie_id}/reviews/`,
-      headers: this.$store.getters.config,
+      // headers: this.$store.getters.config,
     })
       .then((res) => {
         this.possiblePageNum = res.data.pop()["last_page"];
         this.reviews = res.data;
+        let sortedreviews = _.sortBy(this.reviews, function(review) {return review.like_users.length-review.dislike_users.length })
+        console.log(sortedreviews)
       })
       .catch((err) => {
         console.log(err);
@@ -376,8 +376,7 @@ export default {
 <style scoped>
 .side-card,
 .review {
-  /* background-color: #2c272e; */
-  /* background-color: #181d31; */
+
   background-color: #090910;
 }
 .backdrop-box {
@@ -385,12 +384,5 @@ export default {
   overflow: hidden;
   margin-bottom: 1rem;
 }
-.backdrop {
-  /* max-height: initial;
-  filter: blur(5px);
-  -webkit-filter: blur(5px);
-  -moz-filter: blur(5px);
-  -o-filter: blur(5px);
-  -ms-filter: blur(5px); */
-}
+
 </style>

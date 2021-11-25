@@ -83,7 +83,9 @@ def profile(request, username):
             user.profile_image='default.png'
             user.save()
             profile_image = user.profile_image
+        
         context={
+            'following': False,
             'username': username,
             'profile_image': profile_image,
             'password': password,
@@ -124,7 +126,8 @@ def follow(request, username):
         else:
             following = True
             me.followings.add(you)
-
+    else:
+        return Response({'error':'자기자신을 팔로우 할 수 업습니다.'},status=status.HTTP_403_FORBIDDEN)
     context = {
         'following': following,
         'followingCnt' : you.followings.count(),

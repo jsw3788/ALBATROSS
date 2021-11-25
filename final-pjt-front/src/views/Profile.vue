@@ -87,7 +87,7 @@ import axios from "axios";
 import ProfileMovieItem from "@/components/profile/ProfileMovieItem";
 import ProfileReviewItem from "@/components/profile/ProfileReviewItem";
 import UpdateForm from "@/components/authform/UpdateForm";
-import { mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 
 export default {
   name: "Profile",
@@ -145,7 +145,6 @@ export default {
     axios({
       method: "get",
       url: `http://127.0.0.1:8000/api/v1/${this.$route.params.username}/movies/favorite/`,
-      // headers: this.setToken(),
     })
       .then((res) => {
         this.favorite_movies = res.data;
@@ -156,11 +155,8 @@ export default {
     axios({
       method: "get",
       url: `http://127.0.0.1:8000/api/v1/${this.$route.params.username}/movies/recent/`,
-      // headers: this.setToken(),
     })
       .then((res) => {
-        // console.log('recent_movies')
-        // console.log(res)
         this.recent_movies = res.data;
       })
       .catch((err) => {
@@ -170,7 +166,6 @@ export default {
       method: "get",
 
       url: `http://127.0.0.1:8000/api/v1/${this.$route.params.username}/reviews/popular/`,
-      // headers: this.setToken(),
     })
       .then((res) => {
         this.popular_reviews = res.data;
@@ -183,7 +178,6 @@ export default {
       method: "get",
 
       url: `http://127.0.0.1:8000/api/v1/${this.$route.params.username}/reviews/recent/`,
-      // headers: this.setToken(),
     })
       .then((res) => {
         this.recent_reviews = res.data;
@@ -194,12 +188,14 @@ export default {
   },
   computed: {
     isMySelf: function () {
-      if (this.person != localStorage.getItem("username")) {
+      // if (this.person != localStorage.getItem("username")) {
+      if (this.person != this.username) {
         return false;
       } else {
         return true;
       }
     },
+    ...mapState(["username"]),
     ...mapGetters(["config"]),
   },
 };
