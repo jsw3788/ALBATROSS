@@ -18,11 +18,13 @@ def signup(request):
     password = request.data.get('password')
     password_confirmation = request.data.get('passwordConfirmation')
 
+    if get_user_model().objects.filter(username=request.data.get('username')).exists():
+        return Response({'error':'이미 존재하는 사용자 이름 입니다.'},status=status.HTTP_400_BAD_REQUEST)
+
     if password != password_confirmation:
         return Response({'error' : '비밀번호가 일치하지 않습니다.'}, status=status.HTTP_400_BAD_REQUEST)
     
     serializer = UserSerializer(data=request.data)
-
     if serializer.is_valid(raise_exception=True):
         user = serializer.save()
 
@@ -36,7 +38,7 @@ def signup(request):
 @permission_classes([IsAuthenticated])
 # @permission_classes([AllowAny])
 def profile(request, username):
-    # 회원 정보 조회 -> JsonResponse로 바꾸기
+    # 회원 정보 조회 
     def profile_detail():
         person=get_object_or_404(get_user_model(), username=username)
         user=request.user
@@ -62,11 +64,22 @@ def profile(request, username):
 
     # 회원 정보 수정 (프로필 이미지)
     def update_profile(request):
-        profile_image = request.data.get('profileImg')
+        username= request.data.get('username')
+        profile_image=request.data.get('profileImg')
+        password=request.data.get('password')
+        passwordConfirm=request.data.get('passwordConfirmation')
+        if password!=passwordConfirm:
+            return Response({'error' : '비밀번호가 일치하지 않습니다.'}, status=status.HTTP_400_BAD_REQUEST)
+
         if request.user.username != request.data.get('username') and get_user_model().objects.filter(username=request.data.get('username')).exists():
             return Response({'error':'이미 존재하는 사용자 이름 입니다.'},status=status.HTTP_400_BAD_REQUEST)
-        serializer = UserProfileUpdateSerializer(request.user, data=request.data)
-        print('체크')
+        context={
+            'username': username,
+            'profile_image': profile_image,
+            'password': password,
+        }
+        serializer = UserProfileUpdateSerializer(request.user, data=context)
+        
         if serializer.is_valid(raise_exception=True):
             print('체크2')
             serializer.save(profile_image=profile_image)

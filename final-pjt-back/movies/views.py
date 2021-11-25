@@ -360,21 +360,26 @@ def read_popular_reviews_by_user(request, username):
         return Response({'error': '본 영화가 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
 
 
-# 유저의 최신 리뷰 영화
+# 유저가 최근 평점을 매긴 영화
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def read_recent_movies_by_user(request, username):
     person = get_object_or_404(get_user_model(), username=username)
-    recent_reviews = Review.objects.select_related('user').filter(user=person).prefetch_related('movie').order_by('-updated_at')
+    # 최적화
+    records = Record.objects.select_related('user').filter(user=person).prefetch_related('movie').order_by('-pk')
     
-    recent_movies = set()
-    for review in recent_reviews:
+    recent_movies = []
+    for record in records:
         if 4 <= len(recent_movies):
             break
-        recent_movies.add(review.movie)
+        if record.score:
+            recent_movies.append(record.movie)
+
+    
+
     return Response(MovieListSerializer(recent_movies, many=True).data)
 
-# 유저의 최고 평점 영화
+# 유저의 가장 좋아하는(최고 평점) 영화
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def read_favorite_movies_by_user(request, username):

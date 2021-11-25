@@ -127,7 +127,9 @@ export default {
       score: null,
       movieRate: null,
       pageNum: 2,
-      possiblePageNum: 2,
+      possiblePageNum:2,
+      loading: 2,
+
 
       rating: "No Rating Selected",
       currentRating: "평점을 매겨주세요",
@@ -138,25 +140,37 @@ export default {
     // 인피니티 스크롤
     getMoreReviews: function () {
       axios({
-        method: "get",
-        url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/${this.movie.id}/reviews/`,
-        headers: this.$store.getters.config,
-        params: {
-          page: this.pageNum,
-        },
-      }).then((res) => {
-        const newreviews = res.data;
-        this.reviews.push(...newreviews);
+
+            method: 'get',
+            url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/${this.movie.id}/reviews/`,
+            headers: this.$store.getters.config,
+            params: {
+              page: this.pageNum,
+            },
+          })
+          .then((res) =>{
+            
+            this.possiblePageNum = res.data.pop()['last_page']
+            const newreviews = res.data
+            this.reviews.push(...newreviews)
+            
+            this.pageNum += 1
+          }).catch((err)=>
+          console.log(err))
 
         this.pageNum += 1;
       });
     },
     scrollDown: function () {
-      const { scrollHeight, scrollTop, clientHeight } =
-        document.documentElement;
-      if (scrollHeight - Math.round(scrollTop) <= clientHeight) {
-        if (this.pageNum <= this.possiblePageNum) {
-          this.getMoreReviews();
+        const { scrollHeight, scrollTop, clientHeight} = document.documentElement
+        if (scrollHeight - Math.round(scrollTop) <= clientHeight) {
+          if (this.pageNum <= this.possiblePageNum) {
+            if(this.loading == this.pageNum){
+              this.getMoreReviews()
+              this.loading+=1
+            }
+          } 
+
         }
       }
     },
@@ -347,7 +361,10 @@ export default {
       this.checkWanted();
       this.checkScore();
     }
-    document.addEventListener("scroll", this.scrollDown);
+
+    setTimeout(() =>{
+      document.addEventListener('scroll', this.scrollDown)
+    }, 2000)
   },
   destroyed: function () {
     document.removeEventListener("scroll", this.scrollDown);

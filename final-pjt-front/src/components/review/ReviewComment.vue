@@ -88,7 +88,8 @@ export default {
           content: this.updatedcontent,
         };
         this.$emit("update-comment", updatedcomment, this.comment);
-      });
+      }).catch((err) =>
+      console.log(err));
     },
     deleteComment: function () {
       const delComment = this.comment;
@@ -98,7 +99,7 @@ export default {
         headers: this.$store.getters.config,
       }).then(() => {
         this.$emit("delete-comment", delComment);
-      });
+      }).catch((err) => console.log(err));
     },
     humanize: function (now, date) {
       const moment = require("moment");
