@@ -55,13 +55,11 @@ export default {
         // const pattern = ""
 
         this.result = fuse.search(this.pattern);
-        console.log(this.result);
         this.$router.push({
           name: "SearchResult",
           params: { keyword: this.pattern, result: this.result },
         });
       } else {
-        console.log("메롱");
         this.$router.push({
           name: "Home",
         });

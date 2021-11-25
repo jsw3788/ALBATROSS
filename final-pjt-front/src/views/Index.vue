@@ -17,11 +17,6 @@ import anime from "animejs/lib/anime.es.js";
 
 export default {
   name: "Index",
-  data: function () {
-    return {
-      isIndex: true,
-    };
-  },
   created: function () {
     axios({
       method: "get",
@@ -101,8 +96,6 @@ export default {
 
       setTimeout(() => {
         this.$router.push({ name: "Home" });
-        this.isIndex = false;
-        this.$emit("goHome", isIndex);
       }, 3000);
     }, 1000);
   },

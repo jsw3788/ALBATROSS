@@ -45,11 +45,9 @@ export default new Vuex.Store({
     },
     GET_ACTORLIST: function (state, res) {
       state.actors = res.data
-      // console.log(state.actors)
     },
     GET_DIRECTORLIST: function (state, res) {
       state.directors = res.data
-      // console.log(state.directors)
     },
     SET_USERNAME: function (state, username) {
       localStorage.setItem("username", username);
@@ -58,6 +56,10 @@ export default new Vuex.Store({
     SET_PROFILE_IMG: function (state, profileImg) {
       localStorage.setItem("profile_path", profileImg)
       state.profileImg = profileImg
+    },
+    EXP_PROFILE_IMG: function (state, profileImg) {
+      localStorage.removeItem("profile_path", profileImg)
+      state.profileImg = null
     },
     EXP_USERNAME: function (state) {
       localStorage.removeItem("username")
@@ -95,7 +97,6 @@ export default new Vuex.Store({
       commit('SET_USERNAME', username)
     },
     setProfileImg: function ({ commit, state }, credit) {
-      console.log(credit)
       axios({
         method: "put",
         url: `http://127.0.0.1:8000/api/v2/${state.username}/profile/`,

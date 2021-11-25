@@ -239,7 +239,6 @@ export default {
         .catch((err) => console.log(err));
     },
     deleteReview: function () {
-      console.log(this.username);
       const delReview = this.review;
       axios({
         method: "delete",
@@ -311,10 +310,8 @@ export default {
     axios({
       method: "get",
       url: `${process.env.VUE_APP_SERVER_URL}/api/v1/reviews/${this.review.id}/`,
-      headers: this.$store.getters.config,
     })
       .then((res) => {
-        // console.log(this.isLogin);
         this.isLiked = res.data.isLiked;
         this.isDisliked = res.data.isDisliked;
         this.likeCnt = res.data.likeCnt;
@@ -328,10 +325,8 @@ export default {
     axios({
       method: "get",
       url: `${process.env.VUE_APP_SERVER_URL}/api/v1/reviews/${this.review.id}/comments`,
-      headers: this.$store.getters.config,
     })
       .then((res) => {
-        // console.log(res);
         this.comments = res.data;
       })
       .catch((err) => {

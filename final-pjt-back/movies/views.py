@@ -75,9 +75,9 @@ def read_movies_by_release(request):
 
 # 추천 알고리즘
 @api_view(['GET'])
-@authentication_classes([JSONWebTokenAuthentication])
-@permission_classes([IsAuthenticated])
-# @permission_classes([AllowAny])
+# @authentication_classes([JSONWebTokenAuthentication])
+# @permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def read_movies_by_recommend(request):
     # 구버전
     # my_genre = Recommend.objects.filter(user__pk=request.user.pk)
@@ -91,19 +91,19 @@ def read_movies_by_recommend(request):
             most_prefer_point = genre.score
             most_prefer_genre = Genre.objects.get(pk=genre.genre_id).tmdb_id
     
-    # 가장 좋아하는 장르를 못찾으면 랜덤 
+    # 평점을 매기지 않았으면 랜덤 
     if most_prefer_genre == 0:
         most_prefer_genre = choice(
             [28, 12, 16, 35, 80, 99, 18, 10751, 14, 36, 27, 10402, 9648, 10749, 878, 10770, 53, 10752, 37])
     # 최적화
-    movies = Movie.objects.prefetch_related('genres').filter(genres__tmdb_id=most_prefer_genre)
+    movies = Movie.objects.prefetch_related('genres').filter(genres__tmdb_id=most_prefer_genre).order_by('-popularity')
     
     # 해당하는 장르의 영화가 하나도 없으면 다시 뽑기
     while not movies:
         most_prefer_genre = choice(
             [28, 12, 16, 35, 80, 99, 18, 10751, 14, 36, 27, 10402, 9648, 10749, 878, 10770, 53, 10752, 37])
         # 최적화
-        movies = Movie.objects.prefetch_related('genres').filter(genres__tmdb_id=most_prefer_genre)
+        movies = Movie.objects.prefetch_related('genres').filter(genres__tmdb_id=most_prefer_genre).order_by('-popularity')
     return Response(MovieListSerializer(movies[:30], many=True).data)
 
 
@@ -346,14 +346,14 @@ def read_popular_reviews_by_user(request, username):
     if person:
         reviews = []
         # my_reviews = person.reviews.all()
-        my_reviews = Review.objects.annotate(like_count=Count('like_users')).select_related('user').prefetch_related('like_users').prefetch_related('dislike_users').filter(user=person)
+        my_reviews = Review.objects.annotate(like_count=Count('like_users'), dislike_count=Count('dislike_users')).select_related('user').prefetch_related('like_users').prefetch_related('dislike_users').filter(user=person)
         for review in my_reviews:
             # reviews.append((review.like_users.count(), review))
-            reviews.append((review.like_count, review))
-        # 좋아요 순 정렬
-        sorted_reviews = sorted(reviews, key=lambda x: x[0])[:3]
+            reviews.append((review.like_count, review.dislike_count, review))
+        # (좋아요 - 싫어요) 순 정렬
+        sorted_reviews = sorted(reviews, key=lambda x: x[0]-x[1], reverse=True)[:3]
         popular_reviews = []
-        for cnt, review in sorted_reviews:
+        for like, dislike, review in sorted_reviews:
             popular_reviews.append(review)
         return Response(ReviewListSerializer(popular_reviews, many=True).data)
     else:
@@ -451,9 +451,10 @@ def review_detail(request, review_pk):
         context={
             'isLiked': isLiked,
             'isDisliked': isDisiked,
+            # 구버전
             # 'likeCnt' : review.like_users.count(),
-            'likeCnt' : review.like_count,
             # 'dislikeCnt' : review.dislike_users.count(),
+            'likeCnt' : review.like_count,
             'dislikeCnt' : review.dislike_count,
             'commentCnt' : review.comments.count(),
         }
@@ -474,7 +475,7 @@ def review_detail(request, review_pk):
             review.delete()
             return Response({'delete': f'{review_pk}번 리뷰가 삭제되었습니다.'}, status=status.HTTP_204_NO_CONTENT)
 
-    return Response({'Unauthorized': '권한이 없습니다.'}, status=status.HTTP_403_FORBIDDEN)
+    return Response({'Unauthorized': '권한이 없습니다.'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 # 리뷰 좋아요
