@@ -1,7 +1,7 @@
 <template>
   <div id="MovieList">
     <div>
-      <h4 class="mt-5">인기영화</h4>
+      <p class="text-start mt-5 fw-bold fs-4">인기영화</p>
       <carousel
         :loop="true"
         :navigationClickTargetSize="25"
@@ -32,7 +32,7 @@
       </carousel>
     </div>
     <div v-if="isLogin">
-      <h4 class="mt-5">추천영화</h4>
+      <p class="text-start mt-5 fw-bold fs-4">추천영화</p>
       <carousel
         :loop="true"
         :navigationClickTargetSize="25"
@@ -60,7 +60,7 @@
       </carousel>
     </div>
     <div>
-      <h4 class="mt-5">평점이 높은 영화</h4>
+      <p class="text-start mt-5 fw-bold fs-4">명작영화</p>
       <carousel
         :loop="true"
         :navigationClickTargetSize="25"
@@ -99,7 +99,7 @@
       </carousel>
     </div>
     <div>
-      <h4 class="mt-5">최신영화</h4>
+      <p class="text-start mt-5 fw-bold fs-4">최신영화</p>
       <carousel
         :loop="true"
         :navigationClickTargetSize="25"

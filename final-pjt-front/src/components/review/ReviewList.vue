@@ -4,9 +4,15 @@
     <!-- 댓글 -->
     <div v-if="!review.is_spoiled">
       <div class="py-3 px-5">
-        <div class="d-flex justify-content-between mb-2">
-          <div>
-            <span> 작성자 : </span>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <div class="text-start">
+            <span
+              ><img
+                :src="image"
+                alt="profile"
+                style="width: 20%; border-radius: 50%"
+                class="me-2"
+            /></span>
             <span @click="goProfile">{{ review.user.username }}</span>
           </div>
           <div class="d-flex">
@@ -177,6 +183,8 @@ export default {
       dislikeCnt: null,
       commentCnt: null,
       letWrite: false,
+      image:
+        `${process.env.VUE_APP_SERVER_URL}` + this.review.user.profile_image,
     };
   },
   props: {

@@ -14,7 +14,6 @@
 <script src="anime.min.js"></script>
 <script>
 import anime from "animejs/lib/anime.es.js";
-import { mapActions } from "vuex";
 
 export default {
   name: "Index",
@@ -22,16 +21,6 @@ export default {
     return {
       isIndex: true,
     };
-  },
-  created: {
-    ...mapActions([
-      "getAllMovies",
-      "getScoreMovies",
-      "getReleasedMovies",
-      "getPopularMovies",
-      "getRecommendMovies",
-      "getPeople",
-    ]),
   },
   mounted: function () {
     setTimeout(() => {

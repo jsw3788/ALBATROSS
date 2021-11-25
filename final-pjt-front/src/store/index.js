@@ -143,18 +143,8 @@ export default new Vuex.Store({
           console.log(err);
         });
     },
-    getRecommendMovies: function ({ commit }) {
-      axios({
-        method: "get",
-        url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/recommend/`,
-        headers: this.$store.getters.config,
-      })
-        .then((res) => {
-          commit('GET_RECOMMEND_MOVIE_LIST', res.data)
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+    getRecommendMovies: function ({ commit }, data) {
+      commit('GET_RECOMMEND_MOVIE_LIST', data)
     },
     getReleasedMovies: function ({ commit }) {
       axios({
