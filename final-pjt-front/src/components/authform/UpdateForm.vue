@@ -1,5 +1,6 @@
 <template>
   <div id="update">
+    
     <h3>회원정보 수정</h3>
     <hr />
     <div class="mb-3">
@@ -40,9 +41,9 @@
         accept="image/*"
       />
     </div>
-    <div><button @click="deleteFile">프로필 이미지 삭제</button></div>
+    <div><b-button @click="deleteFile">프로필 이미지 삭제</b-button></div>
     <div class="d-flex justify-content-end">
-      <b-button @click="[updateProfile(), close()]">수정</b-button>
+      <b-button @click="updateProfile()">수정</b-button>
     </div>
   </div>
 </template>
@@ -60,7 +61,7 @@ export default {
       updateUsername: this.username,
       password: null,
       passwordConfirmation: null,
-      profileImg: null,
+      profileImg: this.profileImg,
     };
   },
   methods: {
@@ -84,7 +85,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(["username"]),
+    ...mapState(["username, profileImg"]),
     ...mapGetters(["config"]),
   },
 };
