@@ -1,13 +1,15 @@
 <template>
   <b-container class="bv-example-row">
-    <b-row>
-      <people-actor-list-item
-        v-for="actor in actors"
-        :key="actor.actor_id"
-        :actor="actor"
-      >
-      </people-actor-list-item>
-    </b-row>
+    <div class="accordion">
+      <b-row>
+        <people-actor-list-item
+          v-for="actor in actors"
+          :key="actor.actor_id"
+          :actor="actor"
+        >
+        </people-actor-list-item>
+      </b-row>
+    </div>
   </b-container>
 </template>
 

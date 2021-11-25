@@ -365,15 +365,9 @@ def read_popular_reviews_by_user(request, username):
 @permission_classes([AllowAny])
 def read_recent_movies_by_user(request, username):
     person = get_object_or_404(get_user_model(), username=username)
-    recent_reviews = Review.objects.select_related('user').filter(user=person).prefetch_related('movie').order_by('-updated_at')[:10]
-    recent_movies = set()
+    recent_reviews = Review.objects.select_related('user').filter(user=person).prefetch_related('movie').order_by('-updated_at')
     
-    # 구버전
-    # for review in person.reviews.order_by('-updated_at'):
-    #     if 4 <= len(recent_movies):
-    #         break
-    #     recent_movies.add(review.movie)
-    # 최적화
+    recent_movies = set()
     for review in recent_reviews:
         if 4 <= len(recent_movies):
             break

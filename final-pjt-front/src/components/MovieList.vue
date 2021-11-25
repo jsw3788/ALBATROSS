@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="MovieList">
     <h4 class="mt-5">인기영화</h4>
     <carousel
       :loop="true"

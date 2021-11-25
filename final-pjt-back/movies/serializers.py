@@ -52,6 +52,7 @@ class AllMovieListSerializer(serializers.ModelSerializer):
             'genres',
             'actors',
             'directors',
+            'release_date',
         )
 
 class MovieSerializer(serializers.ModelSerializer):

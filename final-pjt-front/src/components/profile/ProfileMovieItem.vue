@@ -1,5 +1,5 @@
 <template>
-  <b-col cols="3">
+  <b-col cols="6" lg="3">
     <div @click="goToDetail">
       <img :src="movie.poster_path" style="width: 100%" />
       {{ movie.title }}

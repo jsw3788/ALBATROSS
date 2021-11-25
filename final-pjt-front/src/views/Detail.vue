@@ -18,7 +18,7 @@
               img-alt="Poster"
               img-top
               tag="article"
-              class="mb-2 side-card"
+              class="mt-5 side-card"
             >
               <b-card-text>
                 <div>
@@ -127,7 +127,7 @@ export default {
       score: null,
       movieRate: null,
       pageNum: 2,
-      possiblePageNum:2,
+      possiblePageNum: 2,
 
       rating: "No Rating Selected",
       currentRating: "평점을 매겨주세요",
@@ -136,31 +136,29 @@ export default {
   },
   methods: {
     // 인피니티 스크롤
-    getMoreReviews: function() {
+    getMoreReviews: function () {
       axios({
-            method: 'get',
-            url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/${this.movie.id}/reviews/`,
-            headers: this.$store.getters.config,
-            params: {
-              page: this.pageNum,
-            },
-          })
-          .then((res) =>{
-            
-            const newreviews = res.data
-            this.reviews.push(...newreviews)
-            
-            this.pageNum += 1
-          })
+        method: "get",
+        url: `${process.env.VUE_APP_SERVER_URL}/api/v1/movies/${this.movie.id}/reviews/`,
+        headers: this.$store.getters.config,
+        params: {
+          page: this.pageNum,
+        },
+      }).then((res) => {
+        const newreviews = res.data;
+        this.reviews.push(...newreviews);
 
+        this.pageNum += 1;
+      });
     },
     scrollDown: function () {
-        const { scrollHeight, scrollTop, clientHeight} = document.documentElement
-        if (scrollHeight - Math.round(scrollTop) <= clientHeight) {
-          if (this.pageNum <= this.possiblePageNum) {
-            this.getMoreReviews()
-          } 
+      const { scrollHeight, scrollTop, clientHeight } =
+        document.documentElement;
+      if (scrollHeight - Math.round(scrollTop) <= clientHeight) {
+        if (this.pageNum <= this.possiblePageNum) {
+          this.getMoreReviews();
         }
+      }
     },
     updatedWanted: function () {
       axios({
@@ -301,7 +299,7 @@ export default {
         });
     },
   },
-  
+
   computed: {
     isScored: function () {
       return this.score;
@@ -349,23 +347,20 @@ export default {
       this.checkWanted();
       this.checkScore();
     }
-    document.addEventListener('scroll', this.scrollDown)
+    document.addEventListener("scroll", this.scrollDown);
   },
   destroyed: function () {
-    document.removeEventListener('scroll',this.scrollDown)
-  }
+    document.removeEventListener("scroll", this.scrollDown);
+  },
 };
 </script>
 
 <style scoped>
-#detail {
-  color: white;
-}
 .side-card {
-  background-color: black;
+  background-color: #301b3f;
 }
 .review {
-  background-color: black;
+  background-color: #301b3f;
 }
 .backdrop-box {
   max-height: 15rem;

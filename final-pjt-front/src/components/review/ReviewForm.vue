@@ -1,21 +1,27 @@
 <template>
-  <div id="review-from">
-    <div class="mx-5">
+  <div
+    id="review-from"
+    class="d-flex justify-content-between align-items-center"
+  >
+    <div>{{ username }}</div>
+    <div>
       <textarea
         v-model.trim="newReview"
-        rows="3"
-        class="form-control mb-2"
+        rows="1"
+        class="form-control"
+        @keyup.enter="writeReview"
+        style="width: 200%"
       ></textarea>
     </div>
-    <div class="d-flex align-items-center justify-content-end">
+    <div class="d-flex align-items-center">
       <input
         type="checkbox"
         id="spoiler"
         v-model="newReviewSpoil"
-        class="m-2"
+        class="me-1"
       />
-      <label for="spoiler" class="me-2">spoiler</label>
-      <a href="" style="color: white" @click="writeReview" class="mx-3 my-1"
+      <label for="spoiler" class="me-4">spoiler</label>
+      <a href="" style="color: white" class="me-4" @click="writeReview"
         ><b-icon-pencil-square scale="2"></b-icon-pencil-square
       ></a>
     </div>
@@ -24,6 +30,7 @@
 
 <script>
 import axios from "axios";
+import { mapState } from "vuex";
 
 export default {
   name: "ReviewForm",
@@ -51,11 +58,15 @@ export default {
         .then((res) => {
           this.$emit("add-review", res.data);
           this.newReview = null;
+          this.newReviewSpoil = false;
         })
         .catch((err) => {
           console.log(err);
         });
     },
+  },
+  computed: {
+    ...mapState(["username"]),
   },
 };
 </script>

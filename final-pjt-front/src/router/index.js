@@ -6,8 +6,8 @@ import People from '@/views/People.vue'
 import Detail from '@/views/Detail.vue'
 import Profile from '@/views/Profile.vue'
 import SearchResult from '@/views/SearchResult.vue'
-import PeopleDirectorDetail from '@/views/detail/PeopleDirectorDetail'
-import PeopleActorDetail from '@/views/detail/PeopleActorDetail'
+import ReleaseSchedule from '@/views/ReleaseSchedule'
+
 
 Vue.use(VueRouter)
 
@@ -33,16 +33,6 @@ const routes = [
     component: Detail
   },
   {
-    path: '/people/director/:director_pk',
-    name: 'PeopleDirectorDetail',
-    component: PeopleDirectorDetail
-  },
-  {
-    path: '/people/actor/:actor_pk',
-    name: 'PeopleActorDetail',
-    component: PeopleActorDetail
-  },
-  {
     path: '/:username/profile',
     name: 'Profile',
     component: Profile
@@ -52,7 +42,13 @@ const routes = [
     name: 'SearchResult',
     component: SearchResult,
     props: true,
-  }
+  },
+  {
+    path: '/release',
+    name: 'ReleaseSchedule',
+    component: ReleaseSchedule,
+  },
+
 ]
 
 const router = new VueRouter({
