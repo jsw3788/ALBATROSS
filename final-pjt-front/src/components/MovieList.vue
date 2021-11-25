@@ -1,114 +1,123 @@
 <template>
   <div id="MovieList">
-    <h4 class="mt-5">인기영화</h4>
-    <carousel
-      :loop="true"
-      :navigationClickTargetSize="25"
-      :paginationSize="5"
-      :navigationEnabled="true"
-      :perPageCustom="[
-        [576, 2],
-        [768, 3],
-        [992, 4],
-        [1200, 5],
-      ]"
-      :paginationActiveColor="'#ff0000'"
-      :paginationColor="'#ffffff'"
-    >
-      <slide v-for="movie in popularMovies" :key="movie.tmdb_id">
-        <div @click="goDetailInfo(movie)" class="poster p-2">
-          <img
-            :src="movie.poster_path"
-            class="poster-img"
-            style="width: 100%"
-          />
-          <p class="poster-text">{{ movie.title }}</p>
-        </div>
-      </slide>
-    </carousel>
-    <h4 class="mt-5">추천영화</h4>
-    <carousel
-      :loop="true"
-      :navigationClickTargetSize="25"
-      :paginationSize="5"
-      :navigationEnabled="true"
-      :perPageCustom="[
-        [576, 2],
-        [768, 3],
-        [992, 4],
-        [1200, 5],
-      ]"
-      :paginationActiveColor="'#ff0000'"
-      :paginationColor="'#ffffff'"
-    >
-      <slide v-for="movie in recommendMovies" :key="movie.tmdb_id">
-        <div @click="goDetailInfo(movie)" class="poster p-2">
-          <img
-            :src="movie.poster_path"
-            class="poster-img"
-            style="width: 100%"
-          />
-          <p class="poster-text">{{ movie.title }}</p>
-        </div>
-      </slide>
-    </carousel>
-    <h4 class="mt-5">평점이 높은 영화</h4>
-    <carousel
-      :loop="true"
-      :navigationClickTargetSize="25"
-      :paginationSize="5"
-      :navigationEnabled="true"
-      :perPageCustom="[
-        [576, 2],
-        [768, 3],
-        [992, 4],
-        [1200, 5],
-      ]"
-      :paginationActiveColor="'#ff0000'"
-      :paginationColor="'#ffffff'"
-    >
-      <slide v-for="movie in scoreMovies" :key="movie.tmdb_id">
-        <div @click="goDetailInfo(movie)" class="poster p-2">
-          <img
-            :src="movie.poster_path"
-            class="poster-img"
-            style="width: 100%"
-          />
-          <p class="poster-text">{{ movie.title }}</p>
-        </div>
-      </slide>
-    </carousel>
-    <h4 class="mt-5">최신영화</h4>
-    <carousel
-      :loop="true"
-      :navigationClickTargetSize="25"
-      :paginationSize="5"
-      :navigationEnabled="true"
-      :perPageCustom="[
-        [576, 2],
-        [768, 3],
-        [992, 4],
-        [1200, 5],
-      ]"
-      :paginationActiveColor="'#ff0000'"
-      :paginationColor="'#ffffff'"
-    >
-      <slide v-for="movie in releasedMovies" :key="movie.tmdb_id">
-        <div @click="goDetailInfo(movie)" class="poster p-2">
-          <img
-            :src="movie.poster_path"
-            class="poster-img"
-            style="width: 100%"
-          />
-          <p class="poster-text">{{ movie.title }}</p>
-        </div>
-      </slide>
-    </carousel>
+    <div>
+      <h4 class="mt-5">인기영화</h4>
+      <carousel
+        :loop="true"
+        :navigationClickTargetSize="25"
+        :paginationSize="5"
+        :navigationEnabled="true"
+        :perPageCustom="[
+          [576, 2],
+          [768, 3],
+          [992, 4],
+          [1200, 5],
+        ]"
+        :paginationActiveColor="'#ff0000'"
+        :paginationColor="'#ffffff'"
+      >
+        <slide v-for="movie in popularMovies" :key="movie.tmdb_id">
+          <div @click="goDetailInfo(movie)" class="poster p-2">
+            <img
+              :src="movie.poster_path"
+              class="poster-img"
+              style="width: 100%"
+            />
+            <p class="poster-text">{{ movie.title }}</p>
+          </div>
+        </slide>
+      </carousel>
+    </div>
+    <div v-if="isLogin">
+      <h4 class="mt-5">추천영화</h4>
+      <carousel
+        :loop="true"
+        :navigationClickTargetSize="25"
+        :paginationSize="5"
+        :navigationEnabled="true"
+        :perPageCustom="[
+          [576, 2],
+          [768, 3],
+          [992, 4],
+          [1200, 5],
+        ]"
+        :paginationActiveColor="'#ff0000'"
+        :paginationColor="'#ffffff'"
+      >
+        <slide v-for="movie in recommendMovies" :key="movie.tmdb_id">
+          <div @click="goDetailInfo(movie)" class="poster p-2">
+            <img
+              :src="movie.poster_path"
+              class="poster-img"
+              style="width: 100%"
+            />
+            <p class="poster-text">{{ movie.title }}</p>
+          </div>
+        </slide>
+      </carousel>
+    </div>
+    <div>
+      <h4 class="mt-5">평점이 높은 영화</h4>
+      <carousel
+        :loop="true"
+        :navigationClickTargetSize="25"
+        :paginationSize="5"
+        :navigationEnabled="true"
+        :perPageCustom="[
+          [576, 2],
+          [768, 3],
+          [992, 4],
+          [1200, 5],
+        ]"
+        :paginationActiveColor="'#ff0000'"
+        :paginationColor="'#ffffff'"
+      >
+        <slide v-for="movie in scoreMovies" :key="movie.tmdb_id">
+          <div @click="goDetailInfo(movie)" class="poster p-2">
+            <img
+              :src="movie.poster_path"
+              class="poster-img"
+              style="width: 100%"
+            />
+            <p class="poster-text">{{ movie.title }}</p>
+          </div>
+        </slide>
+      </carousel>
+    </div>
+    <div>
+      <h4 class="mt-5">최신영화</h4>
+      <carousel
+        :loop="true"
+        :navigationClickTargetSize="25"
+        :paginationSize="5"
+        :navigationEnabled="true"
+        :perPageCustom="[
+          [576, 2],
+          [768, 3],
+          [992, 4],
+          [1200, 5],
+        ]"
+        :paginationActiveColor="'#ff0000'"
+        :paginationColor="'#ffffff'"
+      >
+        <slide v-for="movie in releasedMovies" :key="movie.tmdb_id">
+          <div @click="goDetailInfo(movie)" class="poster p-2">
+            <img
+              :src="movie.poster_path"
+              class="poster-img"
+              style="width: 100%"
+            />
+            <p class="poster-text">{{ movie.title }}</p>
+          </div>
+        </slide>
+      </carousel>
+    </div>
   </div>
 </template>
 
 <script>
 import { mapState } from "vuex";
+import { mapGetters } from "vuex";
 import { Carousel, Slide } from "vue-carousel";
 
 export default {
@@ -124,6 +133,7 @@ export default {
       "releasedMovies",
       "scoreMovies",
     ]),
+    ...mapGetters(["isLogin"]),
   },
   methods: {
     goDetailInfo: function (movie) {
